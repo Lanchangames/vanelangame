@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>記号の彼女 - Hard Mode</title>
+    <style>
+        :root { --main-pink: #ff8da1; }
+        body { background: #2c3e50; font-family: 'Courier New', Courier, monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        #game-container { width: 800px; height: 600px; background: white; display: flex; border-radius: 10px; overflow: hidden; }
+        
+        /* メイン画面 */
+        #main-screen { flex: 1; display: flex; flex-direction: column; border-right: 2px solid #eee; }
+        #display { flex: 1; background: #fff5f7; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+        .chara { font-size: 100px; margin-bottom: 20px; transition: transform 0.3s; }
+        .bubble { background: white; border: 2px solid var(--main-pink); padding: 15px; border-radius: 15px; width: 80%; text-align: center; font-size: 1.2em; min-height: 50px; }
+        .controls { padding: 20px; background: #fff; }
+        
+        /* 辞書パネル */
+        #dictionary { width: 250px; background: #f9f9f9; padding: 15px; overflow-y: auto; }
+        .dict-entry { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+        .dict-entry input { width: 100px; border: 1px solid #ccc; border-radius: 3px; }
+
+        button { width: 100%; padding: 12px; margin: 5px 0; border: none; background: var(--main-pink); color: white; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:disabled { background: #ccc; }
+        .status-bar { padding: 10px; background: #34495e; color: white; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="main-screen">
+        <div class="status-bar">
+            <span id="day-display">Day 1: 放課後</span>
+            <span>理解度: <b id="progress-val">0%</b></span>
+        </div>
+        <div id="display">
+            <div class="chara" id="chara-emoji">👧</div>
+            <div class="bubble" id="message-text">......</div>
+        </div>
+        <div class="controls" id="action-area">
+            </div>
+    </div>
+
+    <div id="dictionary">
+        <h3>📓 異世界語辞書</h3>
+        <p style="font-size: 0.8em; color: #666;">記号の意味を推測してメモせよ</p>
+        <div id="dict-list">
+            </div>
+    </div>
+</div>
+
+<script>
+    // 単語データ
+    const wordBank = {
+        "⏃⟟": { hint: "愛/好き", real: "愛" },
+        "⌇⏁⟒⍀⎍": { hint: "〜する", real: "する" },
+        "⏁⏃⏂⟒⎍": { hint: "食べる", real: "食べる" },
+        "☌⏃☍☍⍜": { hint: "学校", real: "学校" }
+    };
+
+    // シナリオ
+    const scenario = [
+        {
+            day: "Day 1: 校門前",
+            raw: "☌⏃☍☍⍜ ⏁⏃⏂⟒⎍ ⏃⟟?", // 学校・食べる・好き？（＝学校のご飯好き？）
+            options: [
+                { text: "「はい」と答える", love: 10, intel: 5 },
+                { text: "「いいえ」と答える", love: -5, intel: 5 },
+                { text: "辞書を確認する", love: 0, intel: 15 }
+            ]
+        },
+        {
+            day: "Day 2: お弁当",
+            raw: "⏃⟟ ⏁⏃⏂⟒⎍ ⌇⏁⟒⍀⎍", // 愛・食べる・する（＝愛を食べる？）※難解な比喩
+            options: [
+                { text: "一緒に食べる", love: 20, intel: 10 },
+                { text: "困惑する", love: 0, intel: 20 }
+            ]
+        }
+    ];
+
+    let currentStep = 0;
+    let lovePoints = 0;
+    let intelligence = 0;
+    let userDict = {};
+
+    function initDict() {
+        const list = document.getElementById('dict-list');
+        for (let symbol in wordBank) {
+            const div = document.createElement('div');
+            div.className = 'dict-entry';
+            div.innerHTML = `<span>${symbol}</span><input type="text" placeholder="意味を推測..." onchange="updateDict('${symbol}', this.value)">`;
+            list.appendChild(div);
+        }
+    }
+
+    function updateDict(symbol, val) {
+        userDict[symbol] = val;
+        // 辞書に正しい意味を入力すると理解度が上がる
+        if(val === wordBank[symbol].real) {
+            intelligence += 25;
+            updateUI();
+        }
+    }
+
+    function nextStep(optionIdx) {
+        const opt = scenario[currentStep].options[optionIdx];
+        lovePoints += opt.love;
+        intelligence += opt.intel;
+        
+        currentStep++;
+        if (currentStep < scenario.length) {
+            updateUI();
+        } else {
+            showEnding();
+        }
+    }
+
+    function updateUI() {
+        const data = scenario[currentStep];
+        document.getElementById('day-display').innerText = data.day;
+        document.getElementById('progress-val').innerText = intelligence + "%";
+        
+        // メッセージ表示（理解度によって一部解読）
+        let displayText = data.raw;
+        for (let symbol in userDict) {
+            if (userDict[symbol] === wordBank[symbol].real && intelligence > 30) {
+                const reg = new RegExp(symbol, "g");
+                displayText = displayText.replace(reg, `[${wordBank[symbol].real}]`);
+            }
+        }
+        document.getElementById('message-text').innerText = displayText;
+
+        // 選択肢生成
+        const area = document.getElementById('action-area');
+        area.innerHTML = '';
+        data.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.innerText = opt.text;
+            btn.onclick = () => nextStep(idx);
+            area.appendChild(btn);
+        });
+    }
+
+    function showEnding() {
+        let title = "";
+        let desc = "";
+        
+        if (intelligence >= 100 && lovePoints >= 30) {
+            title = "【真実の理解エンド】";
+            desc = "あなたは彼女の言葉を完璧に理解した。二人は次元を超えた絆で結ばれた。";
+        } else if (intelligence < 50 && lovePoints >= 30) {
+            title = "【勘違いの幸福エンド】";
+            desc = "言葉はわからなかったが、なんとなく仲良くなった。でも時々会話が噛み合わない。";
+        } else {
+            title = "【孤独な異邦人エンド】";
+            desc = "結局、彼女が何を言っていたのか最後までわからなかった。";
+        }
+
+        document.getElementById('display').innerHTML = `<h2>${title}</h2><p>${desc}</p><button onclick="location.reload()">もう一度</button>`;
+        document.getElementById('action-area').innerHTML = "";
+    }
+
+    initDict();
+    updateUI();
+</script>
+</body>
+</html>
