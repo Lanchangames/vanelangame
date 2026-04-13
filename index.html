@@ -2,167 +2,331 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>記号の彼女 - Hard Mode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>キミの声が記号に変わっても</title>
     <style>
-        :root { --main-pink: #ff8da1; }
-        body { background: #2c3e50; font-family: 'Courier New', Courier, monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        #game-container { width: 800px; height: 600px; background: white; display: flex; border-radius: 10px; overflow: hidden; }
+        :root { --main: #2c3e50; --correct: #27ae60; --wrong: #e74c3c; --opt-bg: #fff3e0; --opt-hover: #ffe0b2; --selected: #ffcc80; --love-hue: 210; --love-light: 10%; --love-sat: 20%; }
+        body { background: #000; font-family: 'serif', 'Hiragino Mincho ProN', serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: #ecf0f1; overflow: hidden; }
+        #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #000 0%, hsl(var(--love-hue), var(--love-sat), var(--love-light)) 100%); z-index: -1; transition: 2s ease; }
         
-        /* メイン画面 */
-        #main-screen { flex: 1; display: flex; flex-direction: column; border-right: 2px solid #eee; }
-        #display { flex: 1; background: #fff5f7; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
-        .chara { font-size: 100px; margin-bottom: 20px; transition: transform 0.3s; }
-        .bubble { background: white; border: 2px solid var(--main-pink); padding: 15px; border-radius: 15px; width: 80%; text-align: center; font-size: 1.2em; min-height: 50px; }
-        .controls { padding: 20px; background: #fff; }
-        
-        /* 辞書パネル */
-        #dictionary { width: 250px; background: #f9f9f9; padding: 15px; overflow-y: auto; }
-        .dict-entry { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
-        .dict-entry input { width: 100px; border: 1px solid #ccc; border-radius: 3px; }
+        #intro-overlay, #tutorial-overlay, #load-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 100; display: flex; justify-content: center; align-items: center; text-align: center; }
+        .content-box { max-width: 700px; width: 90%; line-height: 2.2; max-height: 90vh; overflow-y: auto; padding: 20px; }
 
-        button { width: 100%; padding: 12px; margin: 5px 0; border: none; background: var(--main-pink); color: white; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        button:disabled { background: #ccc; }
-        .status-bar { padding: 10px; background: #34495e; color: white; display: flex; justify-content: space-between; }
+        #game-container { width: 98vw; max-width: 1200px; height: 92vh; background: rgba(255, 255, 255, 0.98); display: none; border-radius: 4px; overflow: hidden; color: #2c3e50; box-shadow: 0 0 70px rgba(0,0,0,1); }
+        
+        #main-screen { flex: 2; display: flex; flex-direction: column; border-right: 1px solid #ddd; min-width: 0; height: 100%; }
+        #tab-bar { display: grid; grid-template-columns: repeat(10, 1fr); background: #1a1a1a; flex-shrink: 0; }
+        .tab { padding: 12px; cursor: pointer; color: #7f8c8d; border: 0.5px solid #333; font-size: 0.8em; transition: 0.3s; }
+        .tab.active { background: #fff; color: #2c3e50; font-weight: bold; }
+        .tab.locked { opacity: 0.2; cursor: not-allowed; }
+        
+        #display { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; background: #fff; overflow-y: auto; }
+        .bubble { background: #fdfdfd; border-left: 6px solid var(--main); padding: 30px; width: 85%; font-size: 1.3rem; line-height: 2; text-align: left; min-height: 100px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        
+        /* セリフ内のクリッカブル記号 */
+        .symbol, .resolved, .wrong-resolved { cursor: pointer; transition: 0.2s; padding: 0 4px; border-radius: 2px; }
+        .symbol:hover, .resolved:hover, .wrong-resolved:hover { background: #dfe6e9; outline: 1px solid var(--main); }
+
+        .controls { padding: 25px; background: #f8f9fa; border-top: 1px solid #ddd; max-height: 300px; overflow-y: auto; }
+        .opt-btn { width: 100%; padding: 15px; margin: 8px 0; border: 1px solid #e0b17b; background: var(--opt-bg); cursor: pointer; font-size: 1rem; text-align: left; transition: 0.2s; border-radius: 4px; color: #2c3e50; }
+        .opt-btn:hover:not(:disabled) { border-color: #d89c56; background: var(--opt-hover); transform: translateX(5px); }
+        .opt-btn:disabled { cursor: default; opacity: 0.7; }
+        .opt-btn.my-choice { border: 2px solid #e67e22; background: var(--selected); font-weight: bold; }
+
+        #dictionary { flex: 1; background: #fcfcfc; display: flex; flex-direction: column; min-width: 320px; border-left: 1px solid #ddd; height: 100%; }
+        #dict-list { flex: 1; overflow-y: auto; padding: 20px; scroll-behavior: smooth; }
+        .dict-entry { margin-bottom: 15px; padding: 15px; background: white; border: 1px solid #eee; border-radius: 4px; transition: background 0.5s; }
+        .dict-entry.correct { border-left: 8px solid var(--correct); background: #f0fff4; }
+        .dict-entry.highlight-flash { background: #fff9c4; } /* ジャンプ時の演出 */
+        
+        .dict-entry label { font-size: 0.9em; color: #95a5a6; display: block; margin-bottom: 8px; font-family: monospace; font-weight: bold; }
+        .dict-entry input { width: calc(100% - 24px); padding: 10px; border: 1px solid #ddd; font-size: 1rem; outline: none; border-radius: 4px; }
+        .dict-entry input.wrong-text { color: var(--wrong); font-weight: bold; border-color: var(--wrong); }
+        
+        .resolved { color: var(--correct); font-weight: bold; }
+        .wrong-resolved { color: var(--wrong); font-weight: bold; text-decoration: underline wavy var(--wrong); }
+        .symbol { color: #95a5a6; font-family: monospace; background: #eee; }
+
+        .status-bar { padding: 10px 20px; background: #1a1a1a; color: white; display: flex; justify-content: space-between; align-items: center; font-size: 0.8em; }
+        .badge-container { display: flex; gap: 8px; }
+        .badge { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #333; font-size: 12px; filter: grayscale(1); opacity: 0.3; transition: 0.5s; cursor: help; }
+        .badge.unlocked { filter: grayscale(0); opacity: 1; box-shadow: 0 0 10px rgba(255,255,255,0.2); }
+        
+        .hint-text { font-size: 0.9em; color: #7f8c8d; margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 10px; font-style: italic; }
+        .btn-style { padding: 15px 50px; cursor: pointer; border: none; font-size: 1.1em; border-radius: 5px; margin: 10px; transition: 0.3s; }
     </style>
 </head>
 <body>
+<div id="bg-layer"></div>
+
+<div id="intro-overlay">
+    <div class="content-box">
+        <h1 style="color: #d4af37; font-size: 2.5em;">キミの声が記号に変わっても</h1>
+        <p>死線を潜り抜け、ランスロットを死守した代償に言語機能を失った騎士ヴェイン。<br>親友が語りかける言葉は、今や無機質な記号へと成り果てた。</p>
+        <button id="to-tutorial" class="btn-style" style="background: #d4af37; color: #000;">次へ</button>
+    </div>
+</div>
+
+<div id="tutorial-overlay" style="display:none;">
+    <div class="content-box">
+        <h2 style="color: #3498db;">画面構成とプレイ方法</h2>
+        <div style="text-align: left; background: rgba(255,255,255,0.05); padding: 25px; border-radius: 10px; font-size: 0.9em;">
+            <p>● <b>解析:</b> セリフ内の記号をクリックすると、手記の該当箇所へジャンプします。</p>
+            <p>● <b>誤答:</b> 間違った推測はセリフ上でも赤く表示されます。</p>
+            <p>● <b>継承:</b> クリア済みの単語は、次回のプレイへ引き継ぐことが可能です。</p>
+        </div>
+        <button id="start-init-btn" class="btn-style" style="background: #3498db; color: #fff;">物語を開始する</button>
+    </div>
+</div>
+
+<div id="load-overlay" style="display:none;">
+    <div class="content-box">
+        <h2 style="color: #27ae60;">記憶の継承</h2>
+        <p>過去に解読した正解の単語を、最初から手記に埋めますか？</p>
+        <button id="load-yes" class="btn-style" style="background: #27ae60; color: #fff;">継承する</button>
+        <button id="load-no" class="btn-style" style="background: #7f8c8d; color: #fff;">最初から解く</button>
+    </div>
+</div>
 
 <div id="game-container">
     <div id="main-screen">
+        <div id="tab-bar"></div>
         <div class="status-bar">
-            <span id="day-display">Day 1: 放課後</span>
-            <span>理解度: <b id="progress-val">0%</b></span>
+            <span>KNIGHT: VANE</span>
+            <div class="badge-container" id="badge-area">
+                <div class="badge" id="b-1" title="暁光の誓い">💍</div>
+                <div class="badge" id="b-6" title="魂の共鳴">🌌</div>
+                <div class="badge" id="b-2" title="不滅の双璧">🤝</div>
+                <div class="badge" id="b-3" title="硝子の距離">⌛</div>
+                <div class="badge" id="b-4" title="終わらぬ静寂">❄️</div>
+                <div class="badge" id="b-5" title="プリンの迷宮">🍮</div>
+            </div>
+            <span>解析: <b id="intel-val">0%</b> | 収集: <b id="col-val">0%</b></span>
         </div>
         <div id="display">
-            <div class="chara" id="chara-emoji">👧</div>
+            <div id="chara-header"><span id="face-emoji" style="font-size: 2em; margin-right: 15px;">😊</span><span style="font-weight:bold; letter-spacing: 0.1em; color: var(--main);">LANCELOT</span></div>
             <div class="bubble" id="message-text">......</div>
         </div>
-        <div class="controls" id="action-area">
-            </div>
+        <div class="controls" id="action-area"></div>
     </div>
-
     <div id="dictionary">
-        <h3>📓 異世界語辞書</h3>
-        <p style="font-size: 0.8em; color: #666;">記号の意味を推測してメモせよ</p>
-        <div id="dict-list">
-            </div>
+        <div style="padding: 20px; border-bottom: 2px solid #2c3e50; background: #fff;"><h3 style="margin:0;">📓 言語再構築手記</h3></div>
+        <div id="dict-list"></div>
     </div>
 </div>
 
 <script>
-    // 単語データ
     const wordBank = {
-        "⏃⟟": { hint: "愛/好き", real: "愛" },
-        "⌇⏁⟒⍀⎍": { hint: "〜する", real: "する" },
-        "⏁⏃⏂⟒⎍": { hint: "食べる", real: "食べる" },
-        "☌⏃☍☍⍜": { hint: "学校", real: "学校" }
+        "W1": { q: "†§¶λ", accepts: ["おはよう", "おはよー"] },
+        "W2": { q: "ψζβ", accepts: ["好きだ", "好き", "すきだ", "すき"] },
+        "W3": { q: "θωε", accepts: ["心配", "しんぱい"] },
+        "W4": { q: "ξΔφ", accepts: ["危険", "きけん"] },
+        "W5": { q: "ΣΦμ", accepts: ["一緒", "いっしょ"] },
+        "W6": { q: "ΨΩ", accepts: ["隣", "となり"] },
+        "W7": { q: "Ωβδ", accepts: ["つらい", "ツライ", "つらく"] },
+        "W8": { q: "αβγδε", accepts: ["ありがとう", "ありがと"] },
+        "W9": { q: "λησ", accepts: ["親友", "しんゆう"] },
+        "W10": { q: "πρστυφ", accepts: ["愛している", "愛してる", "あいしている"] },
+        "W11": { q: "κμνρ", accepts: ["忘れて", "わすれて"] },
+        "W12": { q: "ϕχψζ", accepts: ["助け", "たすけ"] },
+        "W13": { q: "℧ΞΛ", accepts: ["息災", "そくさい"] },
+        "W14": { q: "∜π", accepts: ["夢", "ゆめ"] },
+        "W15": { q: "∞∅θ", accepts: ["ずっと", "ズット"] },
+        "W16": { q: "▩⊗⊞", accepts: ["プリン", "ぷりん"] },
+        "W17": { q: "ΓΔ", accepts: ["盾", "たて"] },
+        "W18": { q: "ΘΞΦ", accepts: ["守る", "まもる"] },
+        "W19": { q: "ΠΣΩ", accepts: ["騎士", "きし"] }
     };
 
-    // シナリオ
     const scenario = [
-        {
-            day: "Day 1: 校門前",
-            raw: "☌⏃☍☍⍜ ⏁⏃⏂⟒⎍ ⏃⟟?", // 学校・食べる・好き？（＝学校のご飯好き？）
-            options: [
-                { text: "「はい」と答える", love: 10, intel: 5 },
-                { text: "「いいえ」と答える", love: -5, intel: 5 },
-                { text: "辞書を確認する", love: 0, intel: 15 }
-            ]
-        },
-        {
-            day: "Day 2: お弁当",
-            raw: "⏃⟟ ⏁⏃⏂⟒⎍ ⌇⏁⟒⍀⎍", // 愛・食べる・する（＝愛を食べる？）※難解な比喩
-            options: [
-                { text: "一緒に食べる", love: 20, intel: 10 },
-                { text: "困惑する", love: 0, intel: 20 }
-            ]
-        }
+        { id: 0, face: "🌞", q: "「[[W1]]、ヴェイン。[[W14]] は見たか。[[W13]] はどうだ？」", opts: [{t:"元気いっぱいだ！",v:20,p:0}, {t:"今日は片付けからしようかな",v:5,p:0}, {t:"鎧を磨くのが日課なんだ",v:-10,p:1}] },
+        { id: 1, face: "😥", q: "「ひどく [[W3]] したんだぞ。お前を [[W12]] たかったのに、俺は……。」", opts: [{t:"ごめんな。俺だってそうだ",v:20,p:0}, {t:"今日のおやつは何にしようか",v:5,p:0}, {t:"掃除機って知ってるか？",v:-10,p:1}] },
+        { id: 2, face: "🍮", q: "「お前が丹精込めて作るあの [[W16]] が、俺は [[W2]] なんだ。」", opts: [{t:"笑顔が見られて嬉しいぜ！",v:20,p:0}, {t:"いい天気だなあ",v:5,p:0}, {t:"卵の値段が上がってるんだ",v:-10,p:1}] },
+        { id: 3, face: "🗡️", q: "「俺の [[W17]] よ。[[W4]] は承知の上だ。だが、[[W15]] [[W5]] にいたい。それが俺の望みだ。」", opts: [{t:"一生お前の相棒だ",v:20,p:0}, {t:"敵はどこにいるんだ？倒してくるぞ",v:5,p:0}, {t:"筋トレ、代わってやろうか？",v:-10,p:1}] },
+        { id: 4, face: "😳", q: "「[[W6]] に座ってくれ。今度は俺がお前を [[W18]] 番だ。」", opts: [{t:"ああ、近くにいたい",v:20,p:0}, {t:"ここ、俺の席じゃないぞ",v:5,p:0}, {t:"椅子を新調したんだ",v:-10,p:1}] },
+        { id: 5, face: "😢", q: "「言葉を失うのは、それほどまでに [[W7]] ことなのか……。いっそ、俺のことを [[W11]] もいいんだぞ。」", opts: [{t:"そんな寂しいことを言うな",v:20,p:0}, {t:"気のせいじゃないか？",v:5,p:0}, {t:"洗濯機を回してくる",v:-10,p:1}] },
+        { id: 6, face: "🤝", q: "「一人の [[W19]] として、[[W15]] [[W5]] にいたい。毎朝 [[W1]] と言い合いたい。戦場を駆ける日々の中で、それがどれほど贅沢な願いか、俺は [[W11]] いたよ。」", opts: [{t:"そんなことない！",v:20,p:0}, {t:"ランスロットは大丈夫か？",v:10,p:0}, {t:"明日の朝食はパンにするぞ",v:-10,p:1}] },
+        { id: 7, face: "🙏", q: "「あの時、俺を [[W18]] てくれて [[W8]]。お前は、最高の [[W17]] だ。」", opts: [{t:"俺が一番やりたかったことだ",v:20,p:0}, {t:"気にするなよ",v:10,p:0}, {t:"肩の凝りがひどいな",v:-10,p:1}] },
+        { id: 8, face: "💍", q: "「ヴェイン……[[W9]] だから言っているんじゃない。俺は、お前を [[W15]] [[W10]]。」", opts: [{t:"ずっと大切にする",v:30,p:0}, {t:"いい剣だなあ、それ",v:5,p:0}, {t:"俺も肉が好きだぜ！",v:-10,p:1}] },
+        { id: 9, face: "😔", q: "「今の状況が [[W7]] ことは痛いほどわかる。俺のことは [[W11]] くれ。この絶望すら、すべて [[W14]] だったことにしよう。」", opts: [{t:"やだね！断るよ。",v:20,p:0}, {t:"それがランスロットの願い？",v:10,p:0}, {t:"枕が低すぎるのかもな",v:-10,p:1}] },
+        { id: 10, face: "🚑", q: "「お前が [[W13]] を取り戻し、またこうして [[W19]] として [[W5]] にいられることが、何より嬉しいんだ。」", opts: [{t:"また同じ場所で歩き出そう",v:20,p:0}, {t:"無事でよかったな",v:10,p:0}, {t:"次はもっと上手くやるぞ",v:5,p:1}] },
+        { id: 11, face: "🌙", q: "「いつも [[W8]]。お前が [[W2]] だ。この、お前を [[W18]] たいという想いだけは信じてくれ。」", opts: [{t:"俺は生まれた時からそうだ",v:20,p:0}, {t:"明日もよろしくな",v:10,p:0}, {t:"寝言は寝て言えよな",v:-10,p:1}] },
+        { id: 12, face: "✨", q: "「たとえどんな [[W4]] が待ち受けていようと、真の [[W19]] ならば [[W5]] に乗り越えられるはずだ。」", opts: [{t:"ああ、二人でならどこへでも",v:25,p:0}, {t:"覚悟はできている",v:15,p:0}, {t:"筋力には自信があるぞ！",v:-10,p:1}] },
+        { id: 13, face: "❓", q: "「俺を、まだ [[W2]] いてくれるか？ お前をあんな [[W4]] にさらしてしまったのに。……心は、まだ [[W7]] んだろう？」", opts: [{t:"いちばん大事で、守りたい存在だ",v:30,p:0}, {t:"唯一無二の親友で、相棒だぜ！",v:15,p:0}, {t:"腹の具合は悪くないぞ",v:-10,p:1}] },
+        { id: 14, face: "😖", q: "「[[W12]] てくれ、ヴェイン。恐ろしい [[W14]] を見た。お前が [[W19]] を辞め、俺の前から去ってしまう [[W14]] だ。」", opts: [{t:"顔を見たらわかるよ",v:25,p:0}, {t:"不安にさせてごめんな",v:15,p:0}, {t:"運動不足が原因じゃないか？",v:-10,p:1}] },
+        { id: 15, face: "🤝", q: "「[[W6]] にいてくれ。今度は俺がお前の [[W17]] になろう。[[W15]] [[W5]] だ。」", opts: [{t:"一生離れないと約束する",v:20,p:0}, {t:"当たり前だろうが",v:15,p:0}, {t:"三歩後ろを歩こうか",v:-10,p:1}] },
+        { id: 16, face: "💎", q: "「また、俺に [[W10]] と言ってくれるか？ 誇り高き [[W19]] として。」", opts: [{t:"俺も、愛しているよ",v:30,p:0}, {t:"最高の響きだな",v:15,p:0}, {t:"給料の話なら今度な",v:-10,p:1}] },
+        { id: 17, face: "💖", q: "「[[W5]] にいてくれて [[W8]]。[[W15]] [[W10]]！ 俺たちは、二人で一つの [[W17]] だ。」", opts: [{t:"俺もお前を離さない",v:30,p:0}, {t:"最高のパートナーだ",v:20,p:0}, {t:"[[W16]] のおかわり、いるか？",v:-10,p:1}] },
+        { id: 18, face: "🏰", q: "「[[W13]] を崩さぬよう気をつけろ。[[W15]] [[W9]] でいよう。この国を [[W18]] [[W19]] としてな。」", opts: [{t:"俺たちの絆は不滅だ",v:20,p:0}, {t:"規則正しい生活だな",v:10,p:0}, {t:"明日の当番は誰だ？",v:-5,p:1}] },
+        { id: 19, face: "🛡️", q: "「たとえこの [[W14]] から覚めたとしても、[[W5]] に [[W4]] を楽しもう。俺がお前を、お前が俺を [[W18]] ながら。」", opts: [{t:"お前となら、どこまでもいける",v:25,p:0}, {t:"命を懸けて守るよ",v:15,p:0}, {t:"冒険の後は [[W16]] だな！",v:10,p:1}] }
     ];
 
-    let currentStep = 0;
-    let lovePoints = 0;
-    let intelligence = 0;
-    let userDict = {};
+    const endingsData = {
+        1: { title: "暁光の誓い", hint: "完璧な解析と、騎士としての惜しみない愛が必要です。" },
+        2: { title: "不滅の双璧", hint: "解析が甘くとも、揺るぎない信頼を保ち続ければ辿り着けます。" },
+        3: { title: "硝子の距離", hint: "情熱に欠ける当たり障りのない態度は、心の壁を厚くしてしまいます。" },
+        4: { title: "終わらぬ静寂", hint: "解析を放棄し、親友に対して冷淡な道を選んでください。" },
+        5: { title: "プリンの迷宮", hint: "騎士の誇りを捨て、ひたすら不条理な返答に徹してください。" },
+        6: { title: "魂の共鳴", hint: "解析を止め、心のみでランスロットの瞳に応えてください。" }
+    };
 
-    function initDict() {
+    let currentStep = 0, viewingStep = 0, lovePoints = 0, userDict = {}, colSet = new Set(), pCount = 0;
+    let selectedAnswers = [];
+    const maxLove = 450;
+
+    function shuffle(arr) {
+        let n = arr.length;
+        while (n) { let i = Math.floor(Math.random() * n--); [arr[n], arr[i]] = [arr[i], arr[n]]; }
+        return arr;
+    }
+
+    function jumpToDict(key) {
+        const entry = document.getElementById(`entry-${key}`);
+        const input = document.getElementById(`input-${key}`);
+        if (entry && input) {
+            entry.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            entry.classList.add('highlight-flash');
+            setTimeout(() => entry.classList.remove('highlight-flash'), 1000);
+            input.focus();
+        }
+    }
+
+    window.onload = () => {
+        document.getElementById('to-tutorial').onclick = () => {
+            document.getElementById('intro-overlay').style.display = 'none';
+            document.getElementById('tutorial-overlay').style.display = 'flex';
+        };
+        document.getElementById('start-init-btn').onclick = () => {
+            const solved = localStorage.getItem('vane_solved_words');
+            if (solved) {
+                document.getElementById('tutorial-overlay').style.display = 'none';
+                document.getElementById('load-overlay').style.display = 'flex';
+            } else { startGame(false); }
+        };
+        document.getElementById('load-yes').onclick = () => startGame(true);
+        document.getElementById('load-no').onclick = () => startGame(false);
+        const savedCol = localStorage.getItem('vane_collection_v3');
+        if (savedCol) { colSet = new Set(JSON.parse(savedCol)); updateColUI(); }
+        initDict({});
+    };
+
+    function startGame(inherit) {
+        document.getElementById('tutorial-overlay').style.display = 'none';
+        document.getElementById('load-overlay').style.display = 'none';
+        document.getElementById('game-container').style.display = 'flex';
+        selectedAnswers = new Array(scenario.length).fill(null);
+        const savedWords = JSON.parse(localStorage.getItem('vane_solved_words') || "{}");
+        initDict(inherit ? savedWords : {});
+        renderTabs();
+        updateUI();
+    }
+
+    function initDict(initialWords) {
         const list = document.getElementById('dict-list');
-        for (let symbol in wordBank) {
+        list.innerHTML = "";
+        for (let key in wordBank) {
             const div = document.createElement('div');
-            div.className = 'dict-entry';
-            div.innerHTML = `<span>${symbol}</span><input type="text" placeholder="意味を推測..." onchange="updateDict('${symbol}', this.value)">`;
+            div.className = 'dict-entry'; div.id = `entry-${key}`;
+            const isInherited = initialWords[key] && wordBank[key].accepts.includes(initialWords[key]);
+            div.innerHTML = `<label>${wordBank[key].q}</label><input type="text" id="input-${key}" placeholder="${wordBank[key].accepts[0].length}文字" value="${isInherited ? initialWords[key] : ''}" oninput="check('${key}', this.value)">`;
             list.appendChild(div);
+            if (isInherited) { userDict[key] = initialWords[key]; div.classList.add('correct'); }
         }
     }
 
-    function updateDict(symbol, val) {
-        userDict[symbol] = val;
-        // 辞書に正しい意味を入力すると理解度が上がる
-        if(val === wordBank[symbol].real) {
-            intelligence += 25;
-            updateUI();
-        }
-    }
-
-    function nextStep(optionIdx) {
-        const opt = scenario[currentStep].options[optionIdx];
-        lovePoints += opt.love;
-        intelligence += opt.intel;
-        
-        currentStep++;
-        if (currentStep < scenario.length) {
-            updateUI();
+    function check(key, val) {
+        const value = val.trim();
+        userDict[key] = value;
+        const entry = document.getElementById(`entry-${key}`);
+        const input = document.getElementById(`input-${key}`);
+        if (wordBank[key].accepts.includes(value)) {
+            entry.classList.add('correct'); input.classList.remove('wrong-text');
+            const solved = JSON.parse(localStorage.getItem('vane_solved_words') || "{}");
+            solved[key] = value; localStorage.setItem('vane_solved_words', JSON.stringify(solved));
         } else {
-            showEnding();
+            entry.classList.remove('correct');
+            if (value.length > 0) input.classList.add('wrong-text'); else input.classList.remove('wrong-text');
         }
+        updateUI(false);
     }
 
-    function updateUI() {
-        const data = scenario[currentStep];
-        document.getElementById('day-display').innerText = data.day;
-        document.getElementById('progress-val').innerText = intelligence + "%";
-        
-        // メッセージ表示（理解度によって一部解読）
-        let displayText = data.raw;
-        for (let symbol in userDict) {
-            if (userDict[symbol] === wordBank[symbol].real && intelligence > 30) {
-                const reg = new RegExp(symbol, "g");
-                displayText = displayText.replace(reg, `[${wordBank[symbol].real}]`);
-            }
-        }
-        document.getElementById('message-text').innerText = displayText;
-
-        // 選択肢生成
-        const area = document.getElementById('action-area');
-        area.innerHTML = '';
-        data.options.forEach((opt, idx) => {
-            const btn = document.createElement('button');
-            btn.innerText = opt.text;
-            btn.onclick = () => nextStep(idx);
-            area.appendChild(btn);
+    function renderTabs() {
+        const bar = document.getElementById('tab-bar'); bar.innerHTML = '';
+        scenario.forEach((_, i) => {
+            const tab = document.createElement('div');
+            tab.className = `tab ${i === viewingStep ? 'active' : ''} ${i > currentStep ? 'locked' : ''}`;
+            tab.innerText = i + 1;
+            tab.onclick = () => { if (i <= currentStep) { viewingStep = i; renderTabs(); updateUI(); } };
+            bar.appendChild(tab);
         });
     }
 
-    function showEnding() {
-        let title = "";
-        let desc = "";
-        
-        if (intelligence >= 100 && lovePoints >= 30) {
-            title = "【真実の理解エンド】";
-            desc = "あなたは彼女の言葉を完璧に理解した。二人は次元を超えた絆で結ばれた。";
-        } else if (intelligence < 50 && lovePoints >= 30) {
-            title = "【勘違いの幸福エンド】";
-            desc = "言葉はわからなかったが、なんとなく仲良くなった。でも時々会話が噛み合わない。";
-        } else {
-            title = "【孤独な異邦人エンド】";
-            desc = "結局、彼女が何を言っていたのか最後までわからなかった。";
+    function updateUI(redo = true) {
+        if (currentStep >= scenario.length) return;
+        const data = scenario[viewingStep];
+        let text = data.q, corrects = 0;
+        for (let key in wordBank) {
+            const reg = new RegExp("\\[\\[" + key + "\\]\\]", "g");
+            const userInput = userDict[key] || "";
+            let spanClass = "";
+            let displayVal = "";
+            if (wordBank[key].accepts.includes(userInput)) { spanClass = "resolved"; displayVal = userInput; corrects++; }
+            else if (userInput.length > 0) { spanClass = "wrong-resolved"; displayVal = userInput; }
+            else { spanClass = "symbol"; displayVal = wordBank[key].q; }
+            text = text.replace(reg, `<span class="${spanClass}" onclick="jumpToDict('${key}')">${displayVal}</span>`);
         }
-
-        document.getElementById('display').innerHTML = `<h2>${title}</h2><p>${desc}</p><button onclick="location.reload()">もう一度</button>`;
-        document.getElementById('action-area').innerHTML = "";
+        document.getElementById('intel-val').innerText = Math.floor((corrects / Object.keys(wordBank).length) * 100) + "%";
+        document.getElementById('message-text').innerHTML = text.replace(/\n/g, "<br>");
+        document.getElementById('face-emoji').innerText = data.face;
+        const light = Math.min(85, 10 + (lovePoints / 5));
+        const sat = Math.min(100, 20 + (lovePoints / 4));
+        const hue = 210 - (lovePoints / 10);
+        document.documentElement.style.setProperty('--love-light', `${light}%`);
+        document.documentElement.style.setProperty('--love-sat', `${sat}%`);
+        document.documentElement.style.setProperty('--love-hue', `${hue}`);
+        if (!redo) return;
+        const area = document.getElementById('action-area'); area.innerHTML = '';
+        if (viewingStep === currentStep) {
+            shuffle([...data.opts]).forEach(o => {
+                const b = document.createElement('button'); b.className = 'opt-btn'; b.innerText = `▶ ${o.t}`;
+                b.onclick = () => { 
+                    selectedAnswers[currentStep] = o.t;
+                    if(o.p===1) pCount++; lovePoints += o.v; currentStep++; viewingStep = currentStep;
+                    if (currentStep < scenario.length) { renderTabs(); updateUI(true); } else { showEnd(); } 
+                };
+                area.appendChild(b);
+            });
+        } else {
+            data.opts.forEach(o => {
+                const b = document.createElement('button'); b.className = 'opt-btn';
+                if (o.t === selectedAnswers[viewingStep]) b.classList.add('my-choice');
+                b.disabled = true; b.innerText = (o.t === selectedAnswers[viewingStep]) ? `● ${o.t}` : `▶ ${o.t}`;
+                area.appendChild(b);
+            });
+        }
     }
 
-    initDict();
-    updateUI();
+    function updateColUI() {
+        document.getElementById('col-val').innerText = Math.floor((colSet.size / 6) * 100) + "%";
+        colSet.forEach(id => { const el = document.getElementById(`b-${id}`); if (el) el.classList.add('unlocked'); });
+    }
+
+    function showEnd() {
+        let t, c, e, id;
+        const loveRate = (lovePoints / maxLove) * 100;
+        const intel = parseInt(document.getElementById('intel-val').innerText);
+        if (pCount >= 12) { t = endingsData[5].title; e = "🍮❓"; c = "ランスロットは深く嘆息した。「ヴェイン、お前……本当に騎士か？」彼は呆れ果て、山ほどのプリンをヴェインに押し付けて去っていった。二人の会話が噛み合う日は、当分来そうにない。"; id=5; }
+        else if (intel >= 100 && loveRate >= 80) { t = endingsData[1].title; e = "✨💍✨"; c = "霧は完全に晴れた。記号の海は消え去り、そこには涙を浮かべて微笑む親友の姿があった。ヴェインはランスロットの手を取り、再びその名を呼ぶ。二人の魂は、以前よりも強く、深く結ばれた。"; id=1; }
+        else if (intel <= 50 && loveRate >= 80) { t = endingsData[6].title; e = "🌌🤝"; c = "手記の半分は白紙のまま。ヴェインの脳は言葉を拒んでいる。しかし、ランスロットが微笑むだけで、VANEには全てが分かった。音を介さずとも完璧に響き合っていた。"; id=6; }
+        else if (loveRate >= 50) { t = endingsData[2].title; e = "⚔️🤝"; c = "言葉はまだ完璧にはわからない。しかし、ランスロットは安堵の表情を見せる。「やはりお前は俺の最高の相棒だ」。不完全な言葉の隙間を、揺るぎない信頼が埋めていた。"; id=2; }
+        else if (loveRate > 0 && loveRate < 50) { t = endingsData[3].title; e = "⌛"; c = "解読は進んだが、どこか心が通い合わない。ランスロットの苦笑いには、隠しきれない寂しさが混じっていた。二人の間には、硝子の壁が残った。"; id=3; }
+        else { t = endingsData[4].title; e = "❄️"; c = "ノートは白紙のまま、ランスロットの声は空虚な響きとなって消えた。彼は静かに背を向け、去っていく。二人の絆は、ここで潰えた。"; id=4; }
+        colSet.add(id); localStorage.setItem('vane_collection_v3', JSON.stringify(Array.from(colSet))); updateColUI();
+        let uncollected = Object.keys(endingsData).filter(key => !colSet.has(parseInt(key)));
+        let hintHtml = uncollected.length > 0 ? `<div class="hint-text"><b>追憶の導き:</b> 「${endingsData[uncollected[Math.floor(Math.random() * uncollected.length)]].title}」へ至るには、${endingsData[uncollected[Math.floor(Math.random() * uncollected.length)]].hint}</div>` : `<div class="hint-text" style="color:var(--correct)"><b>祝福:</b> すべての結末を綴り、真の絆を取り戻した。</div>`;
+        document.getElementById('display').innerHTML = `<div style="font-size:70px">${e}</div><h2 style="color:#d4af37;">【 ${t} 】</h2><p style="padding:20px 40px; line-height:2.2; text-align:left;">${c}</p>${hintHtml}<button onclick="location.reload()" class="btn-style" style="background:var(--main); color:#fff; margin-top:20px;">追憶の淵へ戻る</button>`;
+        document.getElementById('action-area').innerHTML = "";
+    }
 </script>
 </body>
 </html>
