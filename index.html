@@ -5,11 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>キミの声が記号に変わっても</title>
     <style>
-        :root { --main: #2c3e50; --correct: #27ae60; --wrong: #e74c3c; --opt-bg: #fff3e0; --opt-hover: #ffe0b2; --selected: #ffcc80; --love-hue: 210; --love-light: 10%; --love-sat: 20%; }
+        :root { --main: #2c3e50; --correct: #27ae60; --wrong: #e74c3c; --opt-bg: #fff3e0; --opt-hover: #ffe0b2; --selected: #ffcc80; --love-hue: 210; --love-light: 10%; --love-sat: 20%; --gold: #d4af37; }
         body { background: #000; font-family: 'serif', 'Hiragino Mincho ProN', serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: #ecf0f1; overflow: hidden; }
         #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #000 0%, hsl(var(--love-hue), var(--love-sat), var(--love-light)) 100%); z-index: -1; transition: 2s ease; }
         
-        #intro-overlay, #tutorial-overlay, #load-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 100; display: flex; justify-content: center; align-items: center; text-align: center; }
+        /* 環境確認オーバーレイ */
+        #device-check-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 200; display: flex; justify-content: center; align-items: center; text-align: center; }
+        .device-box { border: 1px solid #d4af37; padding: 40px; border-radius: 8px; background: rgba(255,255,255,0.05); }
+
+        #intro-overlay, #tutorial-overlay, #load-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 100; display: none; justify-content: center; align-items: center; text-align: center; }
         .content-box { max-width: 700px; width: 90%; line-height: 2.2; max-height: 90vh; overflow-y: auto; padding: 20px; }
 
         #game-container { width: 98vw; max-width: 1200px; height: 92vh; background: rgba(255, 255, 255, 0.98); display: none; border-radius: 4px; overflow: hidden; color: #2c3e50; box-shadow: 0 0 70px rgba(0,0,0,1); }
@@ -23,7 +27,6 @@
         #display { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; background: #fff; overflow-y: auto; }
         .bubble { background: #fdfdfd; border-left: 6px solid var(--main); padding: 30px; width: 85%; font-size: 1.3rem; line-height: 2; text-align: left; min-height: 100px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         
-        /* セリフ内のクリッカブル記号 */
         .symbol, .resolved, .wrong-resolved { cursor: pointer; transition: 0.2s; padding: 0 4px; border-radius: 2px; }
         .symbol:hover, .resolved:hover, .wrong-resolved:hover { background: #dfe6e9; outline: 1px solid var(--main); }
 
@@ -37,7 +40,7 @@
         #dict-list { flex: 1; overflow-y: auto; padding: 20px; scroll-behavior: smooth; }
         .dict-entry { margin-bottom: 15px; padding: 15px; background: white; border: 1px solid #eee; border-radius: 4px; transition: background 0.5s; }
         .dict-entry.correct { border-left: 8px solid var(--correct); background: #f0fff4; }
-        .dict-entry.highlight-flash { background: #fff9c4; } /* ジャンプ時の演出 */
+        .dict-entry.highlight-flash { background: #fff9c4; }
         
         .dict-entry label { font-size: 0.9em; color: #95a5a6; display: block; margin-bottom: 8px; font-family: monospace; font-weight: bold; }
         .dict-entry input { width: calc(100% - 24px); padding: 10px; border: 1px solid #ddd; font-size: 1rem; outline: none; border-radius: 4px; }
@@ -48,9 +51,10 @@
         .symbol { color: #95a5a6; font-family: monospace; background: #eee; }
 
         .status-bar { padding: 10px 20px; background: #1a1a1a; color: white; display: flex; justify-content: space-between; align-items: center; font-size: 0.8em; }
-        .badge-container { display: flex; gap: 8px; }
-        .badge { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #333; font-size: 12px; filter: grayscale(1); opacity: 0.3; transition: 0.5s; cursor: help; }
+        .badge-container { display: flex; gap: 6px; }
+        .badge { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #333; font-size: 10px; filter: grayscale(1); opacity: 0.3; transition: 0.5s; cursor: help; }
         .badge.unlocked { filter: grayscale(0); opacity: 1; box-shadow: 0 0 10px rgba(255,255,255,0.2); }
+        .badge.gold { border: 1px solid var(--gold); }
         
         .hint-text { font-size: 0.9em; color: #7f8c8d; margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 10px; font-style: italic; }
         .btn-style { padding: 15px 50px; cursor: pointer; border: none; font-size: 1.1em; border-radius: 5px; margin: 10px; transition: 0.3s; }
@@ -58,6 +62,17 @@
 </head>
 <body>
 <div id="bg-layer"></div>
+
+<div id="device-check-overlay">
+    <div class="device-box">
+        <h2 id="check-title" style="color: var(--gold);">CHECKING ENVIRONMENT...</h2>
+        <p id="check-msg">本ゲームは、手記の入力や解析のため、PCブラウザ環境でのプレイを前提として設計されています。</p>
+        <div id="check-action">
+            <button id="entry-btn" class="btn-style" style="background: var(--gold); color: #000; display: none;">物語を始める</button>
+            <p id="error-msg" style="color: var(--wrong); display: none;"><b>MOBILE DEVICE DETECTED</b><br>スマートフォン等のモバイル環境では、正しくプレイできない可能性があります。</p>
+        </div>
+    </div>
+</div>
 
 <div id="intro-overlay">
     <div class="content-box">
@@ -67,19 +82,19 @@
     </div>
 </div>
 
-<div id="tutorial-overlay" style="display:none;">
+<div id="tutorial-overlay">
     <div class="content-box">
         <h2 style="color: #3498db;">画面構成とプレイ方法</h2>
         <div style="text-align: left; background: rgba(255,255,255,0.05); padding: 25px; border-radius: 10px; font-size: 0.9em;">
-            <p>● <b>解析:</b> セリフ内の記号をクリックすると、手記の該当箇所へジャンプします。</p>
-            <p>● <b>誤答:</b> 間違った推測はセリフ上でも赤く表示されます。</p>
-            <p>● <b>継承:</b> クリア済みの単語は、次回のプレイへ引き継ぐことが可能です。</p>
+            <p>● <b>解析:</b> セリフ内の記号をクリックして解析を進めてください。</p>
+            <p>● <b>継承:</b> クリア済みの単語を継承し、更なる高みを目指してください。</p>
+            <p>● <b>PC環境:</b> 手記の入力にはキーボード入力が必要です。</p>
         </div>
         <button id="start-init-btn" class="btn-style" style="background: #3498db; color: #fff;">物語を開始する</button>
     </div>
 </div>
 
-<div id="load-overlay" style="display:none;">
+<div id="load-overlay">
     <div class="content-box">
         <h2 style="color: #27ae60;">記憶の継承</h2>
         <p>過去に解読した正解の単語を、最初から手記に埋めますか？</p>
@@ -100,6 +115,7 @@
                 <div class="badge" id="b-3" title="硝子の距離">⌛</div>
                 <div class="badge" id="b-4" title="終わらぬ静寂">❄️</div>
                 <div class="badge" id="b-5" title="プリンの迷宮">🍮</div>
+                <div class="badge gold" id="b-7" title="悠久の夜明け">🌅</div>
             </div>
             <span>解析: <b id="intel-val">0%</b> | 収集: <b id="col-val">0%</b></span>
         </div>
@@ -162,17 +178,34 @@
     ];
 
     const endingsData = {
-        1: { title: "暁光の誓い", hint: "完璧な解析と、騎士としての惜しみない愛が必要です。" },
-        2: { title: "不滅の双璧", hint: "解析が甘くとも、揺るぎない信頼を保ち続ければ辿り着けます。" },
-        3: { title: "硝子の距離", hint: "情熱に欠ける当たり障りのない態度は、心の壁を厚くしてしまいます。" },
-        4: { title: "終わらぬ静寂", hint: "解析を放棄し、親友に対して冷淡な道を選んでください。" },
-        5: { title: "プリンの迷宮", hint: "騎士の誇りを捨て、ひたすら不条理な返答に徹してください。" },
-        6: { title: "魂の共鳴", hint: "解析を止め、心のみでランスロットの瞳に応えてください。" }
+        1: { title: "暁光の誓い", hint: "完璧な解析と、最大級の献身が必要です。" },
+        2: { title: "不滅の双璧", hint: "信頼を保ち続けてください。" },
+        3: { title: "硝子の距離", hint: "情熱を欠いた対応は壁を作ります。" },
+        4: { title: "終わらぬ静寂", hint: "冷淡な道を選んでください。" },
+        5: { title: "プリンの迷宮", hint: "ひたすら不条理な返答を。" },
+        6: { title: "魂の共鳴", hint: "言葉を介さず心のみで。" },
+        7: { title: "悠久の夜明け", hint: "すべての記憶を辿りし者のみが辿り着く結末。" }
     };
 
     let currentStep = 0, viewingStep = 0, lovePoints = 0, userDict = {}, colSet = new Set(), pCount = 0;
     let selectedAnswers = [];
     const maxLove = 450;
+
+    // 環境チェック
+    function checkEnvironment() {
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (window.innerWidth < 800);
+        const title = document.getElementById('check-title');
+        const entryBtn = document.getElementById('entry-btn');
+        const errorMsg = document.getElementById('error-msg');
+
+        if (isMobile) {
+            title.innerText = "ACCESS DENIED";
+            errorMsg.style.display = "block";
+        } else {
+            title.innerText = "SYSTEM READY";
+            entryBtn.style.display = "inline-block";
+        }
+    }
 
     function shuffle(arr) {
         let n = arr.length;
@@ -192,10 +225,18 @@
     }
 
     window.onload = () => {
+        checkEnvironment();
+
+        document.getElementById('entry-btn').onclick = () => {
+            document.getElementById('device-check-overlay').style.display = 'none';
+            document.getElementById('intro-overlay').style.display = 'flex';
+        };
+
         document.getElementById('to-tutorial').onclick = () => {
             document.getElementById('intro-overlay').style.display = 'none';
             document.getElementById('tutorial-overlay').style.display = 'flex';
         };
+
         document.getElementById('start-init-btn').onclick = () => {
             const solved = localStorage.getItem('vane_solved_words');
             if (solved) {
@@ -203,8 +244,10 @@
                 document.getElementById('load-overlay').style.display = 'flex';
             } else { startGame(false); }
         };
+
         document.getElementById('load-yes').onclick = () => startGame(true);
         document.getElementById('load-no').onclick = () => startGame(false);
+
         const savedCol = localStorage.getItem('vane_collection_v3');
         if (savedCol) { colSet = new Set(JSON.parse(savedCol)); updateColUI(); }
         initDict({});
@@ -268,8 +311,7 @@
         for (let key in wordBank) {
             const reg = new RegExp("\\[\\[" + key + "\\]\\]", "g");
             const userInput = userDict[key] || "";
-            let spanClass = "";
-            let displayVal = "";
+            let spanClass = "", displayVal = "";
             if (wordBank[key].accepts.includes(userInput)) { spanClass = "resolved"; displayVal = userInput; corrects++; }
             else if (userInput.length > 0) { spanClass = "wrong-resolved"; displayVal = userInput; }
             else { spanClass = "symbol"; displayVal = wordBank[key].q; }
@@ -307,7 +349,7 @@
     }
 
     function updateColUI() {
-        document.getElementById('col-val').innerText = Math.floor((colSet.size / 6) * 100) + "%";
+        document.getElementById('col-val').innerText = Math.floor((colSet.size / 7) * 100) + "%";
         colSet.forEach(id => { const el = document.getElementById(`b-${id}`); if (el) el.classList.add('unlocked'); });
     }
 
@@ -315,12 +357,20 @@
         let t, c, e, id;
         const loveRate = (lovePoints / maxLove) * 100;
         const intel = parseInt(document.getElementById('intel-val').innerText);
-        if (pCount >= 12) { t = endingsData[5].title; e = "🍮❓"; c = "ランスロットは深く嘆息した。「ヴェイン、お前……本当に騎士か？」彼は呆れ果て、山ほどのプリンをヴェインに押し付けて去っていった。二人の会話が噛み合う日は、当分来そうにない。"; id=5; }
-        else if (intel >= 100 && loveRate >= 80) { t = endingsData[1].title; e = "✨💍✨"; c = "霧は完全に晴れた。記号の海は消え去り、そこには涙を浮かべて微笑む親友の姿があった。ヴェインはランスロットの手を取り、再びその名を呼ぶ。二人の魂は、以前よりも強く、深く結ばれた。"; id=1; }
-        else if (intel <= 50 && loveRate >= 80) { t = endingsData[6].title; e = "🌌🤝"; c = "手記の半分は白紙のまま。ヴェインの脳は言葉を拒んでいる。しかし、ランスロットが微笑むだけで、VANEには全てが分かった。音を介さずとも完璧に響き合っていた。"; id=6; }
-        else if (loveRate >= 50) { t = endingsData[2].title; e = "⚔️🤝"; c = "言葉はまだ完璧にはわからない。しかし、ランスロットは安堵の表情を見せる。「やはりお前は俺の最高の相棒だ」。不完全な言葉の隙間を、揺るぎない信頼が埋めていた。"; id=2; }
-        else if (loveRate > 0 && loveRate < 50) { t = endingsData[3].title; e = "⌛"; c = "解読は進んだが、どこか心が通い合わない。ランスロットの苦笑いには、隠しきれない寂しさが混じっていた。二人の間には、硝子の壁が残った。"; id=3; }
-        else { t = endingsData[4].title; e = "❄️"; c = "ノートは白紙のまま、ランスロットの声は空虚な響きとなって消えた。彼は静かに背を向け、去っていく。二人の絆は、ここで潰えた。"; id=4; }
+        const hasAllNormalEndings = [1,2,3,4,5,6].every(val => colSet.has(val));
+
+        if (hasAllNormalEndings && intel >= 100 && loveRate >= 95) {
+            t = endingsData[7].title; e = "🌅✨"; c = "記号の海を越え、二人は光溢れる地平へと歩み出す。この絆は、もう何者にも縛られることはない。"; id=7;
+            document.documentElement.style.setProperty('--love-light', '90%');
+            document.documentElement.style.setProperty('--love-hue', '45');
+        }
+        else if (pCount >= 12) { id=5; t = endingsData[5].title; e = "🍮❓"; c = "ランスロットは呆れ果て、山ほどのプリンをヴェインに押し付けて去っていった。"; }
+        else if (intel >= 100 && loveRate >= 80) { id=1; t = endingsData[1].title; e = "✨💍✨"; c = "二人の魂は、死線を越えたことで以前よりも強く、深く結ばれた。"; }
+        else if (intel <= 50 && loveRate >= 80) { id=6; t = endingsData[6].title; e = "🌌🤝"; c = "音を介さずとも完璧に響き合っていた。"; }
+        else if (loveRate >= 50) { id=2; t = endingsData[2].title; e = "⚔️🤝"; c = "不完全な言葉の隙間を、揺るぎない信頼が埋めていた。"; }
+        else if (loveRate > 0 && loveRate < 50) { id=3; t = endingsData[3].title; e = "⌛"; c = "二人の間には、硝子の壁が残った。"; }
+        else { id=4; t = endingsData[4].title; e = "❄️"; c = "二人の絆は、ここで潰えた。"; }
+        
         colSet.add(id); localStorage.setItem('vane_collection_v3', JSON.stringify(Array.from(colSet))); updateColUI();
         let uncollected = Object.keys(endingsData).filter(key => !colSet.has(parseInt(key)));
         let hintHtml = uncollected.length > 0 ? `<div class="hint-text"><b>追憶の導き:</b> 「${endingsData[uncollected[Math.floor(Math.random() * uncollected.length)]].title}」へ至るには、${endingsData[uncollected[Math.floor(Math.random() * uncollected.length)]].hint}</div>` : `<div class="hint-text" style="color:var(--correct)"><b>祝福:</b> すべての結末を綴り、真の絆を取り戻した。</div>`;
