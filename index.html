@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>キミの声が記号に変わっても</title>
+    <title>聴こえない声をみつけて</title>
     <style>
         :root { --main: #2c3e50; --correct: #27ae60; --wrong: #e74c3c; --opt-bg: #fff3e0; --opt-hover: #ffe0b2; --selected: #ffcc80; --love-hue: 210; --love-light: 10%; --love-sat: 20%; --gold: #d4af37; }
         body { background: #000; font-family: 'serif', 'Hiragino Mincho ProN', serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: #ecf0f1; overflow: hidden; }
@@ -66,7 +66,7 @@
 <div id="device-check-overlay">
     <div class="device-box">
         <h2 id="check-title" style="color: var(--gold);">CHECKING ENVIRONMENT...</h2>
-        <p id="check-msg">本ゲームは、手記の入力や解析のため、PCブラウザ環境でのプレイを前提として設計されています。</p>
+        <p id="check-msg">本ゲームはPCブラウザ環境でのプレイを前提として設計されています。</p>
         <div id="check-action">
             <button id="entry-btn" class="btn-style" style="background: var(--gold); color: #000; display: none;">物語を始める</button>
             <p id="error-msg" style="color: var(--wrong); display: none;"><b>MOBILE DEVICE DETECTED</b><br>スマートフォン等のモバイル環境ではプレイできません。</p>
@@ -76,19 +76,24 @@
 
 <div id="intro-overlay">
     <div class="content-box">
-        <h1 style="color: #d4af37; font-size: 2.5em;">キミの声が記号に変わっても</h1>
-        <p>死線を潜り抜け、ランスロットを死守した代償に言語機能を失った騎士ヴェイン。<br>親友が語りかける言葉は、今や無機質な記号へと成り果てた。</p>
+        <h1 style="color: #d4af37; font-size: 2.5em;">聴こえない声を探して</h1>
+              <p>ある任務にて魔物の前に飛び出したランスロット。<br>
+            目の前の人を助けるのに夢中で、背後から魔物が放った呪いに気づけなかった。<br>大好きな幼馴染を守るために身を投げ出したヴェインは、呪いを全身に浴びてしまう。<br>
+            <br>それは、一番大切な人の言葉がよくわからなくなる呪い。<br>一時気を失い、目が覚めたヴェインは、ランスロットの話す言葉だけがわからなくなってしまった。<br>
+            ____このままランちゃんの声がわからないなんていやだ。<br>ヴェインはランスロットの言葉に耳を傾け、彼が発する言葉をひとつひとつ記録していくことにした。<br>いつかまた、お前の言葉を理解できるように。
+            <br>あの日以来暗い表情のままの幼馴染の笑顔を取り戻して、<br>大好きだよ、と伝えるために。</p>
         <button id="to-tutorial" class="btn-style" style="background: #d4af37; color: #000;">次へ</button>
     </div>
 </div>
 
 <div id="tutorial-overlay">
     <div class="content-box">
-        <h2 style="color: #3498db;">画面構成とプレイ方法</h2>
+        <h2 style="color: #3498db;">プレイ方法</h2>
         <div style="text-align: left; background: rgba(255,255,255,0.05); padding: 25px; border-radius: 10px; font-size: 0.9em;">
-            <p>● <b>解析:</b> セリフ内の記号をクリックして解析を進めてください。</p>
-            <p>● <b>継承:</b> クリア済みの単語を継承し、更なる高みを目指してください。</p>
-            <p>● <b>PC環境:</b> 手記の入力にはキーボード入力が必要です。</p>
+            <p><b>解析</b><br>プレイヤーはヴェインとしてこのゲームを進めます。<br>ヴェインはランスロットの言葉すべてが理解できないわけではなく、虫食いのように聞こえています。<br>ランスロットの発する言葉の意味を推測し、ノートに書きこんでください。<br>
+            虫食いになっている言葉を選択すると、対応する回答欄に進めます。</p>
+            <p><b>返答</b> ランスロットの言葉に対して返答してください。返答によってランスロットの気持ちが変化し、エンディングに影響します。<br>一度返答すると、ゲームの終了まで返答を変えることはできません。</p>
+            <p><b>継承</b> ノートに書いた言葉を保持したまま、2周目以降をプレイすることができます。</p>
         </div>
         <button id="start-init-btn" class="btn-style" style="background: #3498db; color: #fff;">物語を開始する</button>
     </div>
