@@ -3,3170 +3,702 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#080b12">
     <title>声を聴かせて、ランスロット！</title>
-
     <style>
-        :root {
-            --bg-deep: #070910;
-            --bg-blue: #11192a;
-
-            --panel: rgba(12, 17, 29, 0.94);
-            --panel-soft: rgba(255,255,255,0.045);
-            --panel-hover: rgba(255,255,255,0.075);
-
-            --text: #eef2f7;
-            --text-soft: #aab4c3;
-            --text-dark: #263142;
-
-            --line: rgba(255,255,255,0.12);
-            --line-strong: rgba(255,255,255,0.22);
-
-            --accent: #b8cbe6;
-            --accent-bright: #dceaff;
-            --gold: #d7bd72;
-
-            --correct: #7cb99a;
-            --wrong: #cf8181;
-
-            --love-hue: 220;
-            --love-sat: 18%;
-            --love-light: 7%;
-
-            --safe-bottom: env(safe-area-inset-bottom, 0px);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            width: 100%;
-            min-height: 100%;
-            margin: 0;
-        }
-
-        body {
-            min-height: 100dvh;
-            overflow: hidden;
-            font-family:
-                "Hiragino Mincho ProN",
-                "Yu Mincho",
-                "YuMincho",
-                "Noto Serif JP",
-                serif;
-            color: var(--text);
-            background: var(--bg-deep);
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        button,
-        input {
-            font: inherit;
-        }
-
-        button {
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        #bg-layer {
-            position: fixed;
-            inset: 0;
-            z-index: -3;
-            background:
-                radial-gradient(
-                    circle at 50% 15%,
-                    hsla(
-                        var(--love-hue),
-                        var(--love-sat),
-                        calc(var(--love-light) + 9%),
-                        0.55
-                    ),
-                    transparent 42%
-                ),
-                linear-gradient(
-                    155deg,
-                    #05070c 0%,
-                    hsl(
-                        var(--love-hue),
-                        var(--love-sat),
-                        var(--love-light)
-                    ) 58%,
-                    #080b12 100%
-                );
-            transition:
-                background 2.5s ease,
-                filter 2s ease;
-        }
-
-        #bg-layer::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-                linear-gradient(
-                    rgba(255,255,255,0.014) 1px,
-                    transparent 1px
-                ),
-                linear-gradient(
-                    90deg,
-                    rgba(255,255,255,0.01) 1px,
-                    transparent 1px
-                );
-            background-size: 48px 48px;
-            mask-image: linear-gradient(to bottom, rgba(0,0,0,.6), transparent);
-            pointer-events: none;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* =========================
-           START / INTRO
-        ========================= */
-
-        .overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 28px;
-            overflow-y: auto;
-            background:
-                radial-gradient(circle at 50% 20%, #182239 0%, #080b13 48%, #030407 100%);
-        }
-
-        .intro-card {
-            width: min(760px, 100%);
-            margin: auto;
-            padding: 54px 58px;
-            border: 1px solid rgba(215,189,114,.38);
-            background: rgba(6, 9, 16, 0.78);
-            box-shadow:
-                0 40px 100px rgba(0,0,0,.5),
-                inset 0 0 80px rgba(255,255,255,.015);
-            backdrop-filter: blur(12px);
-        }
-
-        .intro-eyebrow {
-            margin-bottom: 18px;
-            color: var(--gold);
-            font-family: Georgia, serif;
-            font-size: .72rem;
-            letter-spacing: .32em;
-            text-align: center;
-        }
-
-        .intro-card h1 {
-            margin: 0 0 34px;
-            color: #f5f0df;
-            font-size: clamp(1.8rem, 5vw, 3.1rem);
-            font-weight: 500;
-            line-height: 1.45;
-            letter-spacing: .09em;
-            text-align: center;
-        }
-
-        .intro-text {
-            color: #d8dde5;
-            font-size: .98rem;
-            line-height: 2.25;
-        }
-
-        .intro-text p {
-            margin: 0 0 1.7em;
-        }
-
-        .quote-line {
-            margin: 2.4em 0 !important;
-            color: #f1e9d1;
-            text-align: center;
-            font-size: 1.05rem;
-        }
-
-        .primary-btn,
-        .secondary-btn,
-        .ghost-btn {
-            min-height: 48px;
-            padding: 12px 26px;
-            border-radius: 2px;
-            cursor: pointer;
-            transition:
-                background .2s ease,
-                border-color .2s ease,
-                color .2s ease,
-                transform .15s ease;
-        }
-
-        .primary-btn {
-            border: 1px solid var(--gold);
-            color: #15130d;
-            background: var(--gold);
-        }
-
-        .primary-btn:hover {
-            background: #ead28e;
-            transform: translateY(-1px);
-        }
-
-        .secondary-btn {
-            border: 1px solid var(--line-strong);
-            color: var(--text);
-            background: rgba(255,255,255,.06);
-        }
-
-        .secondary-btn:hover {
-            background: rgba(255,255,255,.1);
-        }
-
-        .ghost-btn {
-            border: 1px solid transparent;
-            color: var(--text-soft);
-            background: transparent;
-        }
-
-        .ghost-btn:hover {
-            color: var(--text);
-            background: rgba(255,255,255,.05);
-        }
-
-        .intro-actions {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 36px;
-            flex-wrap: wrap;
-        }
-
-        .tutorial-box {
-            display: grid;
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .tutorial-row {
-            display: grid;
-            grid-template-columns: 110px 1fr;
-            gap: 24px;
-            padding: 20px 0;
-            border-top: 1px solid var(--line);
-        }
-
-        .tutorial-row:first-child {
-            border-top: 0;
-        }
-
-        .tutorial-label {
-            color: var(--gold);
-            font-size: .78rem;
-            letter-spacing: .18em;
-        }
-
-        .tutorial-row p {
-            margin: 0;
-            color: #ccd4df;
-            line-height: 2;
-        }
-
-        /* =========================
-           GAME SHELL
-        ========================= */
-
-        #game {
-            width: 100%;
-            height: 100dvh;
-            display: none;
-            flex-direction: column;
-        }
-
-        .game-header {
-            flex: 0 0 auto;
-            height: 66px;
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center;
-            gap: 18px;
-            padding: 0 clamp(18px, 4vw, 54px);
-            border-bottom: 1px solid var(--line);
-            background: rgba(4,7,12,.72);
-            backdrop-filter: blur(14px);
-        }
-
-        .header-left {
-            min-width: 0;
-        }
-
-        .chapter-label {
-            color: var(--text-soft);
-            font-family: Georgia, serif;
-            font-size: .65rem;
-            letter-spacing: .24em;
-        }
-
-        .chapter-value {
-            margin-top: 3px;
-            color: var(--text);
-            font-size: .86rem;
-            letter-spacing: .12em;
-        }
-
-        .header-center {
-            color: var(--text-soft);
-            font-family: Georgia, serif;
-            font-size: .68rem;
-            letter-spacing: .28em;
-            white-space: nowrap;
-        }
-
-        .header-actions {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .header-btn {
-            min-width: 72px;
-            height: 36px;
-            padding: 0 12px;
-            border: 1px solid var(--line);
-            color: #c7d0dd;
-            background: rgba(255,255,255,.025);
-            cursor: pointer;
-            font-size: .69rem;
-            letter-spacing: .15em;
-            transition: .18s ease;
-        }
-
-        .header-btn:hover {
-            color: #fff;
-            border-color: var(--line-strong);
-            background: rgba(255,255,255,.07);
-        }
-
-        .game-stage {
-            position: relative;
-            flex: 1 1 auto;
-            min-height: 0;
-            display: flex;
-            justify-content: center;
-            align-items: stretch;
-            overflow: hidden;
-        }
-
-        .scene {
-            width: min(1120px, 100%);
-            min-height: 0;
-            display: grid;
-            grid-template-rows: minmax(0, 1fr) auto;
-            padding: clamp(22px, 5vh, 56px) clamp(18px, 5vw, 62px)
-                calc(clamp(20px, 4vh, 44px) + var(--safe-bottom));
-        }
-
-        .dialogue-zone {
-            min-height: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .speaker-block {
-            width: min(900px, 100%);
-            margin: 0 auto;
-        }
-
-        .speaker-meta {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            margin-bottom: 14px;
-        }
-
-        .speaker-name {
-            color: var(--gold);
-            font-family: Georgia, serif;
-            font-size: .76rem;
-            letter-spacing: .3em;
-        }
-
-        .speaker-line {
-            height: 1px;
-            flex: 1;
-            background: linear-gradient(90deg, rgba(215,189,114,.4), transparent);
-        }
-
-        .dialogue-box {
-            position: relative;
-            min-height: 210px;
-            display: flex;
-            align-items: center;
-            padding: clamp(30px, 5vw, 58px);
-            border: 1px solid rgba(255,255,255,.13);
-            background:
-                linear-gradient(
-                    135deg,
-                    rgba(255,255,255,.055),
-                    rgba(255,255,255,.018)
-                );
-            box-shadow:
-                0 28px 80px rgba(0,0,0,.25),
-                inset 0 1px rgba(255,255,255,.04);
-            backdrop-filter: blur(12px);
-        }
-
-        .dialogue-box::before {
-            content: "";
-            position: absolute;
-            top: -1px;
-            left: 0;
-            width: 75px;
-            height: 1px;
-            background: var(--gold);
-        }
-
-        #message-text {
-            width: 100%;
-            margin: 0;
-            color: #f0f3f7;
-            font-size: clamp(1.08rem, 2.15vw, 1.42rem);
-            line-height: 2.25;
-            letter-spacing: .055em;
-            text-align: left;
-        }
-
-        .cipher-word,
-        .resolved-word,
-        .guessed-word {
-            display: inline;
-            padding: .06em .16em .11em;
-            border-bottom: 1px solid;
-            cursor: pointer;
-            transition: .15s ease;
-        }
-
-        .cipher-word {
-            color: #adc4e4;
-            border-color: rgba(173,196,228,.5);
-            font-family: Georgia, "Times New Roman", serif;
-            letter-spacing: .1em;
-        }
-
-        .cipher-word:hover {
-            color: #d9e8ff;
-            background: rgba(173,196,228,.08);
-        }
-
-        .resolved-word {
-            color: #bad7c6;
-            border-color: rgba(124,185,154,.4);
-        }
-
-        .resolved-word:hover {
-            background: rgba(124,185,154,.08);
-        }
-
-        .guessed-word {
-            color: #dbc5a1;
-            border-color: rgba(219,197,161,.35);
-        }
-
-        .guessed-word:hover {
-            background: rgba(219,197,161,.07);
-        }
-
-        /* =========================
-           ANSWERS
-        ========================= */
-
-        .answer-zone {
-            width: min(900px, 100%);
-            margin: 28px auto 0;
-        }
-
-        .answer-label {
-            margin-bottom: 12px;
-            color: var(--text-soft);
-            font-size: .68rem;
-            letter-spacing: .18em;
-        }
-
-        #answer-area {
-            display: grid;
-            gap: 10px;
-        }
-
-        .answer-btn {
-            position: relative;
-            width: 100%;
-            min-height: 54px;
-            padding: 14px 48px 14px 20px;
-            border: 1px solid rgba(255,255,255,.12);
-            color: #e4e9ef;
-            background: rgba(255,255,255,.035);
-            cursor: pointer;
-            text-align: left;
-            line-height: 1.7;
-            transition:
-                background .18s ease,
-                border-color .18s ease,
-                transform .18s ease;
-        }
-
-        .answer-btn::after {
-            content: "›";
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-52%);
-            color: rgba(255,255,255,.36);
-            font-family: Georgia, serif;
-            font-size: 1.5rem;
-        }
-
-        .answer-btn:hover:not(:disabled) {
-            border-color: rgba(215,189,114,.42);
-            background: rgba(215,189,114,.075);
-            transform: translateX(4px);
-        }
-
-        .answer-btn:disabled {
-            cursor: default;
-            color: #8f99a8;
-        }
-
-        .answer-btn.selected-answer {
-            color: #f2e8c9;
-            border-color: rgba(215,189,114,.5);
-            background: rgba(215,189,114,.09);
-        }
-
-        .answer-btn.selected-answer::after {
-            content: "—";
-            color: var(--gold);
-        }
-
-        .past-note {
-            padding: 12px 2px 2px;
-            color: var(--text-soft);
-            font-size: .76rem;
-            line-height: 1.8;
-        }
-
-        /* =========================
-           FOOTER STATUS
-        ========================= */
-
-        .game-footer {
-            flex: 0 0 auto;
-            min-height: 38px;
-            display: flex;
-            justify-content: center;
-            padding: 0 18px calc(var(--safe-bottom) / 2);
-            border-top: 1px solid rgba(255,255,255,.07);
-            color: #798495;
-            background: rgba(2,4,8,.52);
-            font-family: Georgia, serif;
-            font-size: .62rem;
-            letter-spacing: .16em;
-        }
-
-        .footer-inner {
-            width: min(1120px, 100%);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* =========================
-           MODALS
-        ========================= */
-
-        .modal-layer {
-            position: fixed;
-            inset: 0;
-            z-index: 300;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 24px;
-            background: rgba(2,4,8,.76);
-            backdrop-filter: blur(10px);
-        }
-
-        .modal-layer.open {
-            display: flex;
-        }
-
-        .modal {
-            width: min(760px, 100%);
-            max-height: min(86dvh, 860px);
-            display: flex;
-            flex-direction: column;
-            border: 1px solid rgba(255,255,255,.15);
-            background: #101621;
-            box-shadow: 0 30px 120px rgba(0,0,0,.55);
-        }
-
-        .modal.wide {
-            width: min(900px, 100%);
-        }
-
-        .modal-header {
-            flex: 0 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 20px;
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--line);
-        }
-
-        .modal-title-wrap {
-            min-width: 0;
-        }
-
-        .modal-kicker {
-            margin-bottom: 3px;
-            color: #758196;
-            font-family: Georgia, serif;
-            font-size: .62rem;
-            letter-spacing: .22em;
-        }
-
-        .modal-title {
-            margin: 0;
-            color: #edf1f5;
-            font-size: 1.08rem;
-            font-weight: 500;
-            letter-spacing: .08em;
-        }
-
-        .close-btn {
-            width: 38px;
-            height: 38px;
-            flex: 0 0 auto;
-            border: 0;
-            color: #adb6c4;
-            background: transparent;
-            cursor: pointer;
-            font-size: 1.35rem;
-        }
-
-        .close-btn:hover {
-            color: white;
-            background: rgba(255,255,255,.05);
-        }
-
-        .modal-body {
-            min-height: 0;
-            overflow-y: auto;
-            padding: 24px;
-        }
-
-        /* =========================
-           NOTE
-        ========================= */
-
-        .note-help {
-            margin: 0 0 24px;
-            color: #9ba7b7;
-            font-size: .84rem;
-            line-height: 1.9;
-        }
-
-        .note-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
-        }
-
-        .note-entry {
-            position: relative;
-            padding: 16px;
-            border: 1px solid rgba(255,255,255,.09);
-            background: rgba(255,255,255,.025);
-            transition: .2s ease;
-        }
-
-        .note-entry.focused {
-            border-color: rgba(215,189,114,.55);
-            background: rgba(215,189,114,.06);
-            box-shadow: inset 3px 0 var(--gold);
-        }
-
-        .note-entry.solved {
-            border-color: rgba(124,185,154,.24);
-        }
-
-        .note-code {
-            margin-bottom: 10px;
-            color: #b9cee8;
-            font-family: Georgia, serif;
-            font-size: 1rem;
-            letter-spacing: .12em;
-        }
-
-        .note-entry.solved .note-code {
-            color: #93b8a2;
-        }
-
-        .note-row {
-            display: flex;
-            gap: 8px;
-        }
-
-        .note-input {
-            width: 100%;
-            min-width: 0;
-            height: 42px;
-            padding: 0 12px;
-            border: 1px solid rgba(255,255,255,.12);
-            outline: none;
-            color: #edf1f6;
-            background: rgba(0,0,0,.22);
-            transition: border-color .15s ease;
-        }
-
-        .note-input:focus {
-            border-color: rgba(184,203,230,.7);
-        }
-
-        .note-submit {
-            flex: 0 0 auto;
-            min-width: 72px;
-            border: 1px solid rgba(255,255,255,.12);
-            color: #d9e1eb;
-            background: rgba(255,255,255,.05);
-            cursor: pointer;
-        }
-
-        .note-submit:hover {
-            border-color: rgba(215,189,114,.42);
-            background: rgba(215,189,114,.08);
-        }
-
-        .note-result {
-            min-height: 1.5em;
-            margin-top: 9px;
-            color: #7f8a99;
-            font-size: .72rem;
-            line-height: 1.5;
-        }
-
-        .note-entry.solved .note-result {
-            color: var(--correct);
-        }
-
-        .note-entry.failed {
-            animation: noteShake .25s linear;
-        }
-
-        @keyframes noteShake {
-            0%, 100% { transform: translateX(0); }
-            33% { transform: translateX(-3px); }
-            66% { transform: translateX(3px); }
-        }
-
-        /* =========================
-           LOG
-        ========================= */
-
-        .log-list {
-            display: grid;
-            gap: 10px;
-        }
-
-        .log-entry {
-            width: 100%;
-            padding: 18px 20px;
-            border: 1px solid rgba(255,255,255,.09);
-            color: #d7dee8;
-            background: rgba(255,255,255,.025);
-            cursor: pointer;
-            text-align: left;
-            transition: .15s ease;
-        }
-
-        .log-entry:hover {
-            background: rgba(255,255,255,.055);
-            border-color: rgba(255,255,255,.16);
-        }
-
-        .log-entry.current {
-            border-color: rgba(215,189,114,.38);
-        }
-
-        .log-number {
-            display: block;
-            margin-bottom: 7px;
-            color: #718095;
-            font-family: Georgia, serif;
-            font-size: .64rem;
-            letter-spacing: .2em;
-        }
-
-        .log-preview {
-            display: -webkit-box;
-            overflow: hidden;
-            color: #c3ccd8;
-            font-size: .82rem;
-            line-height: 1.8;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
-        }
-
-        /* =========================
-           ENDING
-        ========================= */
-
-        .ending-screen {
-            width: min(820px, 100%);
-            margin: auto;
-            padding: 30px 0 10px;
-            text-align: center;
-        }
-
-        .ending-number {
-            margin-bottom: 18px;
-            color: #738096;
-            font-family: Georgia, serif;
-            font-size: .67rem;
-            letter-spacing: .28em;
-        }
-
-        .ending-title {
-            margin: 0 0 34px;
-            color: #e7d292;
-            font-size: clamp(1.8rem, 5vw, 3rem);
-            font-weight: 500;
-            letter-spacing: .12em;
-        }
-
-        .ending-rule {
-            width: 72px;
-            height: 1px;
-            margin: 0 auto 36px;
-            background: var(--gold);
-        }
-
-        .ending-text {
-            max-width: 620px;
-            margin: 0 auto;
-            color: #d7dde5;
-            font-size: 1rem;
-            line-height: 2.35;
-            text-align: left;
-        }
-
-        .ending-hint {
-            max-width: 620px;
-            margin: 38px auto 0;
-            padding: 18px 20px;
-            border-top: 1px solid var(--line);
-            color: #8e9bad;
-            font-size: .8rem;
-            line-height: 1.9;
-            text-align: left;
-        }
-
-        .ending-actions {
-            margin-top: 32px;
-        }
-
-        /* =========================
-           RESPONSIVE
-        ========================= */
-
-        @media (max-width: 760px) {
-            body {
-                overflow: auto;
-            }
-
-            #game {
-                min-height: 100dvh;
-                height: auto;
-            }
-
-            .game-header {
-                position: sticky;
-                top: 0;
-                z-index: 20;
-                height: 58px;
-                grid-template-columns: 1fr auto;
-                padding: 0 14px;
-            }
-
-            .header-center {
-                display: none;
-            }
-
-            .header-btn {
-                min-width: 58px;
-                height: 34px;
-                padding: 0 9px;
-                font-size: .62rem;
-            }
-
-            .chapter-label {
-                font-size: .57rem;
-            }
-
-            .chapter-value {
-                font-size: .74rem;
-            }
-
-            .game-stage {
-                overflow: visible;
-            }
-
-            .scene {
-                min-height: calc(100dvh - 96px);
-                padding: 34px 16px calc(24px + var(--safe-bottom));
-            }
-
-            .dialogue-zone {
-                justify-content: flex-start;
-            }
-
-            .dialogue-box {
-                min-height: 220px;
-                padding: 28px 22px;
-            }
-
-            #message-text {
-                font-size: 1.02rem;
-                line-height: 2.05;
-            }
-
-            .answer-zone {
-                margin-top: 24px;
-            }
-
-            .answer-btn {
-                padding: 14px 42px 14px 16px;
-                font-size: .9rem;
-            }
-
-            .game-footer {
-                min-height: 34px;
-                position: relative;
-            }
-
-            .intro-card {
-                padding: 34px 24px;
-            }
-
-            .tutorial-row {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-
-            .note-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .modal-layer {
-                padding: 12px;
-                align-items: flex-end;
-            }
-
-            .modal {
-                max-height: 88dvh;
-            }
-
-            .modal-body {
-                padding: 18px;
-            }
-        }
-
-        @media (max-width: 420px) {
-            .header-btn {
-                min-width: 52px;
-            }
-
-            .speaker-meta {
-                gap: 12px;
-            }
-
-            .speaker-name {
-                font-size: .7rem;
-                letter-spacing: .22em;
-            }
-
-            .dialogue-box {
-                padding: 24px 18px;
-            }
-
-            .note-row {
-                flex-direction: column;
-            }
-
-            .note-submit {
-                height: 40px;
-            }
-
-            .footer-inner {
-                gap: 12px;
-                font-size: .55rem;
-            }
-        }
+        :root { --main: #2c3e50; --correct: #27ae60; --wrong: #e74c3c; --opt-bg: #fff3e0; --opt-hover: #ffe0b2; --selected: #ffcc80; --love-hue: 210; --love-light: 10%; --love-sat: 20%; --gold: #d4af37; }
+        body { background: #000; font-family: 'serif', 'Hiragino Mincho ProN', serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: #ecf0f1; overflow: hidden; }
+        #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #000 0%, hsl(var(--love-hue), var(--love-sat), var(--love-light)) 100%); z-index: -1; transition: 2s ease; }
+        
+        /* 環境確認オーバーレイ */
+        #device-check-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 200; display: flex; justify-content: center; align-items: center; text-align: center; }
+        .device-box { border: 1px solid #d4af37; padding: 40px; border-radius: 8px; background: rgba(255,255,255,0.05); }
+
+        #intro-overlay, #tutorial-overlay, #load-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 100; display: none; justify-content: center; align-items: center; text-align: center; }
+        .content-box { max-width: 700px; width: 90%; line-height: 2.2; max-height: 90vh; overflow-y: auto; padding: 20px; }
+
+        #game-container { width: 98vw; max-width: 1200px; height: 92vh; background: rgba(255, 255, 255, 0.98); display: none; border-radius: 4px; overflow: hidden; color: #2c3e50; box-shadow: 0 0 70px rgba(0,0,0,1); }
+        
+        #main-screen { flex: 2; display: flex; flex-direction: column; border-right: 1px solid #ddd; min-width: 0; height: 100%; }
+        #tab-bar { display: grid; grid-template-columns: repeat(10, 1fr); background: #1a1a1a; flex-shrink: 0; }
+        .tab { padding: 12px; cursor: pointer; color: #7f8c8d; border: 0.5px solid #333; font-size: 0.8em; transition: 0.3s; }
+        .tab.active { background: #fff; color: #2c3e50; font-weight: bold; }
+        .tab.locked { opacity: 0.2; cursor: not-allowed; }
+        
+        #display { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; background: #fff; overflow-y: auto; }
+        .bubble { background: #fdfdfd; border-left: 6px solid var(--main); padding: 30px; width: 85%; font-size: 1.3rem; line-height: 2; text-align: left; min-height: 100px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        
+        .symbol, .resolved, .wrong-resolved { cursor: pointer; transition: 0.2s; padding: 0 4px; border-radius: 2px; }
+        .symbol:hover, .resolved:hover, .wrong-resolved:hover { background: #dfe6e9; outline: 1px solid var(--main); }
+
+        .controls { padding: 25px; background: #f8f9fa; border-top: 1px solid #ddd; max-height: 300px; overflow-y: auto; }
+        .opt-btn { width: 100%; padding: 15px; margin: 8px 0; border: 1px solid #e0b17b; background: var(--opt-bg); cursor: pointer; font-size: 1rem; text-align: left; transition: 0.2s; border-radius: 4px; color: #2c3e50; }
+        .opt-btn:hover:not(:disabled) { border-color: #d89c56; background: var(--opt-hover); transform: translateX(5px); }
+        .opt-btn:disabled { cursor: default; opacity: 0.7; }
+        .opt-btn.my-choice { border: 2px solid #e67e22; background: var(--selected); font-weight: bold; }
+
+        #dictionary { flex: 1; background: #fcfcfc; display: flex; flex-direction: column; min-width: 320px; border-left: 1px solid #ddd; height: 100%; }
+        #dict-list { flex: 1; overflow-y: auto; padding: 20px; scroll-behavior: smooth; }
+        .dict-entry { margin-bottom: 15px; padding: 15px; background: white; border: 1px solid #eee; border-radius: 4px; transition: background 0.5s; }
+        .dict-entry.correct { border-left: 8px solid var(--correct); background: #f0fff4; }
+        .dict-entry.guessing { border-left: 8px solid #3498db; background: #f4f9ff; }
+        .dict-entry.highlight-flash { background: #fff9c4; }
+        
+        .dict-entry label { font-size: 0.9em; color: #95a5a6; display: block; margin-bottom: 8px; font-family: monospace; font-weight: bold; }
+        .dict-entry input { width: calc(100% - 24px); padding: 10px; border: 1px solid #ddd; font-size: 1rem; outline: none; border-radius: 4px; }
+        .dict-entry input.wrong-text { color: var(--wrong); font-weight: bold; border-color: var(--wrong); }
+
+        .dict-status { font-size: 0.75em; color: #95a5a6; margin-bottom: 6px; }
+        .dict-entry.guessing .dict-status { color: #2980b9; }
+        .dict-entry.correct .dict-status { color: var(--correct); font-weight: bold; }
+        
+        .resolved { color: var(--correct); font-weight: bold; }
+        .wrong-resolved { color: var(--wrong); font-weight: bold; text-decoration: underline wavy var(--wrong); }
+        .symbol { color: #95a5a6; font-family: monospace; background: #eee; }
+
+        .status-bar { padding: 10px 20px; background: #1a1a1a; color: white; display: flex; justify-content: space-between; align-items: center; font-size: 0.8em; }
+        .badge-container { display: flex; gap: 6px; }
+        .badge { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #333; font-size: 10px; filter: grayscale(1); opacity: 0.3; transition: 0.5s; cursor: help; }
+        .badge.unlocked { filter: grayscale(0); opacity: 1; box-shadow: 0 0 10px rgba(255,255,255,0.2); }
+        .badge.gold { border: 1px solid var(--gold); }
+        
+        .hint-text { font-size: 0.9em; color: #7f8c8d; margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 10px; font-style: italic; }
+        .btn-style { padding: 15px 50px; cursor: pointer; border: none; font-size: 1.1em; border-radius: 5px; margin: 10px; transition: 0.3s; }
     </style>
 </head>
-
 <body>
-
 <div id="bg-layer"></div>
 
-<!-- =========================
-     INTRO
-========================= -->
-
-<section id="intro-overlay" class="overlay">
-    <div class="intro-card">
-        <div class="intro-eyebrow">LANCELOT / VANE</div>
-
-        <h1>声を聴かせて、<br>ランスロット！</h1>
-
-        <div class="intro-text">
-            <p>
-                ある任務にて魔物の前に飛び出したランスロット。<br>
-                目の前の人を助けるのに夢中で、
-                背後から魔物が放った呪いに気づけなかった。
-            </p>
-
-            <p>
-                大好きな幼馴染を守るために身を投げ出したヴェインは、
-                呪いを全身に浴びてしまう。
-            </p>
-
-            <p>
-                それは、<br>
-                <strong>一番大切な人の言葉が、よくわからなくなる呪い。</strong>
-            </p>
-
-            <p>
-                気絶から回復したヴェインは、
-                ランスロットの話す言葉だけが
-                虫食いのように聞こえるようになっていた。
-            </p>
-
-            <p class="quote-line">
-                ――俺は絶対にあきらめない。<br>
-                このままランちゃんの声がわからないなんて、いやだ。
-            </p>
-
-            <p>
-                ヴェインはランスロットの言葉に耳を傾け、
-                聞き取れない言葉をひとつずつノートへ記録していく。
-            </p>
-
-            <p>
-                いつかまた、お前の言葉を理解できるように。<br>
-                あの日以来、暗い表情のままの幼馴染の笑顔を取り戻して――
-                大好きだよ、と伝えるために。
-            </p>
-        </div>
-
-        <div class="intro-actions">
-            <button id="to-tutorial" class="primary-btn">
-                次へ
-            </button>
+<div id="device-check-overlay">
+    <div class="device-box">
+        <h2 id="check-title" style="color: var(--gold);">CHECKING ENVIRONMENT...</h2>
+        <p id="check-msg">本ゲームはPCブラウザ環境でのプレイを前提として設計されています。</p>
+        <div id="check-action">
+            <button id="entry-btn" class="btn-style" style="background: var(--gold); color: #000; display: none;">物語を始める</button>
+            <p id="error-msg" style="color: var(--wrong); display: none;"><b>MOBILE DEVICE DETECTED</b><br>スマートフォン等のモバイル環境ではプレイできません。</p>
         </div>
     </div>
-</section>
-
-
-<!-- =========================
-     TUTORIAL
-========================= -->
-
-<section id="tutorial-overlay" class="overlay hidden">
-    <div class="intro-card">
-
-        <div class="intro-eyebrow">HOW TO PLAY</div>
-
-        <h1 style="font-size:clamp(1.6rem,4vw,2.4rem);">
-            プレイ方法
-        </h1>
-
-        <div class="tutorial-box">
-
-            <div class="tutorial-row">
-                <div class="tutorial-label">DECODE</div>
-                <p>
-                    あなたはヴェインとして物語を進めます。
-                    ランスロットの言葉の一部は、意味の分からない記号として聞こえます。
-                    記号を選択し、その意味を推測してノートへ記録してください。
-                </p>
-            </div>
-
-            <div class="tutorial-row">
-                <div class="tutorial-label">ANSWER</div>
-                <p>
-                    ランスロットの言葉に対する返答を選びます。
-                    一度選んだ返答は、その周回では変更できません。
-                    選択は二人の関係と結末に影響します。
-                </p>
-            </div>
-
-            <div class="tutorial-row">
-                <div class="tutorial-label">MEMORY</div>
-                <p>
-                    正しく解析した言葉は記録されます。
-                    二周目以降では、その記憶を引き継いだ状態から物語を始めることもできます。
-                </p>
-            </div>
-
-            <div class="tutorial-row">
-                <div class="tutorial-label">LOG</div>
-                <p>
-                    一度読んだ場面は、画面上部のLOGから読み返せます。
-                    物語を進めながら過去の言葉を手がかりにしてください。
-                </p>
-            </div>
-
-        </div>
-
-        <div class="intro-actions">
-            <button id="start-init-btn" class="primary-btn">
-                物語を始める
-            </button>
-        </div>
-
-    </div>
-</section>
-
-
-<!-- =========================
-     LOAD MEMORY
-========================= -->
-
-<section id="load-overlay" class="overlay hidden">
-    <div class="intro-card">
-
-        <div class="intro-eyebrow">MEMORY</div>
-
-        <h1 style="font-size:clamp(1.6rem,4vw,2.4rem);">
-            記憶の継承
-        </h1>
-
-        <div class="intro-text" style="text-align:center;">
-            <p>
-                過去の周回で正しく解析した言葉があります。
-            </p>
-
-            <p>
-                その記憶を引き継いで、
-                最初から意味が分かった状態で始めますか？
-            </p>
-        </div>
-
-        <div class="intro-actions">
-            <button id="load-yes" class="primary-btn">
-                継承する
-            </button>
-
-            <button id="load-no" class="secondary-btn">
-                最初から解く
-            </button>
-        </div>
-
-    </div>
-</section>
-
-
-<!-- =========================
-     GAME
-========================= -->
-
-<main id="game">
-
-    <header class="game-header">
-
-        <div class="header-left">
-            <div class="chapter-label">CHAPTER</div>
-            <div id="chapter-value" class="chapter-value">
-                01 / 20
-            </div>
-        </div>
-
-        <div class="header-center">
-            VOICE OF LANCELOT
-        </div>
-
-        <div class="header-actions">
-            <button id="log-btn" class="header-btn">
-                LOG
-            </button>
-
-            <button id="note-btn" class="header-btn">
-                NOTE
-            </button>
-        </div>
-
-    </header>
-
-
-    <section class="game-stage">
-
-        <div id="scene" class="scene">
-
-            <div class="dialogue-zone">
-
-                <div class="speaker-block">
-
-                    <div class="speaker-meta">
-                        <div class="speaker-name">
-                            LANCELOT
-                        </div>
-
-                        <div class="speaker-line"></div>
-                    </div>
-
-                    <div class="dialogue-box">
-                        <p id="message-text">
-                            ……
-                        </p>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="answer-zone">
-
-                <div id="answer-label" class="answer-label">
-                    VANE'S ANSWER
-                </div>
-
-                <div id="answer-area"></div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <footer class="game-footer">
-
-        <div class="footer-inner">
-
-            <span>
-                ANALYSIS
-                <b id="intel-val">0%</b>
-            </span>
-
-            <span>
-                ENDINGS
-                <b id="collection-val">0 / 7</b>
-            </span>
-
-        </div>
-
-    </footer>
-
-</main>
-
-
-<!-- =========================
-     NOTE MODAL
-========================= -->
-
-<div id="note-modal-layer" class="modal-layer">
-
-    <div class="modal wide">
-
-        <div class="modal-header">
-
-            <div class="modal-title-wrap">
-                <div class="modal-kicker">
-                    VANE'S NOTE
-                </div>
-
-                <h2 class="modal-title">
-                    ヴェインのノート
-                </h2>
-            </div>
-
-            <button
-                class="close-btn"
-                data-close="note-modal-layer"
-                aria-label="閉じる"
-            >
-                ×
-            </button>
-
-        </div>
-
-        <div class="modal-body">
-
-            <p class="note-help">
-                ランスロットの声から聞こえた記号と、
-                推測した意味を記録する。
-                正しい意味に辿り着いた言葉は、以降の会話でも読めるようになる。
-            </p>
-
-            <div id="note-grid" class="note-grid"></div>
-
-        </div>
-
-    </div>
-
 </div>
 
-
-<!-- =========================
-     LOG MODAL
-========================= -->
-
-<div id="log-modal-layer" class="modal-layer">
-
-    <div class="modal wide">
-
-        <div class="modal-header">
-
-            <div class="modal-title-wrap">
-                <div class="modal-kicker">
-                    STORY LOG
-                </div>
-
-                <h2 class="modal-title">
-                    過去の会話
-                </h2>
-            </div>
-
-            <button
-                class="close-btn"
-                data-close="log-modal-layer"
-                aria-label="閉じる"
-            >
-                ×
-            </button>
-
-        </div>
-
-        <div class="modal-body">
-            <div id="log-list" class="log-list"></div>
-        </div>
-
+<div id="intro-overlay">
+    <div class="content-box">
+        <h1 style="color: #d4af37; font-size: 2.5em;">声を聴かせて、ランスロット！</h1>
+        <p>ある任務にて魔物の前に飛び出したランスロット。<br>
+        目の前の人を助けるのに夢中で、背後から魔物が放った呪いに気づけなかった。<br>大好きな幼馴染を守るために身を投げ出したヴェインは、呪いを全身に浴びてしまう。<br>
+        <br>それは、一番大切な人の言葉がよくわからなくなる呪い。<br>気絶から回復したヴェインは、ランスロットの話す言葉だけがわからなくなってしまった。<br><br>
+        ____俺は絶対にあきらめない！このままランちゃんの声がわからないなんていやだ。<br>ヴェインはランスロットの言葉に耳を傾け、<br>彼が発する言葉をひとつひとつ記録していくことにした。<br>いつかまた、お前の言葉を理解できるように。
+        <br>あの日以来暗い表情のままの幼馴染の笑顔を取り戻して、<br>大好きだよ、と伝えるために。</p>
+        <button id="to-tutorial" class="btn-style" style="background: #d4af37; color: #000;">次へ</button>
     </div>
-
 </div>
 
+<div id="tutorial-overlay">
+    <div class="content-box">
+        <h2 style="color: #3498db;">プレイ方法</h2>
+        <div style="text-align: left; background: rgba(255,255,255,0.05); padding: 25px; border-radius: 10px; font-size: 0.9em;">
+            <p><b>【解析】</b><br>プレイヤーはヴェインとしてこのゲームを進めます。<br>ヴェインはランスロットの言葉すべてが理解できないわけではなく、虫食いのように聞こえています。ランスロットの発する言葉の意味を推測し、ノートに書きこんでください。<br>
+            虫食いになっている言葉を選択すると、対応する回答欄に進めます。ノートへ書き込んだ言葉は、入力した時点では正解かどうか判定されません。会話を重ね、十分な手掛かりが揃ったときにヴェインが意味を理解します。</p><br>
+            <p><b>【返答】</b><br> ランスロットの言葉への返答を選択肢から選んでください。<br>返答によってランスロットの気持ちが変化し、エンディングに影響します。<br>一度返答すると、ゲームの終了まで返答を変えることはできません。</p><br>
+            <p><b>【継承】</b><br> 理解した言葉を保持したまま、2周目以降をプレイすることができます。</p><br>
+        </div>
+        <button id="start-init-btn" class="btn-style" style="background: #3498db; color: #fff;">物語を開始する</button>
+    </div>
+</div>
+
+<div id="load-overlay">
+    <div class="content-box">
+        <h2 style="color: #27ae60;">記憶の継承</h2>
+        <p>過去に理解した単語を、最初からノートに引き継ぎますか？</p>
+        <button id="load-yes" class="btn-style" style="background: #27ae60; color: #fff;">継承する</button>
+        <button id="load-no" class="btn-style" style="background: #7f8c8d; color: #fff;">最初から解く</button>
+    </div>
+</div>
+
+<div id="game-container">
+    <div id="main-screen">
+        <div id="tab-bar"></div>
+        <div class="status-bar">
+            <span>KNIGHT: VANE</span>
+            <div class="badge-container" id="badge-area">
+                <div class="badge" id="b-1" title="暁光の誓い">💍</div>
+                <div class="badge" id="b-6" title="魂の共鳴">🌌</div>
+                <div class="badge" id="b-2" title="不滅の双璧">🤝</div>
+                <div class="badge" id="b-3" title="硝子の距離">⌛</div>
+                <div class="badge" id="b-4" title="終わらぬ静寂">❄️</div>
+                <div class="badge" id="b-5" title="プリンの迷宮">🍮</div>
+                <div class="badge gold" id="b-7" title="悠久の夜明け">🌅</div>
+            </div>
+            <span>解析: <b id="intel-val">0%</b> | 収集: <b id="col-val">0%</b></span>
+        </div>
+        <div id="display">
+            <div id="chara-header"><span id="face-emoji" style="font-size: 2em; margin-right: 15px;">😊</span><span id="speaker-name" style="font-weight:bold; letter-spacing: 0.1em; color: var(--main);">LANCELOT</span></div>
+            <div class="bubble" id="message-text">......</div>
+        </div>
+        <div class="controls" id="action-area"></div>
+    </div>
+    <div id="dictionary">
+        <div style="padding: 20px; border-bottom: 2px solid #2c3e50; background: #fff;"><h3 style="margin:0;">📓 ヴェインのノート</h3></div>
+        <div id="dict-list"></div>
+    </div>
+</div>
 
 <script>
-/* =========================================================
-   DATA
-========================================================= */
+    const wordBank = {
+        "W1": { q: "†§¶λ", accepts: ["おはよう", "おはよー"] },
+        "W2": { q: "ψζβ", accepts: ["大好き", "好き"] },
+        "W3": { q: "θωε", accepts: ["心配", "しんぱい"] },
+        "W4": { q: "ξΔφ", accepts: ["危険", "きけん"] },
+        "W5": { q: "ΣΦμ", accepts: ["一緒", "いっしょ"] },
+        "W6": { q: "ΨΩ", accepts: ["隣", "となり"] },
+        "W7": { q: "Ωβδ", accepts: ["つらい", "ツライ", "つらく"] },
+        "W8": { q: "αβγδε", accepts: ["ありがとう", "ありがと"] },
+        "W9": { q: "λησ", accepts: ["親友", "しんゆう"] },
+        "W10": { q: "πρστυφ", accepts: ["愛している", "愛してる"] },
+        "W11": { q: "κμνρ", accepts: ["忘れて"] },
+        "W12": { q: "ϕχψζ", accepts: ["助け"] },
+        "W13": { q: "℧ΞΛ", accepts: ["体調", "具合", "気分", "きぶん"] },
+        "W14": { q: "∜π", accepts: ["夢", "ゆめ"] },
+        "W15": { q: "∞∅θ", accepts: ["ずっと", "ズット"] },
+        "W16": { q: "▩⊗⊞", accepts: ["プリン", "ぷりん"] },
+        "W17": { q: "ΓΔ", accepts: ["命", "いのち"] },
+        "W18": { q: "ΘΞΦ", accepts: ["守る", "まもる"] },
+        "W19": { q: "ΠΣΩ", accepts: ["騎士", "きし"] }
+    };
 
-const wordBank = {
-    W1: {
-        q: "†§¶λ",
-        accepts: ["おはよう", "おはよー"]
-    },
+    const scenario = [
+        { id: 0, face: "🌞", q: "「[[W1]]、ヴェイン。いい[[W14]] は見れたか。[[W13]] はどうだ？」", opts: [{t:"元気いっぱいだ！",v:20,p:0}, {t:"今日は片付けからしようかな",v:5,p:0}, {t:"鎧を磨くのが日課なんだ",v:-10,p:1}] },
+        { id: 1, face: "😥", q: "「 [[W3]] したんだぞ。いつだってお前を [[W12]] たかったのに、俺は……。」", opts: [{t:"ごめんな。俺だってそうだ",v:20,p:0}, {t:"今日のおやつは何にしようか",v:5,p:0}, {t:"掃除機って知ってるか？",v:-10,p:1}] },
+        { id: 2, face: "🍮", q: "「お前が作る [[W16]] が、俺は [[W2]] なんだ。」", opts: [{t:"笑顔が見られて嬉しいぜ！",v:20,p:0}, {t:"いい天気だなあ",v:5,p:0}, {t:"卵の値段が上がってるんだ",v:-10,p:1}] },
+        { id: 3, face: "🗡️", q: "「 [[W19]] として[[W4]] は承知の上だ。[[W17]]あることが当然とは思わない。 だが、[[W15]] [[W5]] にいたい。それが俺の望みだ。」", opts: [{t:"一生お前の相棒だ",v:20,p:0}, {t:"敵はどこにいるんだ？倒してくるぞ",v:5,p:0}, {t:"筋トレ、代わってやろうか？",v:-10,p:1}] },
+        { id: 4, face: "😟", q: "「[[W6]] に座ってくれ。呪いから [[W18]] ことができずすまない。」", opts: [{t:"ああ、近くにいたい",v:20,p:0}, {t:"ここ、俺の席じゃないぞ",v:5,p:0}, {t:"椅子を新調したんだ",v:-10,p:1}] },
+        { id: 5, face: "😢", q: "「言葉が分からず [[W7]] だろう。お前が楽になるなら、いっそ俺を [[W11]]くれ…。」", opts: [{t:"そんな寂しいことを言うな",v:20,p:0}, {t:"気のせいじゃないか？",v:5,p:0}, {t:"洗濯機を回してくる",v:-10,p:1}] },
+        { id: 6, face: "🤝", q: "「[[W9]] として、[[W15]] [[W5]] にいたい。毎朝 [[W1]] と言い合いたい。 [[W19]]として生きるなら、それがどれほど贅沢か、俺は [[W11]] いたよ。」", opts: [{t:"絶対にかなえてやる",v:20,p:0}, {t:"ランスロットは大丈夫か？",v:10,p:0}, {t:"明日の朝食はパンにするぞ",v:-10,p:1}] },
+        { id: 7, face: "🙏", q: "「俺を [[W18]] ために[[W6]] にいてくれて [[W8]]。お前は、最高の [[W19]]で、最高の____  [[W9]]だ。」", opts: [{t:"俺が一番やりたかったことだ",v:20,p:0}, {t:"気にするなよ",v:10,p:0}, {t:"肩の凝りがひどいな",v:-10,p:1}] },
+        { id: 8, face: "💍", q: "「ヴェイン……[[W9]] だからじゃない。俺は、お前を [[W15]] [[W10]]。…今言うなんてずるいな。」", opts: [{t:"わかるよ。大切にする",v:30,p:0}, {t:"何がずるいんだ？",v:5,p:0}, {t:"俺も肉が好きだぜ！",v:-10,p:1}] },
+        { id: 9, face: "😔", q: "「今は[[W7]] が、[[W17]]ある限り可能性はある。いつか痛みを [[W11]] 、この絶望すら、すべて [[W14]] だったことにしよう。」", opts: [{t:"俺もそう信じてる。",v:20,p:0}, {t:"それがランスロットの願い？",v:10,p:0}, {t:"枕が低すぎるのかもな",v:-10,p:1}] },
+        { id: 10, face: "🚑", q: "「[[W13]]が戻ってよかった。こうして [[W19]] として [[W6]] にいられることが、何より嬉しいんだ。」", opts: [{t:"また同じ場所で歩き出そう",v:20,p:0}, {t:"無事でよかったよな",v:10,p:0}, {t:"演技がうまいだろ",v:5,p:1}] },
+        { id: 11, face: "🌙", q: "「いつも [[W8]]。お前が [[W2]] だ。何があってもお前を [[W18]]と誓っていたはずなのに」", opts: [{t:"俺だってそうなんだよ",v:20,p:0}, {t:"明日もよろしくな",v:10,p:0}, {t:"子供のころは楽しかったよな",v:-10,p:1}] },
+        { id: 12, face: "✨", q: "「どんな [[W4]] が待ち受けていようと、 [[W5]] に乗り越えられるはずだ。そのために [[W19]] になった」", opts: [{t:"ああ、二人でならどこへでも",v:25,p:0}, {t:"覚悟はできている",v:15,p:0}, {t:"筋力には自信があるぞ！",v:-10,p:1}] },
+        { id: 13, face: "❓", q: "「顔が赤いぞ。本当はまだ[[W13]]んじゃないか。俺がお前に[[W7]]思いをさせているだとしたら…。」", opts: [{t:"俺はランちゃんのことが、いちばん大事で、守りたいんだよ",v:30,p:0}, {t:"唯一無二の親友で、相棒だぜ！",v:15,p:0}, {t:"腹の具合は悪くないぞ",v:-10,p:1}] },
+        { id: 14, face: "😖", q: "「[[W12]] てくれ、ヴェイン。恐ろしい [[W14]] を見た。お前が [[W19]] を辞め、俺の前から去ってしまう [[W14]] だ。」", opts: [{t:"そんなのありえないよ",v:25,p:0}, {t:"不安にさせてごめんな",v:15,p:0}, {t:"運動不足が原因じゃないか？",v:-10,p:1}] },
+        { id: 15, face: "🤝", q: "「[[W5]]尽きるまで[[W6]] にいてくれ。[[W15]] [[W5]] だ。」", opts: [{t:"離れないと約束する",v:20,p:0}, {t:"わかってるよ",v:15,p:0}, {t:"三歩後ろを歩こうか",v:-10,p:1}] },
+        { id: 16, face: "💎", q: "「また昔みたいに、俺に [[W2] だって言ってくれるか？  [[W9]] として。」", opts: [{t:"そんなの、当たり前だ",v:30,p:0}, {t:"いい響きだな",v:15,p:0}, {t:"おやつの話なら今度な",v:-10,p:1}] },
+        { id: 17, face: "💖", q: "「[[W5]] にいてくれて [[W8]]。[[W15]] [[W10]]」", opts: [{t:"俺もお前を離さない",v:30,p:0}, {t:"最高のパートナーだ",v:20,p:0}, {t:"[[W16]] のおかわり、いるか？",v:-10,p:1}] },
+        { id: 18, face: "🏰", q: "「[[W15]] [[W9]] でいよう。この国を [[W18]] [[W19]] として[[W5]] に歩き続けたい。」", opts: [{t:"俺たちの絆は不滅だ",v:20,p:0}, {t:"規則正しい生活だな",v:10,p:0}, {t:"明日の当番は誰だ？",v:-5,p:1}] },
+        { id: 19, face: "🛡️", q: "「俺が呪いを解く。この悪い [[W14]] から覚ましてみせる。次は俺がお前を[[W18]]。呪いがとけたら、また[[W5]] におしゃべりしながら [[W16]] を食べたいな。その時に、ちゃんと[[W10]] って伝えるから。」", opts: [{t:"もちろんだよ、ランちゃん",v:25,p:0}, {t:"そう言ってくれて嬉しいぜ",v:15,p:0}, {t:"冒険の後はごはんだな！",v:10,p:1}] }
+    ];
 
-    W2: {
-        q: "ψζβ",
-        accepts: ["大好き", "好き"]
-    },
+    const endingsData = {
+        1: { title: "暁光の誓い", hint: "完璧な解析のうえで、ランスロットの愛を理解しましょう。" },
+        2: { title: "不滅の双璧", hint: "一定以上の愛をもつとたどり着けます" },
+        3: { title: "硝子の距離", hint: "愛を欠いた対応は壁を作ります。" },
+        4: { title: "終わらぬ静寂", hint: "ランスロットが何を言っているのか理解ができない。" },
+        5: { title: "プリンの迷宮", hint: "一番ヴェインがしなさそうな解答のみを選んでください" },
+        6: { title: "魂の共鳴", hint: "解析なんてしなくても、お前の顔を見ればわかる。" },
+        7: { title: "悠久の夜明け", hint: "すべての記憶を知るヴェインだけが辿り着く結末。" }
+    };
 
-    W3: {
-        q: "θωε",
-        accepts: ["心配", "しんぱい"]
-    },
+    let currentStep = 0, viewingStep = 0, lovePoints = 0, userDict = {}, colSet = new Set(), pCount = 0;
+    let selectedAnswers = [];
+    let resolvedWords = new Set();
+    let wordSeenCounts = {};
+    let seenSceneIds = new Set();
+    let interactionPhase = "conversation";
+    let pendingOption = null;
+    let pendingResolvedKeys = [];
+    const maxLove = 450;
 
-    W4: {
-        q: "ξΔφ",
-        accepts: ["危険", "きけん"]
-    },
-
-    W5: {
-        q: "ΣΦμ",
-        accepts: ["一緒", "いっしょ"]
-    },
-
-    W6: {
-        q: "ΨΩ",
-        accepts: ["隣", "となり"]
-    },
-
-    W7: {
-        q: "Ωβδ",
-        accepts: ["つらい", "ツライ", "つらく"]
-    },
-
-    W8: {
-        q: "αβγδε",
-        accepts: ["ありがとう", "ありがと"]
-    },
-
-    W9: {
-        q: "λησ",
-        accepts: ["親友", "しんゆう"]
-    },
-
-    W10: {
-        q: "πρστυφ",
-        accepts: ["愛している", "愛してる"]
-    },
-
-    W11: {
-        q: "κμνρ",
-        accepts: ["忘れて"]
-    },
-
-    W12: {
-        q: "ϕχψζ",
-        accepts: ["助け"]
-    },
-
-    W13: {
-        q: "℧ΞΛ",
-        accepts: ["体調", "具合", "気分", "きぶん"]
-    },
-
-    W14: {
-        q: "∜π",
-        accepts: ["夢", "ゆめ"]
-    },
-
-    W15: {
-        q: "∞∅θ",
-        accepts: ["ずっと", "ズット"]
-    },
-
-    W16: {
-        q: "▩⊗⊞",
-        accepts: ["プリン", "ぷりん"]
-    },
-
-    W17: {
-        q: "ΓΔ",
-        accepts: ["命", "いのち"]
-    },
-
-    W18: {
-        q: "ΘΞΦ",
-        accepts: ["守る", "まもる"]
-    },
-
-    W19: {
-        q: "ΠΣΩ",
-        accepts: ["騎士", "きし"]
+    const wordTotalClueScenes = {};
+    for (let key in wordBank) {
+        wordTotalClueScenes[key] = scenario.filter(data => data.q.includes(`[[${key}]]`)).length;
     }
-};
 
+    // 環境チェック
+    function checkEnvironment() {
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (window.innerWidth < 800);
+        const title = document.getElementById('check-title');
+        const entryBtn = document.getElementById('entry-btn');
+        const errorMsg = document.getElementById('error-msg');
 
-const scenario = [
-    {
-        id: 0,
-        q: "「[[W1]]、ヴェイン。いい[[W14]]は見れたか。[[W13]]はどうだ？」",
-        opts: [
-            { t: "元気いっぱいだ！", v: 20, p: 0 },
-            { t: "今日は片付けからしようかな", v: 5, p: 0 },
-            { t: "鎧を磨くのが日課なんだ", v: -10, p: 1 }
-        ]
-    },
-
-    {
-        id: 1,
-        q: "「[[W3]]したんだぞ。いつだってお前を[[W12]]たかったのに、俺は……。」",
-        opts: [
-            { t: "ごめんな。俺だってそうだ", v: 20, p: 0 },
-            { t: "今日のおやつは何にしようか", v: 5, p: 0 },
-            { t: "掃除機って知ってるか？", v: -10, p: 1 }
-        ]
-    },
-
-    {
-        id: 2,
-        q: "「お前が作る[[W16]]が、俺は[[W2]]なんだ。」",
-        opts: [
-            { t: "笑顔が見られて嬉しいぜ！", v: 20, p: 0 },
-            { t: "いい天気だなあ", v: 5, p: 0 },
-            { t: "卵の値段が上がってるんだ", v: -10, p: 1 }
-        ]
-    },
-
-    {
-        id: 3,
-        q: "「[[W19]]として[[W4]]は承知の上だ。[[W17]]あることが当然とは思わない。だが、[[W15]][[W5]]にいたい。それが俺の望みだ。」",
-        opts: [
-            { t: "一生お前の相棒だ", v: 20, p: 0 },
-            { t: "敵はどこにいるんだ？倒してくるぞ", v: 5, p: 0 },
-            { t: "筋トレ、代わってやろうか？", v: -10, p: 1 }
-        ]
-    },
-
-    {
-        id: 4,
-        q: "「[[W6]]に座ってくれ。呪いから[[W18]]ことができずすまない。」",
-        opts: [
-            { t: "ああ、近くにいたい", v: 20, p: 0 },
-            { t: "ここ、俺の席じゃないぞ", v: 5, p: 0 },
-            { t: "椅子を新調したんだ", v: -10, p: 1 }
-        ]
-    },
-
-    {
-        id: 5,
-        q: "「言葉が分からず[[W7]]だろう。お前が楽になるなら、いっそ俺を[[W11]]くれ……。」",
-        opts: [
-            { t: "そんな寂しいことを言うな", v: 20, p: 0 },
-            { t: "気のせいじゃないか？", v: 5, p: 0 },
-            { t: "洗濯機を回してくる", v: -10, p: 1 }
-        ]
-    },
-
-    {
-        id: 6,
-        q: "「[[W9]]として、[[W15]][[W5]]にいたい。毎朝[[W1]]と言い合いたい。[[W19]]として生きるなら、それがどれほど贅沢か、俺は[[W11]]いたよ。」",
-        opts: [
-            { t: "絶対にかなえてやる", v: 20, p: 0 },
-            { t: "ランスロットは大丈夫か？", v: 10, p: 0 },
-            { t: "明日の朝食はパンにするぞ", v: -10, p: 1 }
-        ]
-    },
-
-    {
-        id: 7,
-        q: "「俺を[[W18]]ために[[W6]]にいてくれて[[W8]]。お前は、最高の[[W19]]で、最高の――[[W9]]だ。」",
-        opts: [
-            { t: "俺が一番やりたかったことだ", v: 20, p: 0 },
-            { t: "気にするなよ", v: 10, p: 0 },
-            { t: "肩の凝りがひどいな", v: -10, p: 1 }
-        ]
-    },
-
-    {
-        id: 8,
-        q: "「ヴェイン……[[W9]]だからじゃない。俺は、お前を[[W15]][[W10]]。……今言うなんてずるいな。」",
-        opts: [
-            { t: "わかるよ。大切にする", v: 30, p: 0 },
-            { t: "何がずるいんだ？", v: 5, p: 0 },
-            { t: "俺も肉が好きだぜ！", v: -10, p: 1 }
-        ]
-    },
-
-    {
-        id: 9,
-        q: "「今は[[W7]]が、[[W17]]ある限り可能性はある。いつか痛みを[[W11]]、この絶望すら、すべて[[W14]]だったことにしよう。」",
-        opts: [
-            { t: "俺もそう信じてる", v: 20, p: 0 },
-            { t: "それがランスロットの願い？", v: 10, p: 0 },
-            { t: "枕が低すぎるのかもな", v: -10, p: 1 }
-        ]
-    },
-
-    {
-        id: 10,
-        q: "「[[W13]]が戻ってよかった。こうして[[W19]]として[[W6]]にいられることが、何より嬉しいんだ。」",
-        opts: [
-            { t: "また同じ場所で歩き出そう", v: 20, p: 0 },
-            { t: "無事でよかったよな", v: 10, p: 0 },
-            { t: "演技がうまいだろ", v: 5, p: 1 }
-        ]
-    },
-
-    {
-        id: 11,
-        q: "「いつも[[W8]]。お前が[[W2]]だ。何があってもお前を[[W18]]と誓っていたはずなのに。」",
-        opts: [
-            { t: "俺だってそうなんだよ", v: 20, p: 0 },
-            { t: "明日もよろしくな", v: 10, p: 0 },
-            { t: "子供のころは楽しかったよな", v: -10, p: 1 }
-        ]
-    },
-
-    {
-        id: 12,
-        q: "「どんな[[W4]]が待ち受けていようと、[[W5]]に乗り越えられるはずだ。そのために[[W19]]になった。」",
-        opts: [
-            { t: "ああ、二人でならどこへでも", v: 25, p: 0 },
-            { t: "覚悟はできている", v: 15, p: 0 },
-            { t: "筋力には自信があるぞ！", v: -10, p: 1 }
-        ]
-    },
-
-    {
-        id: 13,
-        q: "「顔が赤いぞ。本当はまだ[[W13]]んじゃないか。俺がお前に[[W7]]思いをさせているだとしたら……。」",
-        opts: [
-            { t: "俺はランちゃんのことが、いちばん大事で、守りたいんだよ", v: 30, p: 0 },
-            { t: "唯一無二の親友で、相棒だぜ！", v: 15, p: 0 },
-            { t: "腹の具合は悪くないぞ", v: -10, p: 1 }
-        ]
-    },
-
-    {
-        id: 14,
-        q: "「[[W12]]てくれ、ヴェイン。恐ろしい[[W14]]を見た。お前が[[W19]]を辞め、俺の前から去ってしまう[[W14]]だ。」",
-        opts: [
-            { t: "そんなのありえないよ", v: 25, p: 0 },
-            { t: "不安にさせてごめんな", v: 15, p: 0 },
-            { t: "運動不足が原因じゃないか？", v: -10, p: 1 }
-        ]
-    },
-
-    {
-        id: 15,
-        q: "「[[W17]]尽きるまで[[W6]]にいてくれ。[[W15]][[W5]]だ。」",
-        opts: [
-            { t: "離れないと約束する", v: 20, p: 0 },
-            { t: "わかってるよ", v: 15, p: 0 },
-            { t: "三歩後ろを歩こうか", v: -10, p: 1 }
-        ]
-    },
-
-    {
-        id: 16,
-        q: "「また昔みたいに、俺に[[W2]]だって言ってくれるか？　[[W9]]として。」",
-        opts: [
-            { t: "そんなの、当たり前だ", v: 30, p: 0 },
-            { t: "いい響きだな", v: 15, p: 0 },
-            { t: "おやつの話なら今度な", v: -10, p: 1 }
-        ]
-    },
-
-    {
-        id: 17,
-        q: "「[[W5]]にいてくれて[[W8]]。[[W15]][[W10]]。」",
-        opts: [
-            { t: "俺もお前を離さない", v: 30, p: 0 },
-            { t: "最高のパートナーだ", v: 20, p: 0 },
-            { t: "[[W16]]のおかわり、いるか？", v: -10, p: 1 }
-        ]
-    },
-
-    {
-        id: 18,
-        q: "「[[W15]][[W9]]でいよう。この国を[[W18]][[W19]]として[[W5]]に歩き続けたい。」",
-        opts: [
-            { t: "俺たちの絆は不滅だ", v: 20, p: 0 },
-            { t: "規則正しい生活だな", v: 10, p: 0 },
-            { t: "明日の当番は誰だ？", v: -5, p: 1 }
-        ]
-    },
-
-    {
-        id: 19,
-        q: "「俺が呪いを解く。この悪い[[W14]]から覚ましてみせる。次は俺がお前を[[W18]]。呪いがとけたら、また[[W5]]におしゃべりしながら[[W16]]を食べたいな。その時に、ちゃんと[[W10]]って伝えるから。」",
-        opts: [
-            { t: "もちろんだよ、ランちゃん", v: 25, p: 0 },
-            { t: "そう言ってくれて嬉しいぜ", v: 15, p: 0 },
-            { t: "冒険の後はごはんだな！", v: 10, p: 1 }
-        ]
+        if (isMobile) {
+            title.innerText = "ACCESS DENIED";
+            errorMsg.style.display = "block";
+        } else {
+            title.innerText = "ATTENTION";
+            entryBtn.style.display = "inline-block";
+        }
     }
-];
 
-
-const endingsData = {
-    1: {
-        title: "暁光の誓い",
-        hint: "すべての言葉を解析し、ランスロットの想いへまっすぐ応え続けてみましょう。"
-    },
-
-    2: {
-        title: "不滅の双璧",
-        hint: "言葉が完全に分からなくても、二人の信頼を育てる選択を重ねてみましょう。"
-    },
-
-    3: {
-        title: "硝子の距離",
-        hint: "ランスロットの想いに十分応えられないまま物語を終えてみましょう。"
-    },
-
-    4: {
-        title: "終わらぬ静寂",
-        hint: "ランスロットの声も想いも、最後までほとんど掴めない場合に辿り着きます。"
-    },
-
-    5: {
-        title: "プリンの迷宮",
-        hint: "ヴェインらしからぬ返答を、できるだけ多く選んでみましょう。"
-    },
-
-    6: {
-        title: "魂の共鳴",
-        hint: "言葉そのものをほとんど解析せず、それでも彼の心に寄り添ってみましょう。"
-    },
-
-    7: {
-        title: "悠久の夜明け",
-        hint: "ほかのすべての結末を知り、言葉も想いも完全に理解した状態で物語を終えましょう。"
+    function shuffle(arr) {
+        let n = arr.length;
+        while (n) { let i = Math.floor(Math.random() * n--); [arr[n], arr[i]] = [arr[i], arr[n]]; }
+        return arr;
     }
-};
 
-
-/* =========================================================
-   STATE
-========================================================= */
-
-let currentStep = 0;
-let viewingStep = 0;
-
-let lovePoints = 0;
-let pCount = 0;
-
-let userDict = {};
-let selectedAnswers = [];
-
-let colSet = new Set();
-
-let gameEnded = false;
-
-
-/*
-    シナリオ側の最高得点を自動計算。
-    数値を変えても maxLove を手動修正する必要がない。
-*/
-const maxLove = scenario.reduce((total, scene) => {
-    const max = Math.max(...scene.opts.map(option => option.v));
-    return total + max;
-}, 0);
-
-
-/* =========================================================
-   STORAGE
-========================================================= */
-
-function loadCollection() {
-    try {
-        const saved = JSON.parse(
-            localStorage.getItem("vane_collection_v4") || "[]"
-        );
-
-        colSet = new Set(saved);
-    } catch {
-        colSet = new Set();
+    function jumpToDict(key) {
+        const entry = document.getElementById(`entry-${key}`);
+        const input = document.getElementById(`input-${key}`);
+        if (entry && input) {
+            entry.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            entry.classList.add('highlight-flash');
+            setTimeout(() => entry.classList.remove('highlight-flash'), 1000);
+            if (!input.disabled) input.focus();
+        }
     }
-}
 
+    window.onload = () => {
+        checkEnvironment();
 
-function saveCollection() {
-    localStorage.setItem(
-        "vane_collection_v4",
-        JSON.stringify(Array.from(colSet))
-    );
-}
+        document.getElementById('entry-btn').onclick = () => {
+            document.getElementById('device-check-overlay').style.display = 'none';
+            document.getElementById('intro-overlay').style.display = 'flex';
+        };
 
+        document.getElementById('to-tutorial').onclick = () => {
+            document.getElementById('intro-overlay').style.display = 'none';
+            document.getElementById('tutorial-overlay').style.display = 'flex';
+        };
 
-function loadSolvedWords() {
-    try {
-        return JSON.parse(
-            localStorage.getItem("vane_solved_words") || "{}"
-        );
-    } catch {
-        return {};
+        document.getElementById('start-init-btn').onclick = () => {
+            const solved = localStorage.getItem('vane_solved_words');
+            if (solved) {
+                document.getElementById('tutorial-overlay').style.display = 'none';
+                document.getElementById('load-overlay').style.display = 'flex';
+            } else { startGame(false); }
+        };
+
+        document.getElementById('load-yes').onclick = () => startGame(true);
+        document.getElementById('load-no').onclick = () => startGame(false);
+
+        const savedCol = localStorage.getItem('vane_collection_v3');
+        if (savedCol) { colSet = new Set(JSON.parse(savedCol)); updateColUI(); }
+        initDict({});
+    };
+
+    function startGame(inherit) {
+        document.getElementById('tutorial-overlay').style.display = 'none';
+        document.getElementById('load-overlay').style.display = 'none';
+        document.getElementById('game-container').style.display = 'flex';
+
+        selectedAnswers = new Array(scenario.length).fill(null);
+        resolvedWords = new Set();
+        wordSeenCounts = {};
+        seenSceneIds = new Set();
+        interactionPhase = "conversation";
+        pendingOption = null;
+        pendingResolvedKeys = [];
+
+        const savedWords = JSON.parse(localStorage.getItem('vane_solved_words') || "{}");
+        initDict(inherit ? savedWords : {});
+        registerSceneWords(currentStep);
+        renderTabs();
+        updateUI();
     }
-}
 
+    function initDict(initialWords) {
+        const list = document.getElementById('dict-list');
+        list.innerHTML = "";
+        userDict = {};
 
-function saveSolvedWord(key, value) {
-    const saved = loadSolvedWords();
+        for (let key in wordBank) {
+            const div = document.createElement('div');
+            div.className = 'dict-entry';
+            div.id = `entry-${key}`;
 
-    saved[key] = value;
+            const isInherited = initialWords[key] && wordBank[key].accepts.includes(initialWords[key]);
 
-    localStorage.setItem(
-        "vane_solved_words",
-        JSON.stringify(saved)
-    );
-}
+            userDict[key] = isInherited ? initialWords[key] : "";
 
-
-/* =========================================================
-   START FLOW
-========================================================= */
-
-window.addEventListener("DOMContentLoaded", () => {
-
-    loadCollection();
-
-    updateCollectionUI();
-
-    document
-        .getElementById("to-tutorial")
-        .addEventListener("click", () => {
-
-            hide("intro-overlay");
-            show("tutorial-overlay");
-
-        });
-
-
-    document
-        .getElementById("start-init-btn")
-        .addEventListener("click", () => {
-
-            const solved = loadSolvedWords();
-
-            if (Object.keys(solved).length > 0) {
-
-                hide("tutorial-overlay");
-                show("load-overlay");
-
-            } else {
-
-                startGame(false);
-
+            if (isInherited) {
+                resolvedWords.add(key);
             }
 
+            div.innerHTML = `
+                <label>${wordBank[key].q}</label>
+                <div class="dict-status" id="status-${key}"></div>
+                <input
+                    type="text"
+                    id="input-${key}"
+                    placeholder="意味を推測"
+                    value="${isInherited ? initialWords[key] : ''}"
+                    oninput="updateGuess('${key}', this.value)"
+                >
+            `;
+
+            list.appendChild(div);
+            renderDictEntryState(key);
+        }
+
+        updateIntelUI();
+    }
+
+    function renderDictEntryState(key) {
+        const entry = document.getElementById(`entry-${key}`);
+        const input = document.getElementById(`input-${key}`);
+        const status = document.getElementById(`status-${key}`);
+
+        if (!entry || !input || !status) return;
+
+        entry.classList.remove('correct', 'guessing');
+        input.classList.remove('wrong-text');
+
+        if (resolvedWords.has(key)) {
+            entry.classList.add('correct');
+            status.innerText = "理解した";
+            input.disabled = true;
+            input.value = wordBank[key].accepts[0];
+        } else if ((userDict[key] || "").trim().length > 0) {
+            entry.classList.add('guessing');
+            status.innerText = "推測中";
+            input.disabled = false;
+        } else {
+            status.innerText = "未推測";
+            input.disabled = false;
+        }
+    }
+
+    function updateGuess(key, val) {
+        if (resolvedWords.has(key)) return;
+
+        userDict[key] = val.trim();
+        renderDictEntryState(key);
+    }
+
+    function registerSceneWords(index) {
+        if (index < 0 || index >= scenario.length) return;
+        if (seenSceneIds.has(index)) return;
+
+        seenSceneIds.add(index);
+
+        const text = scenario[index].q;
+        const keysInScene = new Set();
+
+        for (let key in wordBank) {
+            if (text.includes(`[[${key}]]`)) {
+                keysInScene.add(key);
+            }
+        }
+
+        keysInScene.forEach(key => {
+            wordSeenCounts[key] = (wordSeenCounts[key] || 0) + 1;
         });
+    }
 
+    function resolveWord(key) {
+        if (resolvedWords.has(key)) return false;
 
-    document
-        .getElementById("load-yes")
-        .addEventListener("click", () => {
+        const guess = (userDict[key] || "").trim();
 
-            startGame(true);
+        if (!wordBank[key].accepts.includes(guess)) {
+            return false;
+        }
 
-        });
+        resolvedWords.add(key);
 
+        const canonical = wordBank[key].accepts[0];
+        userDict[key] = canonical;
 
-    document
-        .getElementById("load-no")
-        .addEventListener("click", () => {
+        const solved = JSON.parse(localStorage.getItem('vane_solved_words') || "{}");
+        solved[key] = canonical;
+        localStorage.setItem('vane_solved_words', JSON.stringify(solved));
 
-            startGame(false);
+        renderDictEntryState(key);
+        updateIntelUI();
 
-        });
+        return true;
+    }
 
+    function evaluateUnderstanding(data) {
+        let candidates;
 
-    document
-        .getElementById("note-btn")
-        .addEventListener("click", () => {
-
-            openNote();
-
-        });
-
-
-    document
-        .getElementById("log-btn")
-        .addEventListener("click", () => {
-
-            openLog();
-
-        });
-
-
-    document
-        .querySelectorAll("[data-close]")
-        .forEach(button => {
-
-            button.addEventListener("click", () => {
-
-                closeModal(
-                    button.dataset.close
-                );
-
+        if (Array.isArray(data.resolveChecks)) {
+            candidates = data.resolveChecks;
+        } else {
+            candidates = Object.keys(wordBank).filter(key => {
+                const totalClues = wordTotalClueScenes[key] || 1;
+                const requiredClues = Math.min(2, totalClues);
+                return (wordSeenCounts[key] || 0) >= requiredClues;
             });
+        }
 
+        const resolvedNow = [];
+
+        candidates.forEach(key => {
+            if (resolveWord(key)) {
+                resolvedNow.push(key);
+            }
         });
 
+        return resolvedNow;
+    }
 
-    document
-        .querySelectorAll(".modal-layer")
-        .forEach(layer => {
+    function updateIntelUI() {
+        const intel = Math.floor((resolvedWords.size / Object.keys(wordBank).length) * 100);
+        const el = document.getElementById('intel-val');
+        if (el) el.innerText = intel + "%";
+    }
 
-            layer.addEventListener("click", event => {
+    function getReactionText(option) {
+        if (option && option.reaction) {
+            return option.reaction;
+        }
 
-                if (event.target === layer) {
-                    closeModal(layer.id);
+        return "（ランちゃんは、俺の返事を静かに聞いている。）";
+    }
+
+    function continueFromReaction() {
+        const data = scenario[currentStep];
+
+        pendingResolvedKeys = evaluateUnderstanding(data);
+
+        if (pendingResolvedKeys.length > 0) {
+            interactionPhase = "resolution";
+            updateUI(true);
+        } else {
+            advanceScene();
+        }
+    }
+
+    function advanceScene() {
+        pendingOption = null;
+        pendingResolvedKeys = [];
+        interactionPhase = "conversation";
+
+        currentStep++;
+        viewingStep = currentStep;
+
+        if (currentStep < scenario.length) {
+            registerSceneWords(currentStep);
+            renderTabs();
+            updateUI(true);
+        } else {
+            showEnd();
+        }
+    }
+
+    function renderTabs() {
+        const bar = document.getElementById('tab-bar');
+        bar.innerHTML = '';
+
+        scenario.forEach((_, i) => {
+            const tab = document.createElement('div');
+            tab.className = `tab ${i === viewingStep ? 'active' : ''} ${i > currentStep ? 'locked' : ''}`;
+            tab.innerText = i + 1;
+
+            tab.onclick = () => {
+                if (i <= currentStep) {
+                    viewingStep = i;
+                    renderTabs();
+                    updateUI();
                 }
+            };
 
-            });
-
+            bar.appendChild(tab);
         });
+    }
 
+    function updateUI(redo = true) {
+        if (currentStep >= scenario.length) return;
 
-    document.addEventListener("keydown", event => {
+        const data = scenario[viewingStep];
+        const speaker = document.getElementById('speaker-name');
+        const face = document.getElementById('face-emoji');
+        const message = document.getElementById('message-text');
 
-        if (event.key !== "Escape") {
+        updateIntelUI();
+
+        const isCurrent = viewingStep === currentStep;
+
+        if (isCurrent && interactionPhase === "reaction") {
+            speaker.innerText = "VANE";
+            face.innerText = "💭";
+            message.innerHTML = getReactionText(pendingOption);
+
+            const area = document.getElementById('action-area');
+            area.innerHTML = '';
+
+            const next = document.createElement('button');
+            next.className = 'opt-btn';
+            next.innerText = "▶ 次へ";
+            next.onclick = continueFromReaction;
+            area.appendChild(next);
+
             return;
         }
 
-        closeModal("note-modal-layer");
-        closeModal("log-modal-layer");
+        if (isCurrent && interactionPhase === "resolution") {
+            speaker.innerText = "VANE";
+            face.innerText = "💭";
 
-    });
+            const understood = pendingResolvedKeys.map(key => {
+                return `「${wordBank[key].q}」――「${wordBank[key].accepts[0]}」`;
+            }).join("<br>");
 
-});
+            message.innerHTML = `（……意味がつながった。）<br><br>${understood}`;
 
+            const area = document.getElementById('action-area');
+            area.innerHTML = '';
 
-function startGame(inherit) {
+            const next = document.createElement('button');
+            next.className = 'opt-btn';
+            next.innerText = "▶ 次へ";
+            next.onclick = advanceScene;
+            area.appendChild(next);
 
-    hide("intro-overlay");
-    hide("tutorial-overlay");
-    hide("load-overlay");
+            return;
+        }
 
-    gameEnded = false;
+        speaker.innerText = "LANCELOT";
+        face.innerText = data.face;
 
-    currentStep = 0;
-    viewingStep = 0;
+        let text = data.q;
 
-    lovePoints = 0;
-    pCount = 0;
+        for (let key in wordBank) {
+            const reg = new RegExp("\\[\\[" + key + "\\]\\]", "g");
 
-    selectedAnswers =
-        new Array(scenario.length).fill(null);
+            let spanClass;
+            let displayVal;
 
-    userDict = {};
-
-    if (inherit) {
-
-        const saved = loadSolvedWords();
-
-        Object.entries(saved).forEach(([key, value]) => {
-
-            if (
-                wordBank[key] &&
-                isCorrectWord(key, value)
-            ) {
-                userDict[key] = value;
+            if (resolvedWords.has(key)) {
+                spanClass = "resolved";
+                displayVal = wordBank[key].accepts[0];
+            } else {
+                spanClass = "symbol";
+                displayVal = wordBank[key].q;
             }
 
-        });
-
-    }
-
-    buildNote();
-
-    document.getElementById("game").style.display = "flex";
-
-    updateUI();
-
-}
-
-
-/* =========================================================
-   GENERIC HELPERS
-========================================================= */
-
-function show(id) {
-    document
-        .getElementById(id)
-        .classList.remove("hidden");
-}
-
-
-function hide(id) {
-    document
-        .getElementById(id)
-        .classList.add("hidden");
-}
-
-
-function openModal(id) {
-
-    document
-        .getElementById(id)
-        .classList.add("open");
-
-}
-
-
-function closeModal(id) {
-
-    document
-        .getElementById(id)
-        .classList.remove("open");
-
-}
-
-
-function isCorrectWord(key, value) {
-
-    const normalized =
-        String(value || "").trim();
-
-    return wordBank[key]
-        .accepts
-        .includes(normalized);
-
-}
-
-
-/* =========================================================
-   TEXT RENDERING
-========================================================= */
-
-function renderText(rawText) {
-
-    let text = rawText;
-
-    Object.keys(wordBank).forEach(key => {
-
-        const reg =
-            new RegExp(
-                "\\[\\[" + key + "\\]\\]",
-                "g"
+            text = text.replace(
+                reg,
+                `<span class="${spanClass}" onclick="jumpToDict('${key}')">${displayVal}</span>`
             );
+        }
 
-        const userValue =
-            String(userDict[key] || "").trim();
+        message.innerHTML = text.replace(/\n/g, "<br>");
 
-        let replacement;
+        const light = Math.min(85, 10 + (lovePoints / 5));
+        const sat = Math.min(100, 20 + (lovePoints / 4));
+        const hue = 210 - (lovePoints / 10);
 
-        if (isCorrectWord(key, userValue)) {
+        document.documentElement.style.setProperty('--love-light', `${light}%`);
+        document.documentElement.style.setProperty('--love-sat', `${sat}%`);
+        document.documentElement.style.setProperty('--love-hue', `${hue}`);
 
-            replacement = `
-                <span
-                    class="resolved-word"
-                    data-word="${key}"
-                    tabindex="0"
-                >${escapeHtml(userValue)}</span>
-            `;
+        if (!redo) return;
 
-        } else if (userValue) {
+        const area = document.getElementById('action-area');
+        area.innerHTML = '';
 
-            replacement = `
-                <span
-                    class="guessed-word"
-                    data-word="${key}"
-                    tabindex="0"
-                >${escapeHtml(userValue)}</span>
-            `;
+        if (isCurrent) {
+            shuffle([...data.opts]).forEach(o => {
+                const b = document.createElement('button');
+                b.className = 'opt-btn';
+                b.innerText = `▶ ${o.t}`;
 
+                b.onclick = () => {
+                    selectedAnswers[currentStep] = o.t;
+
+                    if (o.p === 1) pCount++;
+                    lovePoints += o.v;
+
+                    pendingOption = o;
+                    interactionPhase = "reaction";
+
+                    updateUI(true);
+                };
+
+                area.appendChild(b);
+            });
         } else {
+            data.opts.forEach(o => {
+                const b = document.createElement('button');
+                b.className = 'opt-btn';
 
-            replacement = `
-                <span
-                    class="cipher-word"
-                    data-word="${key}"
-                    tabindex="0"
-                >${escapeHtml(wordBank[key].q)}</span>
-            `;
+                if (o.t === selectedAnswers[viewingStep]) {
+                    b.classList.add('my-choice');
+                }
 
+                b.disabled = true;
+                b.innerText = (o.t === selectedAnswers[viewingStep])
+                    ? `● ${o.t}`
+                    : `▶ ${o.t}`;
+
+                area.appendChild(b);
+            });
         }
-
-        text = text.replace(
-            reg,
-            replacement
-        );
-
-    });
-
-    return text.replace(/\n/g, "<br>");
-
-}
-
-
-function escapeHtml(text) {
-
-    return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-
-}
-
-
-/* =========================================================
-   MAIN UI
-========================================================= */
-
-function updateUI() {
-
-    if (gameEnded) {
-        return;
     }
 
-    const scene =
-        scenario[viewingStep];
-
-    updateChapterUI();
-
-    document
-        .getElementById("message-text")
-        .innerHTML =
-        renderText(scene.q);
-
-    bindWordLinks(
-        document.getElementById("message-text")
-    );
-
-    updateAnswerArea();
-
-    updateAnalysisUI();
-
-    updateCollectionUI();
-
-    updateBackgroundMood();
-
-}
-
-
-function updateChapterUI() {
-
-    document
-        .getElementById("chapter-value")
-        .textContent =
-        `${String(viewingStep + 1).padStart(2, "0")} / ${String(scenario.length).padStart(2, "0")}`;
-
-}
-
-
-function updateAnswerArea() {
-
-    const area =
-        document.getElementById("answer-area");
-
-    const label =
-        document.getElementById("answer-label");
-
-    area.innerHTML = "";
-
-    const data =
-        scenario[viewingStep];
-
-
-    /*
-        今まさに進行中の場面
-    */
-    if (viewingStep === currentStep) {
-
-        label.textContent =
-            "VANE'S ANSWER";
-
-        data.opts.forEach(option => {
-
-            const button =
-                document.createElement("button");
-
-            button.className =
-                "answer-btn";
-
-            button.innerHTML =
-                renderText(option.t);
-
-            bindWordLinks(button);
-
-            button.addEventListener(
-                "click",
-                event => {
-
-                    /*
-                        回答文中の暗号語を押した場合は
-                        回答選択ではなくノートを開く。
-                    */
-                    if (
-                        event.target.closest(
-                            "[data-word]"
-                        )
-                    ) {
-                        return;
-                    }
-
-                    chooseAnswer(option);
-
-                }
-            );
-
-            area.appendChild(button);
-
+    function updateColUI() {
+        document.getElementById('col-val').innerText = Math.floor((colSet.size / 7) * 100) + "%";
+        colSet.forEach(id => {
+            const el = document.getElementById(`b-${id}`);
+            if (el) el.classList.add('unlocked');
         });
-
-        return;
     }
 
+    function showEnd() {
+        let t, c, e, id;
+        const loveRate = (lovePoints / maxLove) * 100;
+        const intel = parseInt(document.getElementById('intel-val').innerText);
+        const hasAllNormalEndings = [1,2,3,4,5,6].every(val => colSet.has(val));
 
-    /*
-        過去ログとして見ている場面
-    */
-    label.textContent =
-        "PAST ANSWER";
+        if (hasAllNormalEndings && intel >= 100 && loveRate >= 95) {
+            t = endingsData[7].title;
+            e = "🌅✨";
+            c = "記号の海を越え、二人は光溢れる地平へと歩み出す。この絆は、もう何者にも縛られることはない。";
+            id = 7;
 
-    data.opts.forEach(option => {
-
-        const button =
-            document.createElement("button");
-
-        button.className =
-            "answer-btn";
-
-        button.disabled = true;
-
-        if (
-            selectedAnswers[viewingStep] ===
-            option.t
-        ) {
-            button.classList.add(
-                "selected-answer"
-            );
+            document.documentElement.style.setProperty('--love-light', '90%');
+            document.documentElement.style.setProperty('--love-hue', '45');
         }
-
-        button.innerHTML =
-            renderText(option.t);
-
-        bindWordLinks(button);
-
-        area.appendChild(button);
-
-    });
-
-
-    const note =
-        document.createElement("div");
-
-    note.className =
-        "past-note";
-
-    note.textContent =
-        "過去の場面を読み返しています。現在の場面へ戻るにはLOGから最新の記録を選択してください。";
-
-    area.appendChild(note);
-
-}
-
-
-function chooseAnswer(option) {
-
-    if (
-        viewingStep !== currentStep ||
-        gameEnded
-    ) {
-        return;
-    }
-
-    selectedAnswers[currentStep] =
-        option.t;
-
-    lovePoints += option.v;
-
-    if (option.p === 1) {
-        pCount++;
-    }
-
-    currentStep++;
-
-    if (
-        currentStep >=
-        scenario.length
-    ) {
-
-        showEnding();
-        return;
-
-    }
-
-    viewingStep =
-        currentStep;
-
-    updateUI();
-
-}
-
-
-function bindWordLinks(root) {
-
-    root
-        .querySelectorAll("[data-word]")
-        .forEach(element => {
-
-            element.addEventListener(
-                "click",
-                event => {
-
-                    event.stopPropagation();
-
-                    openNote(
-                        element.dataset.word
-                    );
-
-                }
-            );
-
-
-            element.addEventListener(
-                "keydown",
-                event => {
-
-                    if (
-                        event.key === "Enter" ||
-                        event.key === " "
-                    ) {
-
-                        event.preventDefault();
-
-                        openNote(
-                            element.dataset.word
-                        );
-
-                    }
-
-                }
-            );
-
-        });
-
-}
-
-
-/* =========================================================
-   ANALYSIS
-========================================================= */
-
-function getCorrectCount() {
-
-    return Object
-        .keys(wordBank)
-        .filter(key =>
-            isCorrectWord(
-                key,
-                userDict[key]
-            )
-        )
-        .length;
-
-}
-
-
-function getAnalysisPercent() {
-
-    return Math.floor(
-        (
-            getCorrectCount() /
-            Object.keys(wordBank).length
-        ) * 100
-    );
-
-}
-
-
-function updateAnalysisUI() {
-
-    document
-        .getElementById("intel-val")
-        .textContent =
-        getAnalysisPercent() + "%";
-
-}
-
-
-/* =========================================================
-   BACKGROUND MOOD
-========================================================= */
-
-function updateBackgroundMood() {
-
-    const progress =
-        Math.max(
-            0,
-            Math.min(
-                1,
-                lovePoints / maxLove
-            )
-        );
-
-    const hue =
-        220 - progress * 14;
-
-    const saturation =
-        18 + progress * 15;
-
-    const lightness =
-        7 + progress * 9;
-
-    document.documentElement.style.setProperty(
-        "--love-hue",
-        hue
-    );
-
-    document.documentElement.style.setProperty(
-        "--love-sat",
-        `${saturation}%`
-    );
-
-    document.documentElement.style.setProperty(
-        "--love-light",
-        `${lightness}%`
-    );
-
-}
-
-
-/* =========================================================
-   NOTE
-========================================================= */
-
-function buildNote() {
-
-    const grid =
-        document.getElementById("note-grid");
-
-    grid.innerHTML = "";
-
-
-    Object.entries(wordBank)
-        .forEach(([key, word]) => {
-
-            const entry =
-                document.createElement("div");
-
-            entry.className =
-                "note-entry";
-
-            entry.id =
-                `note-entry-${key}`;
-
-
-            const code =
-                document.createElement("div");
-
-            code.className =
-                "note-code";
-
-            code.textContent =
-                word.q;
-
-
-            const row =
-                document.createElement("div");
-
-            row.className =
-                "note-row";
-
-
-            const input =
-                document.createElement("input");
-
-            input.className =
-                "note-input";
-
-            input.id =
-                `note-input-${key}`;
-
-            input.type =
-                "text";
-
-            input.autocomplete =
-                "off";
-
-            input.spellcheck =
-                false;
-
-            input.placeholder =
-                "意味を推測する";
-
-            input.value =
-                userDict[key] || "";
-
-
-            const submit =
-                document.createElement("button");
-
-            submit.className =
-                "note-submit";
-
-            submit.type =
-                "button";
-
-            submit.textContent =
-                "記録";
-
-
-            const result =
-                document.createElement("div");
-
-            result.className =
-                "note-result";
-
-            result.id =
-                `note-result-${key}`;
-
-
-            row.append(
-                input,
-                submit
-            );
-
-            entry.append(
-                code,
-                row,
-                result
-            );
-
-            grid.appendChild(entry);
-
-
-            submit.addEventListener(
-                "click",
-                () => {
-
-                    submitGuess(
-                        key,
-                        input.value
-                    );
-
-                }
-            );
-
-
-            input.addEventListener(
-                "keydown",
-                event => {
-
-                    if (
-                        event.key ===
-                        "Enter"
-                    ) {
-
-                        submitGuess(
-                            key,
-                            input.value
-                        );
-
-                    }
-
-                }
-            );
-
-
-            updateNoteEntry(key);
-
-        });
-
-}
-
-
-function updateNoteEntry(key) {
-
-    const entry =
-        document.getElementById(
-            `note-entry-${key}`
-        );
-
-    const input =
-        document.getElementById(
-            `note-input-${key}`
-        );
-
-    const result =
-        document.getElementById(
-            `note-result-${key}`
-        );
-
-    if (
-        !entry ||
-        !input ||
-        !result
-    ) {
-        return;
-    }
-
-
-    entry.classList.remove(
-        "solved",
-        "failed"
-    );
-
-
-    const value =
-        String(
-            userDict[key] || ""
-        ).trim();
-
-
-    if (
-        isCorrectWord(
-            key,
-            value
-        )
-    ) {
-
-        entry.classList.add(
-            "solved"
-        );
-
-        result.textContent =
-            "意味を掴んだ。";
-
-    } else if (value) {
-
-        result.textContent =
-            "まだ確信は持てない。";
-
-    } else {
-
-        result.textContent =
-            "";
-
-    }
-
-}
-
-
-function submitGuess(key, rawValue) {
-
-    const value =
-        String(rawValue || "")
-            .trim();
-
-    const entry =
-        document.getElementById(
-            `note-entry-${key}`
-        );
-
-    const input =
-        document.getElementById(
-            `note-input-${key}`
-        );
-
-    const result =
-        document.getElementById(
-            `note-result-${key}`
-        );
-
-
-    if (!value) {
-
-        userDict[key] = "";
-
-        updateNoteEntry(key);
-        updateUI();
-
-        return;
-
-    }
-
-
-    userDict[key] =
-        value;
-
-
-    if (
-        isCorrectWord(
-            key,
-            value
-        )
-    ) {
-
-        saveSolvedWord(
-            key,
-            value
-        );
-
-        entry.classList.remove(
-            "failed"
-        );
-
-        entry.classList.add(
-            "solved"
-        );
-
-        result.textContent =
-            `――分かった。これは「${value}」だ。`;
-
-    } else {
-
-        entry.classList.remove(
-            "solved"
-        );
-
-        entry.classList.remove(
-            "failed"
-        );
-
-        void entry.offsetWidth;
-
-        entry.classList.add(
-            "failed"
-        );
-
-        result.textContent =
-            "……違う気がする。";
-
-    }
-
-
-    input.value =
-        value;
-
-    updateUI();
-
-}
-
-
-function openNote(focusKey = null) {
-
-    openModal(
-        "note-modal-layer"
-    );
-
-
-    document
-        .querySelectorAll(
-            ".note-entry.focused"
-        )
-        .forEach(entry => {
-
-            entry.classList.remove(
-                "focused"
-            );
-
-        });
-
-
-    if (!focusKey) {
-        return;
-    }
-
-
-    const entry =
-        document.getElementById(
-            `note-entry-${focusKey}`
-        );
-
-    const input =
-        document.getElementById(
-            `note-input-${focusKey}`
-        );
-
-
-    if (!entry || !input) {
-        return;
-    }
-
-
-    entry.classList.add(
-        "focused"
-    );
-
-
-    requestAnimationFrame(() => {
-
-        entry.scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-        });
-
-        setTimeout(() => {
-            input.focus();
-            input.select();
-        }, 250);
-
-    });
-
-}
-
-
-/* =========================================================
-   LOG
-========================================================= */
-
-function openLog() {
-
-    buildLog();
-
-    openModal(
-        "log-modal-layer"
-    );
-
-}
-
-
-function buildLog() {
-
-    const list =
-        document.getElementById(
-            "log-list"
-        );
-
-    list.innerHTML = "";
-
-
-    const lastUnlocked =
-        Math.min(
-            currentStep,
-            scenario.length - 1
-        );
-
-
-    for (
-        let i = 0;
-        i <= lastUnlocked;
-        i++
-    ) {
-
-        const scene =
-            scenario[i];
-
-        const button =
-            document.createElement(
-                "button"
-            );
-
-        button.className =
-            "log-entry";
-
-        if (
-            i === viewingStep
-        ) {
-
-            button.classList.add(
-                "current"
-            );
-
+        else if (pCount >= 12) {
+            id = 5;
+            t = endingsData[5].title;
+            e = "🍮❓";
+            c = "ランスロットは呆れ果て、山ほどのプリンをヴェインに押し付けて去っていった。";
         }
+        else if (intel >= 100 && loveRate >= 80) {
+            id = 1;
+            t = endingsData[1].title;
+            e = "✨💍✨";
+            c = "二人の魂は、死線を越えたことで以前よりも強く、深く結ばれた。";
+        }
+        else if (intel <= 50 && loveRate >= 80) {
+            id = 6;
+            t = endingsData[6].title;
+            e = "🌌🤝";
+            c = "音を介さずとも完璧に響き合っていた。";
+        }
+        else if (loveRate >= 50) {
+            id = 2;
+            t = endingsData[2].title;
+            e = "⚔️🤝";
+            c = "不完全な言葉の隙間を、揺るぎない信頼が埋めていた。";
+        }
+        else if (loveRate > 0 && loveRate < 50) {
+            id = 3;
+            t = endingsData[3].title;
+            e = "⌛";
+            c = "二人の間には、硝子の壁が残った。";
+        }
+        else {
+            id = 4;
+            t = endingsData[4].title;
+            e = "❄️";
+            c = "二人の絆は、ここで潰えた。";
+        }
+        
+        colSet.add(id);
+        localStorage.setItem('vane_collection_v3', JSON.stringify(Array.from(colSet)));
+        updateColUI();
 
+        let uncollected = Object.keys(endingsData).filter(key => !colSet.has(parseInt(key)));
 
-        const number =
-            document.createElement(
-                "span"
-            );
+        let hintHtml = uncollected.length > 0
+            ? `<div class="hint-text"><b>追憶の導き:</b> 「${endingsData[uncollected[Math.floor(Math.random() * uncollected.length)]].title}」へ至るには、${endingsData[uncollected[Math.floor(Math.random() * uncollected.length)]].hint}</div>`
+            : `<div class="hint-text" style="color:var(--correct)"><b>祝福:</b> すべての結末を綴り、真の絆を取り戻した。</div>`;
 
-        number.className =
-            "log-number";
-
-        number.textContent =
-            `RECORD ${String(i + 1).padStart(2, "0")}`;
-
-
-        const preview =
-            document.createElement(
-                "span"
-            );
-
-        preview.className =
-            "log-preview";
-
-        preview.innerHTML =
-            stripInteractiveMarkup(
-                renderText(scene.q)
-            );
-
-
-        button.append(
-            number,
-            preview
-        );
-
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                viewingStep = i;
-
-                closeModal(
-                    "log-modal-layer"
-                );
-
-                updateUI();
-
-            }
-        );
-
-
-        list.appendChild(
-            button
-        );
-
+        document.getElementById('display').innerHTML = `<div style="font-size:70px">${e}</div><h2 style="color:#d4af37;">【 ${t} 】</h2><p style="padding:20px 40px; line-height:2.2; text-align:left;">${c}</p>${hintHtml}<button onclick="location.reload()" class="btn-style" style="background:var(--main); color:#fff; margin-top:20px;">追憶の淵へ戻る</button>`;
+        document.getElementById('action-area').innerHTML = "";
     }
-
-}
-
-
-function stripInteractiveMarkup(html) {
-
-    const template =
-        document.createElement(
-            "template"
-        );
-
-    template.innerHTML =
-        html.trim();
-
-    template
-        .content
-        .querySelectorAll(
-            "[data-word]"
-        )
-        .forEach(element => {
-
-            element.removeAttribute(
-                "data-word"
-            );
-
-            element.removeAttribute(
-                "tabindex"
-            );
-
-        });
-
-    return template.innerHTML;
-
-}
-
-
-/* =========================================================
-   COLLECTION
-========================================================= */
-
-function updateCollectionUI() {
-
-    const element =
-        document.getElementById(
-            "collection-val"
-        );
-
-    if (!element) {
-        return;
-    }
-
-    element.textContent =
-        `${colSet.size} / 7`;
-
-}
-
-
-/* =========================================================
-   ENDING
-========================================================= */
-
-function showEnding() {
-
-    gameEnded = true;
-
-    const intel =
-        getAnalysisPercent();
-
-    const loveRate =
-        maxLove > 0
-            ? (
-                lovePoints /
-                maxLove
-            ) * 100
-            : 0;
-
-
-    const hasAllNormalEndings =
-        [1, 2, 3, 4, 5, 6]
-            .every(
-                id =>
-                    colSet.has(id)
-            );
-
-
-    let endingId;
-    let endingText;
-
-
-    if (
-        hasAllNormalEndings &&
-        intel >= 100 &&
-        loveRate >= 95
-    ) {
-
-        endingId = 7;
-
-        endingText =
-            "記号の海を越え、二人はついに同じ言葉の中へ帰ってきた。声も、想いも、もう取りこぼさない。長い夜の向こうで、二人は光の差す方へ並んで歩き出す。";
-
-        document.documentElement.style.setProperty(
-            "--love-hue",
-            "42"
-        );
-
-        document.documentElement.style.setProperty(
-            "--love-sat",
-            "32%"
-        );
-
-        document.documentElement.style.setProperty(
-            "--love-light",
-            "18%"
-        );
-
-    } else if (
-        pCount >= 12
-    ) {
-
-        endingId = 5;
-
-        endingText =
-            "最後まで会話が妙な方向へ転がり続け、ランスロットは深いため息をついた。翌朝、ヴェインの部屋の前には、なぜか山ほどのプリンが置かれていた。";
-
-    } else if (
-        intel >= 100 &&
-        loveRate >= 80
-    ) {
-
-        endingId = 1;
-
-        endingText =
-            "失われていた言葉は、ひとつ残らずヴェインのもとへ戻った。死線を越えた二人の間に、もう言葉を遮るものはない。";
-
-    } else if (
-        intel <= 50 &&
-        loveRate >= 80
-    ) {
-
-        endingId = 6;
-
-        endingText =
-            "聞き取れない言葉はいくつも残っていた。それでも、ランスロットが何を伝えたいのかだけは、不思議なくらい分かっていた。";
-
-    } else if (
-        loveRate >= 50
-    ) {
-
-        endingId = 2;
-
-        endingText =
-            "すべての言葉を取り戻すことはできなかった。それでも二人は、不完全な言葉の隙間を、長い年月で培った信頼で埋めていった。";
-
-    } else if (
-        loveRate > 0
-    ) {
-
-        endingId = 3;
-
-        endingText =
-            "届かなかった言葉が、二人の間に薄い硝子のような距離を残した。触れられそうなほど近いのに、その向こうの声はまだ遠い。";
-
-    } else {
-
-        endingId = 4;
-
-        endingText =
-            "言葉は最後まで意味を結ばなかった。何度呼びかけても届かない声だけが、静かな部屋に残り続けた。";
-
-    }
-
-
-    colSet.add(
-        endingId
-    );
-
-    saveCollection();
-
-    updateCollectionUI();
-
-
-    const data =
-        endingsData[endingId];
-
-
-    const uncollected =
-        Object.keys(endingsData)
-            .map(Number)
-            .filter(id =>
-                !colSet.has(id)
-            );
-
-
-    let hintHtml;
-
-
-    if (
-        uncollected.length > 0
-    ) {
-
-        const hintId =
-            uncollected[
-                Math.floor(
-                    Math.random() *
-                    uncollected.length
-                )
-            ];
-
-        const hint =
-            endingsData[hintId];
-
-        hintHtml = `
-            <div class="ending-hint">
-                <strong>追憶の導き</strong><br>
-                「${escapeHtml(hint.title)}」へ至るには、
-                ${escapeHtml(hint.hint)}
-            </div>
-        `;
-
-    } else {
-
-        hintHtml = `
-            <div class="ending-hint">
-                <strong>すべての追憶を綴りました。</strong><br>
-                二人の物語に存在するすべての結末が記録されています。
-            </div>
-        `;
-
-    }
-
-
-    const scene =
-        document.getElementById(
-            "scene"
-        );
-
-
-    scene.innerHTML = `
-        <div class="ending-screen">
-
-            <div class="ending-number">
-                ENDING ${String(endingId).padStart(2, "0")}
-            </div>
-
-            <h1 class="ending-title">
-                ${escapeHtml(data.title)}
-            </h1>
-
-            <div class="ending-rule"></div>
-
-            <div class="ending-text">
-                ${escapeHtml(endingText)}
-            </div>
-
-            ${hintHtml}
-
-            <div class="ending-actions">
-
-                <button
-                    id="restart-btn"
-                    class="primary-btn"
-                >
-                    もう一度、声を聴く
-                </button>
-
-            </div>
-
-        </div>
-    `;
-
-
-    document
-        .getElementById(
-            "chapter-value"
-        )
-        .textContent =
-        "END";
-
-
-    document
-        .getElementById(
-            "restart-btn"
-        )
-        .addEventListener(
-            "click",
-            () => {
-
-                location.reload();
-
-            }
-        );
-
-}
 </script>
-
 </body>
 </html>
