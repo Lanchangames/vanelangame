@@ -805,10 +805,68 @@
 
         const isCurrent = viewingStep === currentStep;
 
-        if (isCurrent && interactionPhase === "reaction") {
+        /*
+            第5段階：
+            ランスロットの会話
+            ↓
+            ヴェインの心の声
+            ↓
+            ノートで推測しながら返答を選ぶ
+            ↓
+            reaction + afterStory + nextHook
+            ↓
+            理解判定
+        */
+
+        if (isCurrent && interactionPhase === "thought") {
             speaker.innerText = "VANE";
             face.innerText = "💭";
-            message.innerHTML = getReactionText(pendingOption);
+            message.innerHTML = (data.vaneThought || "").replace(/\n/g, "<br>");
+
+            const area = document.getElementById('action-area');
+
+            area.innerHTML = '';
+
+            shuffle([...data.opts]).forEach(o => {
+                const b = document.createElement('button');
+
+                b.className = 'opt-btn';
+                b.innerText = `▶ ${o.t}`;
+
+                b.onclick = () => {
+                    selectedAnswers[currentStep] = o.t;
+
+                    if (o.p === 1) {
+                        pCount++;
+                    }
+
+                    lovePoints += o.v;
+
+                    pendingOption = o;
+                    interactionPhase = "reaction";
+
+                    updateUI(true);
+                };
+
+                area.appendChild(b);
+            });
+
+            return;
+        }
+
+        if (isCurrent && interactionPhase === "reaction") {
+            speaker.innerText = "STORY";
+            face.innerText = "📖";
+
+            const storyParts = [
+                getReactionText(pendingOption),
+                data.afterStory,
+                data.nextHook
+            ]
+                .filter(part => part && part.trim().length > 0)
+                .map(part => part.replace(/\n/g, "<br>"));
+
+            message.innerHTML = storyParts.join("<br><br>");
 
             const area = document.getElementById('action-area');
 
@@ -910,29 +968,16 @@
         area.innerHTML = '';
 
         if (isCurrent) {
-            shuffle([...data.opts]).forEach(o => {
-                const b = document.createElement('button');
+            const next = document.createElement('button');
 
-                b.className = 'opt-btn';
-                b.innerText = `▶ ${o.t}`;
+            next.className = 'opt-btn';
+            next.innerText = "▶ ヴェインの心の声";
+            next.onclick = () => {
+                interactionPhase = "thought";
+                updateUI(true);
+            };
 
-                b.onclick = () => {
-                    selectedAnswers[currentStep] = o.t;
-
-                    if (o.p === 1) {
-                        pCount++;
-                    }
-
-                    lovePoints += o.v;
-
-                    pendingOption = o;
-                    interactionPhase = "reaction";
-
-                    updateUI(true);
-                };
-
-                area.appendChild(b);
-            });
+            area.appendChild(next);
         } else {
             data.opts.forEach(o => {
                 const b = document.createElement('button');
