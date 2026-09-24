@@ -24,8 +24,17 @@
         .tab.active { background: #fff; color: #2c3e50; font-weight: bold; }
         .tab.locked { opacity: 0.2; cursor: not-allowed; }
         
-        #display { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; background: #fff; overflow-y: auto; }
-        .bubble { background: #fdfdfd; border-left: 6px solid var(--main); padding: 30px; width: 85%; font-size: 1.3rem; line-height: 2; text-align: left; min-height: 100px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        #display { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; gap: 16px; padding: 40px; background: #fff; overflow-y: auto; }
+        #chara-header { width: 85%; flex-shrink: 0; }
+        .bubble { background: #fdfdfd; border-left: 6px solid var(--main); padding: 30px; width: 85%; box-sizing: border-box; font-size: 1.3rem; line-height: 2; text-align: left; min-height: 100px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+
+        #vane-thought-block, #story-block, #resolution-block { width: 85%; box-sizing: border-box; }
+        .block-label { font-size: 0.8em; font-weight: bold; letter-spacing: 0.08em; color: #7f8c8d; margin-bottom: 6px; }
+        .thought-bubble { background: #f6f8fa; border-left: 4px solid #95a5a6; padding: 18px 22px; box-sizing: border-box; line-height: 1.8; text-align: left; color: #566573; font-style: italic; }
+        .story-bubble { background: #fffaf3; border-left: 4px solid #d8a45d; padding: 22px; box-sizing: border-box; line-height: 1.9; text-align: left; color: #2c3e50; }
+        .resolution-bubble { background: #f0fff4; border-left: 4px solid var(--correct); padding: 20px 22px; box-sizing: border-box; line-height: 1.9; text-align: left; color: #2c3e50; }
+        .selected-reply { font-weight: bold; margin-bottom: 14px; color: #8e5b22; }
+        .final-resolve-line { font-size: 1.3em; font-weight: bold; margin-top: 14px; color: var(--correct); }
         
         .symbol, .resolved, .wrong-resolved { cursor: pointer; transition: 0.2s; padding: 0 4px; border-radius: 2px; }
         .symbol:hover, .resolved:hover, .wrong-resolved:hover { background: #dfe6e9; outline: 1px solid var(--main); }
@@ -145,7 +154,23 @@
                 <span id="face-emoji" style="font-size: 2em; margin-right: 15px;">😊</span>
                 <span id="speaker-name" style="font-weight:bold; letter-spacing: 0.1em; color: var(--main);">LANCELOT</span>
             </div>
+
             <div class="bubble" id="message-text">......</div>
+
+            <div id="vane-thought-block">
+                <div class="block-label">💭 VANE</div>
+                <div class="thought-bubble" id="vane-thought-text"></div>
+            </div>
+
+            <div id="story-block" style="display:none;">
+                <div class="block-label">STORY</div>
+                <div class="story-bubble" id="story-text"></div>
+            </div>
+
+            <div id="resolution-block" style="display:none;">
+                <div class="block-label">UNDERSTANDING</div>
+                <div class="resolution-bubble" id="resolution-text"></div>
+            </div>
         </div>
 
         <div class="controls" id="action-area"></div>
@@ -412,6 +437,7 @@
     let interactionPhase = "conversation";
     let pendingOption = null;
     let pendingResolvedKeys = [];
+    let pendingFinalLine = "";
     const maxLove = 450;
 
     function normalizeGuess(value) {
@@ -561,6 +587,7 @@
         interactionPhase = "conversation";
         pendingOption = null;
         pendingResolvedKeys = [];
+        pendingFinalLine = "";
 
         const savedWords = getSavedWords();
 
@@ -693,7 +720,7 @@
         let candidates;
 
         if (Array.isArray(data.resolveChecks)) {
-            candidates = data.resolveChecks;
+            candidates = [...data.resolveChecks];
         } else {
             candidates = Object.keys(wordBank).filter(key => {
                 const totalClues = wordTotalClueScenes[key] || 1;
@@ -704,6 +731,16 @@
                 );
 
                 return (wordSeenCounts[key] || 0) >= requiredClues;
+            });
+        }
+
+        if (
+            data.finalResolve &&
+            data.finalResolve.special &&
+            data.finalResolve.key
+        ) {
+            candidates = candidates.filter(key => {
+                return key !== data.finalResolve.key;
             });
         }
 
@@ -738,12 +775,62 @@
         return "（ランちゃんは、俺の返事を静かに聞いている。）";
     }
 
+    function renderDialogueText(text) {
+        let rendered = text || "";
+
+        for (let key in wordBank) {
+            const reg = new RegExp(
+                "\\[\\[" + key + "(?:\\|([^\\]]+))?\\]\\]",
+                "g"
+            );
+
+            rendered = rendered.replace(
+                reg,
+                (match, surfaceForm) => {
+                    const resolved = resolvedWords.has(key);
+
+                    const spanClass = resolved
+                        ? "resolved"
+                        : "symbol";
+
+                    const displayVal = resolved
+                        ? (surfaceForm || wordBank[key].canonical)
+                        : wordBank[key].q;
+
+                    return `<span class="${spanClass}" onclick="jumpToDict('${key}')">${displayVal}</span>`;
+                }
+            );
+        }
+
+        return rendered.replace(/\n/g, "<br>");
+    }
+
     function continueFromReaction() {
         const data = scenario[currentStep];
 
         pendingResolvedKeys = evaluateUnderstanding(data);
+        pendingFinalLine = "";
 
-        if (pendingResolvedKeys.length > 0) {
+        if (
+            data.finalResolve &&
+            data.finalResolve.special &&
+            data.finalResolve.key
+        ) {
+            const finalKey = data.finalResolve.key;
+
+            if (resolvedWords.has(finalKey)) {
+                pendingFinalLine = data.finalResolve.line || "";
+            } else if (isAcceptedGuess(finalKey, userDict[finalKey])) {
+                if (resolveWord(finalKey)) {
+                    pendingFinalLine = data.finalResolve.line || "";
+                }
+            }
+        }
+
+        if (
+            pendingResolvedKeys.length > 0 ||
+            pendingFinalLine
+        ) {
             interactionPhase = "resolution";
             updateUI(true);
         } else {
@@ -754,6 +841,7 @@
     function advanceScene() {
         pendingOption = null;
         pendingResolvedKeys = [];
+        pendingFinalLine = "";
         interactionPhase = "conversation";
 
         currentStep++;
@@ -763,6 +851,11 @@
             registerSceneWords(currentStep);
             renderTabs();
             updateUI(true);
+
+            const display = document.getElementById('display');
+            if (display) {
+                display.scrollTop = 0;
+            }
         } else {
             showEnd();
         }
@@ -786,6 +879,11 @@
                     viewingStep = i;
                     renderTabs();
                     updateUI();
+
+                    const display = document.getElementById('display');
+                    if (display) {
+                        display.scrollTop = 0;
+                    }
                 }
             };
 
@@ -801,146 +899,113 @@
         const face = document.getElementById('face-emoji');
         const message = document.getElementById('message-text');
 
+        const thoughtBlock = document.getElementById('vane-thought-block');
+        const thoughtText = document.getElementById('vane-thought-text');
+
+        const storyBlock = document.getElementById('story-block');
+        const storyText = document.getElementById('story-text');
+
+        const resolutionBlock = document.getElementById('resolution-block');
+        const resolutionText = document.getElementById('resolution-text');
+
         updateIntelUI();
 
         const isCurrent = viewingStep === currentStep;
 
-        /*
-            第5段階：
-            ランスロットの会話
-            ↓
-            ヴェインの心の声
-            ↓
-            ノートで推測しながら返答を選ぶ
-            ↓
-            reaction + afterStory + nextHook
-            ↓
-            理解判定
-        */
-
-        if (isCurrent && interactionPhase === "thought") {
-            speaker.innerText = "VANE";
-            face.innerText = "💭";
-            message.innerHTML = (data.vaneThought || "").replace(/\n/g, "<br>");
-
-            const area = document.getElementById('action-area');
-
-            area.innerHTML = '';
-
-            shuffle([...data.opts]).forEach(o => {
-                const b = document.createElement('button');
-
-                b.className = 'opt-btn';
-                b.innerText = `▶ ${o.t}`;
-
-                b.onclick = () => {
-                    selectedAnswers[currentStep] = o.t;
-
-                    if (o.p === 1) {
-                        pCount++;
-                    }
-
-                    lovePoints += o.v;
-
-                    pendingOption = o;
-                    interactionPhase = "reaction";
-
-                    updateUI(true);
-                };
-
-                area.appendChild(b);
-            });
-
-            return;
-        }
-
-        if (isCurrent && interactionPhase === "reaction") {
-            speaker.innerText = "STORY";
-            face.innerText = "📖";
-
-            const storyParts = [
-                getReactionText(pendingOption),
-                data.afterStory,
-                data.nextHook
-            ]
-                .filter(part => part && part.trim().length > 0)
-                .map(part => part.replace(/\n/g, "<br>"));
-
-            message.innerHTML = storyParts.join("<br><br>");
-
-            const area = document.getElementById('action-area');
-
-            area.innerHTML = '';
-
-            const next = document.createElement('button');
-
-            next.className = 'opt-btn';
-            next.innerText = "▶ 次へ";
-            next.onclick = continueFromReaction;
-
-            area.appendChild(next);
-
-            return;
-        }
-
-        if (isCurrent && interactionPhase === "resolution") {
-            speaker.innerText = "VANE";
-            face.innerText = "💭";
-
-            const understood = pendingResolvedKeys
-                .map(key => {
-                    return `「${wordBank[key].q}」――「${wordBank[key].canonical}」`;
-                })
-                .join("<br>");
-
-            message.innerHTML =
-                `（……意味がつながった。）<br><br>${understood}`;
-
-            const area = document.getElementById('action-area');
-
-            area.innerHTML = '';
-
-            const next = document.createElement('button');
-
-            next.className = 'opt-btn';
-            next.innerText = "▶ 次へ";
-            next.onclick = advanceScene;
-
-            area.appendChild(next);
-
-            return;
-        }
-
         speaker.innerText = "LANCELOT";
         face.innerText = data.face;
+        message.innerHTML = renderDialogueText(data.q);
 
-        let text = data.q;
+        thoughtBlock.style.display = "block";
+        thoughtText.innerHTML =
+            (data.vaneThought || "").replace(/\n/g, "<br>");
 
-        for (let key in wordBank) {
-            const reg = new RegExp(
-                "\\[\\[" + key + "(?:\\|([^\\]]+))?\\]\\]",
-                "g"
-            );
+        storyBlock.style.display = "none";
+        storyText.innerHTML = "";
 
-            text = text.replace(
-                reg,
-                (match, surfaceForm) => {
-                    const resolved = resolvedWords.has(key);
+        resolutionBlock.style.display = "none";
+        resolutionText.innerHTML = "";
 
-                    const spanClass = resolved
-                        ? "resolved"
-                        : "symbol";
+        const selectedText = selectedAnswers[viewingStep];
 
-                    const displayVal = resolved
-                        ? (surfaceForm || wordBank[key].canonical)
-                        : wordBank[key].q;
+        let selectedOption = null;
 
-                    return `<span class="${spanClass}" onclick="jumpToDict('${key}')">${displayVal}</span>`;
-                }
-            );
+        if (isCurrent && pendingOption) {
+            selectedOption = pendingOption;
+        } else if (selectedText) {
+            selectedOption =
+                data.opts.find(option => option.t === selectedText) || null;
         }
 
-        message.innerHTML = text.replace(/\n/g, "<br>");
+        if (
+            selectedOption &&
+            (
+                !isCurrent ||
+                interactionPhase === "reaction" ||
+                interactionPhase === "resolution"
+            )
+        ) {
+            const storyParts = [];
+
+            storyParts.push(
+                `<div class="selected-reply">● ${selectedOption.t}</div>`
+            );
+
+            const reaction = getReactionText(selectedOption);
+
+            if (reaction) {
+                storyParts.push(
+                    reaction.replace(/\n/g, "<br>")
+                );
+            }
+
+            if (data.afterStory) {
+                storyParts.push(
+                    data.afterStory.replace(/\n/g, "<br>")
+                );
+            }
+
+            if (data.nextHook) {
+                storyParts.push(
+                    data.nextHook.replace(/\n/g, "<br>")
+                );
+            }
+
+            storyText.innerHTML =
+                storyParts.join("<br><br>");
+
+            storyBlock.style.display = "block";
+        }
+
+        if (
+            isCurrent &&
+            interactionPhase === "resolution"
+        ) {
+            const resolutionParts = [];
+
+            if (pendingResolvedKeys.length > 0) {
+                const understood = pendingResolvedKeys
+                    .map(key => {
+                        return `「${wordBank[key].q}」――「${wordBank[key].canonical}」`;
+                    })
+                    .join("<br>");
+
+                resolutionParts.push(
+                    `（……意味がつながった。）<br><br>${understood}`
+                );
+            }
+
+            if (pendingFinalLine) {
+                resolutionParts.push(
+                    `<div class="final-resolve-line">${pendingFinalLine}</div>`
+                );
+            }
+
+            resolutionText.innerHTML =
+                resolutionParts.join("<br>");
+
+            resolutionBlock.style.display = "block";
+        }
 
         const light = Math.min(85, 10 + (lovePoints / 5));
         const sat = Math.min(100, 20 + (lovePoints / 4));
@@ -968,16 +1033,49 @@
         area.innerHTML = '';
 
         if (isCurrent) {
-            const next = document.createElement('button');
+            if (interactionPhase === "conversation") {
+                shuffle([...data.opts]).forEach(o => {
+                    const b = document.createElement('button');
 
-            next.className = 'opt-btn';
-            next.innerText = "▶ ヴェインの心の声";
-            next.onclick = () => {
-                interactionPhase = "thought";
-                updateUI(true);
-            };
+                    b.className = 'opt-btn';
+                    b.innerText = `▶ ${o.t}`;
 
-            area.appendChild(next);
+                    b.onclick = () => {
+                        selectedAnswers[currentStep] = o.t;
+
+                        if (o.p === 1) {
+                            pCount++;
+                        }
+
+                        lovePoints += o.v;
+
+                        pendingOption = o;
+                        interactionPhase = "reaction";
+
+                        updateUI(true);
+                    };
+
+                    area.appendChild(b);
+                });
+            }
+            else if (interactionPhase === "reaction") {
+                const next = document.createElement('button');
+
+                next.className = 'opt-btn';
+                next.innerText = "▶ 次へ";
+                next.onclick = continueFromReaction;
+
+                area.appendChild(next);
+            }
+            else if (interactionPhase === "resolution") {
+                const next = document.createElement('button');
+
+                next.className = 'opt-btn';
+                next.innerText = "▶ 次へ";
+                next.onclick = advanceScene;
+
+                area.appendChild(next);
+            }
         } else {
             data.opts.forEach(o => {
                 const b = document.createElement('button');
