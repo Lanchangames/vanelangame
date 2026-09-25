@@ -6,6 +6,7 @@
     ・endingsData
     ・7種類のエンディング本文
     ・showEnd()
+    ・showSpecialEnding()
 
     END ID
     1 : 暁光の誓い
@@ -45,7 +46,7 @@ const endingsData = {
     },
     7: {
         title: "悠久の夜明け",
-        hint: "すべての結末を知ったうえで、最後の言葉まで理解しましょう。"
+        hint: "三つ以上の結末を辿り、十五の言葉すべてを解読すると、追憶に新たな項目が現れます。"
     }
 };
 
@@ -183,127 +184,18 @@ const endingBodies = {
 
 
 // =========================================================
-// エンディング表示
+// 共通END表示
 // =========================================================
 
-function showEnd() {
-    let id;
-
-    const intel = parseInt(
-        document.getElementById('intel-val').innerText
-    );
-
-    const hasAllNormalEndings =
-        [1, 2, 3, 4, 5, 6].every(val => colSet.has(val));
-
-    /*
-        優先順位
-
-        7 悠久の夜明け
-        5 プリンの迷宮
-        1 暁光の誓い
-        6 魂の共鳴
-        4 静寂のあとで
-        ↓
-        残った混合型を
-        daily / act / self / listen+bond
-        の傾向から振り分ける。
-    */
-
-    if (
-        hasAllNormalEndings &&
-        intel >= 100 &&
-        resolvedWords.has("W11") &&
-        interpretationCounts.understood >= 5
-    ) {
-        id = 7;
-
-        document.documentElement.style.setProperty(
-            '--love-light',
-            '90%'
-        );
-
-        document.documentElement.style.setProperty(
-            '--love-hue',
-            '45'
-        );
-    }
-
-    else if (
-        interpretationCounts.misread >= 8
-    ) {
-        id = 5;
-    }
-
-    else if (
-        intel >= 100 &&
-        resolvedWords.has("W11") &&
-        interpretationCounts.understood >= 5
-    ) {
-        id = 1;
-    }
-
-    else if (
-        intel <= 60 &&
-        axisCounts.listen + axisCounts.bond >= 6
-    ) {
-        id = 6;
-    }
-
-    else if (
-        interpretationCounts.unknown >= 5
-    ) {
-        id = 4;
-    }
-
-    else {
-        const actScore =
-            axisCounts.act;
-
-        const selfScore =
-            axisCounts.self;
-
-        const dailyScore =
-            axisCounts.daily;
-
-        const resonanceScore =
-            axisCounts.listen +
-            axisCounts.bond;
-
-        if (
-            dailyScore > actScore &&
-            dailyScore > selfScore &&
-            dailyScore > resonanceScore
-        ) {
-            id = 4;
-        }
-
-        else if (
-            actScore >= selfScore &&
-            actScore >= resonanceScore
-        ) {
-            id = 2;
-        }
-
-        else if (
-            selfScore >= actScore &&
-            selfScore >= resonanceScore
-        ) {
-            id = 3;
-        }
-
-        else {
-            id = 6;
-        }
-    }
-
-
+function renderEndingScreen(
+    id,
+    progressResult = null
+) {
     const title =
         endingsData[id].title;
 
     const body =
         endingBodies[id];
-
 
     const endingIcons = {
         1: "✨💍✨",
@@ -320,36 +212,67 @@ function showEnd() {
 
 
     // ---------------------------------------------------------
-    // コレクション登録
+    // 声の鍵・追憶解放表示
     // ---------------------------------------------------------
 
-    colSet.add(id);
+    const progressMessages = [];
 
-    localStorage.setItem(
-        'vane_collection_v3',
-        JSON.stringify(Array.from(colSet))
-    );
+    if (progressResult) {
+        if (
+            progressResult.keysGained === 3
+        ) {
+            progressMessages.push(
+                "🔑 声の鍵を3個手に入れた。<br>追憶から別の可能性を辿れるようになった。"
+            );
+        }
+        else if (
+            progressResult.keysGained === 1
+        ) {
+            progressMessages.push(
+                "🔑 声の鍵を1個手に入れた。"
+            );
+        }
 
-    updateColUI();
+        if (
+            progressResult.finalRecollectionUnlockedNow
+        ) {
+            progressMessages.push(
+                "🌅 最後の追憶が開いた。"
+            );
+        }
+    }
+
+    const progressHtml =
+        progressMessages.length > 0
+            ? `<div
+                    class="hint-text"
+                    style="color:var(--correct)"
+                >
+                    ${progressMessages.join("<br><br>")}
+                </div>`
+            : "";
 
 
     // ---------------------------------------------------------
     // 未回収ENDヒント
     // ---------------------------------------------------------
 
-    const uncollected =
-        Object.keys(endingsData)
-            .filter(key => {
-                return !colSet.has(parseInt(key));
+    const uncollectedNormal =
+        [1, 2, 3, 4, 5, 6]
+            .filter(normalId => {
+                return !colSet.has(normalId);
             });
 
     let hintHtml;
 
-    if (uncollected.length > 0) {
+    if (
+        uncollectedNormal.length > 0
+    ) {
         const hintId =
-            uncollected[
+            uncollectedNormal[
                 Math.floor(
-                    Math.random() * uncollected.length
+                    Math.random() *
+                    uncollectedNormal.length
                 )
             ];
 
@@ -360,14 +283,34 @@ function showEnd() {
                 ${endingsData[hintId].hint}
             </div>`;
     }
-    else {
+    else if (
+        !colSet.has(7) &&
+        typeof recollectionProgress !== "undefined" &&
+        recollectionProgress.finalRecollectionUnlocked
+    ) {
+        hintHtml =
+            `<div class="hint-text">
+                <b>追憶の導き:</b>
+                「最後の追憶」が開いている。
+            </div>`;
+    }
+    else if (
+        colSet.size >= 7
+    ) {
         hintHtml =
             `<div
                 class="hint-text"
                 style="color:var(--correct)"
             >
                 <b>祝福:</b>
-                すべての結末を綴り、真の絆を取り戻した。
+                すべての結末を綴り、二人の物語を見届けた。
+            </div>`;
+    }
+    else {
+        hintHtml =
+            `<div class="hint-text">
+                <b>追憶の導き:</b>
+                ${endingsData[7].hint}
             </div>`;
     }
 
@@ -395,7 +338,21 @@ function showEnd() {
             ${body}
         </p>
 
+        ${progressHtml}
+
         ${hintHtml}
+
+        <button
+            onclick="openRecollection()"
+            class="btn-style"
+            style="
+                background:#d4af37;
+                color:#000;
+                margin-top:20px;
+            "
+        >
+            追憶へ
+        </button>
 
         <button
             onclick="location.reload()"
@@ -406,10 +363,131 @@ function showEnd() {
                 margin-top:20px;
             "
         >
-            追憶の淵へ戻る
+            タイトルへ
         </button>`;
 
     document.getElementById(
         'action-area'
     ).innerHTML = "";
 }
+
+
+// =========================================================
+// 通常エンディング表示
+// =========================================================
+
+function showEnd() {
+
+    /*
+        通常プレイ・通常追憶から到達するのは
+        END1～END6のみ。
+
+        END7はここでは絶対に判定しない。
+    */
+
+    const id =
+        determineNormalEndingId();
+
+
+    // ---------------------------------------------------------
+    // 追憶進行・鍵報酬・snapshot登録
+    // ---------------------------------------------------------
+
+    const progressResult =
+        recordEndingProgress(id);
+
+
+    // ---------------------------------------------------------
+    // コレクション登録
+    // ---------------------------------------------------------
+
+    colSet.add(id);
+
+    localStorage.setItem(
+        'vane_collection_v3',
+        JSON.stringify(
+            Array.from(colSet)
+        )
+    );
+
+    updateColUI();
+
+
+    // ---------------------------------------------------------
+    // END表示
+    // ---------------------------------------------------------
+
+    renderEndingScreen(
+        id,
+        progressResult
+    );
+}
+
+
+// =========================================================
+// END7　最後の追憶専用
+// =========================================================
+
+window.showSpecialEnding =
+    function(id) {
+
+        if (
+            Number(id) !== 7
+        ) {
+            return;
+        }
+
+        /*
+            END7は通常分岐からは到達しない。
+
+            recollection.js の
+            startFinalRecollectionFromUI()
+            からのみ呼ばれる。
+
+            念のため、解放前なら表示しない。
+        */
+
+        if (
+            typeof recollectionProgress !== "undefined" &&
+            !recollectionProgress.finalRecollectionUnlocked
+        ) {
+            return;
+        }
+
+
+        document.documentElement.style.setProperty(
+            '--love-light',
+            '90%'
+        );
+
+        document.documentElement.style.setProperty(
+            '--love-hue',
+            '45'
+        );
+
+
+        // -----------------------------------------------------
+        // コレクション登録
+        // -----------------------------------------------------
+
+        colSet.add(7);
+
+        localStorage.setItem(
+            'vane_collection_v3',
+            JSON.stringify(
+                Array.from(colSet)
+            )
+        );
+
+        updateColUI();
+
+
+        // -----------------------------------------------------
+        // END表示
+        // -----------------------------------------------------
+
+        renderEndingScreen(
+            7,
+            null
+        );
+    };
