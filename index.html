@@ -83,6 +83,7 @@
         <p id="check-msg">本ゲームはPCブラウザ環境でのプレイを前提として設計されています。</p>
         <div id="check-action">
             <button id="entry-btn" class="btn-style" style="background: var(--gold); color: #000; display: none;">物語を始める</button>
+            <button id="recollection-entry-btn" class="btn-style" style="background: #2c3e50; color: #fff; display: none;">追憶を辿る</button>
             <p id="error-msg" style="color: var(--wrong); display: none;"><b>MOBILE DEVICE DETECTED</b><br>スマートフォン等のモバイル環境ではプレイできません。</p>
         </div>
     </div>
@@ -421,7 +422,11 @@
 
     let currentStep = 0, viewingStep = 0, lovePoints = 0, userDict = {}, colSet = new Set();
     let selectedAnswers = [];
-    let resolvedWords = new Set();
+
+    let masteredWords = new Set();
+    let vaneKnownWords = new Set();
+    let vaneUnderstoodAt = {};
+
     let wordSeenCounts = {};
     let seenSceneIds = new Set();
     let interactionPhase = "conversation";
@@ -443,7 +448,95 @@
         daily: 0
     };
 
+    let routeCounts = {
+        twin: 0,
+        glass: 0,
+        resonance: 0
+    };
+
+    scenario.forEach(scene => {
+        scene.opts.forEach((option, optionIndex) => {
+            if (!option.id) {
+                option.id =
+                    `s${String(scene.id).padStart(2, "0")}_o${optionIndex + 1}`;
+            }
+        });
+    });
+
     const maxLove = 450;
+
+    function rebuildRunState() {
+        lovePoints = 0;
+
+        interpretationCounts = {
+            unknown: 0,
+            misread: 0,
+            understood: 0
+        };
+
+        axisCounts = {
+            listen: 0,
+            act: 0,
+            bond: 0,
+            self: 0,
+            daily: 0
+        };
+
+        routeCounts = {
+            twin: 0,
+            glass: 0,
+            resonance: 0
+        };
+
+        selectedAnswers.forEach((optionId, sceneIndex) => {
+            if (!optionId) return;
+
+            const data = scenario[sceneIndex];
+
+            if (!data) return;
+
+            const option =
+                data.opts.find(o => o.id === optionId);
+
+            if (!option) return;
+
+            lovePoints += Number(option.v) || 0;
+
+            if (!option.endingImpact) {
+                return;
+            }
+
+            if (
+                option.interpretation &&
+                Object.prototype.hasOwnProperty.call(
+                    interpretationCounts,
+                    option.interpretation
+                )
+            ) {
+                interpretationCounts[option.interpretation]++;
+            }
+
+            if (
+                option.axis &&
+                Object.prototype.hasOwnProperty.call(
+                    axisCounts,
+                    option.axis
+                )
+            ) {
+                axisCounts[option.axis]++;
+            }
+
+            if (
+                option.route &&
+                Object.prototype.hasOwnProperty.call(
+                    routeCounts,
+                    option.route
+                )
+            ) {
+                routeCounts[option.route]++;
+            }
+        });
+    }
 
     function normalizeGuess(value) {
         return String(value || "")
@@ -476,12 +569,37 @@
         }
     }
 
-    function hasCompatibleSavedWords() {
+    function getMasteredWordSet() {
         const saved = getSavedWords();
+        const result = new Set();
 
-        return Object.keys(wordBank).some(key => {
-            return saved[key] && isAcceptedGuess(key, saved[key]);
+        Object.keys(wordBank).forEach(key => {
+            if (
+                saved[key] &&
+                isAcceptedGuess(key, saved[key])
+            ) {
+                result.add(key);
+            }
         });
+
+        return result;
+    }
+
+    function persistMasteredWord(key) {
+        if (!wordBank[key]) return;
+
+        const solved = getSavedWords();
+
+        solved[key] = wordBank[key].canonical;
+
+        localStorage.setItem(
+            'vane_solved_words',
+            JSON.stringify(solved)
+        );
+    }
+
+    function hasCompatibleSavedWords() {
+        return getMasteredWordSet().size > 0;
     }
 
     function sceneContainsWord(text, key) {
@@ -546,11 +664,37 @@
     }
 
     window.onload = () => {
+        masteredWords = getMasteredWordSet();
+
         checkEnvironment();
 
-        document.getElementById('entry-btn').onclick = () => {
+        const entryBtn =
+            document.getElementById('entry-btn');
+
+        const recollectionEntryBtn =
+            document.getElementById('recollection-entry-btn');
+
+        const isMobile =
+            /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+            (window.innerWidth < 800);
+
+        if (
+            !isMobile &&
+            typeof recollectionProgress !== "undefined" &&
+            recollectionProgress.gameCleared
+        ) {
+            entryBtn.innerText = "はじめから";
+            recollectionEntryBtn.style.display = "inline-block";
+        }
+
+        entryBtn.onclick = () => {
             document.getElementById('device-check-overlay').style.display = 'none';
             document.getElementById('intro-overlay').style.display = 'flex';
+        };
+
+        recollectionEntryBtn.onclick = () => {
+            document.getElementById('device-check-overlay').style.display = 'none';
+            openRecollection();
         };
 
         document.getElementById('to-tutorial').onclick = () => {
@@ -585,8 +729,20 @@
         document.getElementById('load-overlay').style.display = 'none';
         document.getElementById('game-container').style.display = 'flex';
 
+        if (typeof runMode !== "undefined") {
+            runMode = "story";
+        }
+
+        if (typeof recollectionBaseEndingId !== "undefined") {
+            recollectionBaseEndingId = null;
+        }
+
         selectedAnswers = new Array(scenario.length).fill(null);
-        resolvedWords = new Set();
+
+        masteredWords = getMasteredWordSet();
+        vaneKnownWords = new Set();
+        vaneUnderstoodAt = {};
+
         wordSeenCounts = {};
         seenSceneIds = new Set();
         interactionPhase = "conversation";
@@ -594,19 +750,7 @@
         pendingResolvedKeys = [];
         pendingFinalLine = "";
 
-        interpretationCounts = {
-            unknown: 0,
-            misread: 0,
-            understood: 0
-        };
-
-        axisCounts = {
-            listen: 0,
-            act: 0,
-            bond: 0,
-            self: 0,
-            daily: 0
-        };
+        rebuildRunState();
 
         const savedWords = getSavedWords();
 
@@ -637,7 +781,9 @@
                 : "";
 
             if (isInherited) {
-                resolvedWords.add(key);
+                masteredWords.add(key);
+                vaneKnownWords.add(key);
+                vaneUnderstoodAt[key] = -1;
             }
 
             div.innerHTML = `
@@ -669,23 +815,29 @@
         entry.classList.remove('correct', 'guessing');
         input.classList.remove('wrong-text');
 
-        if (resolvedWords.has(key)) {
+        if (vaneKnownWords.has(key)) {
             entry.classList.add('correct');
             status.innerText = "理解した";
             input.disabled = true;
             input.value = wordBank[key].canonical;
         } else if ((userDict[key] || "").trim().length > 0) {
             entry.classList.add('guessing');
-            status.innerText = "推測中";
+            status.innerText =
+                masteredWords.has(key)
+                    ? "推測中（解読実績あり）"
+                    : "推測中";
             input.disabled = false;
         } else {
-            status.innerText = "未推測";
+            status.innerText =
+                masteredWords.has(key)
+                    ? "解読済み／このヴェインは未理解"
+                    : "未推測";
             input.disabled = false;
         }
     }
 
     function updateGuess(key, val) {
-        if (resolvedWords.has(key)) return;
+        if (vaneKnownWords.has(key)) return;
 
         userDict[key] = val.trim();
         renderDictEntryState(key);
@@ -707,7 +859,7 @@
     }
 
     function resolveWord(key) {
-        if (resolvedWords.has(key)) return false;
+        if (vaneKnownWords.has(key)) return false;
 
         const guess = (userDict[key] || "").trim();
 
@@ -715,19 +867,16 @@
             return false;
         }
 
-        resolvedWords.add(key);
+        vaneKnownWords.add(key);
+        vaneUnderstoodAt[key] = currentStep;
 
         const canonical = wordBank[key].canonical;
         userDict[key] = canonical;
 
-        const solved = getSavedWords();
-
-        solved[key] = canonical;
-
-        localStorage.setItem(
-            'vane_solved_words',
-            JSON.stringify(solved)
-        );
+        if (!masteredWords.has(key)) {
+            masteredWords.add(key);
+            persistMasteredWord(key);
+        }
 
         renderDictEntryState(key);
         updateIntelUI();
@@ -776,7 +925,7 @@
 
     function updateIntelUI() {
         const intel = Math.floor(
-            (resolvedWords.size / Object.keys(wordBank).length) * 100
+            (vaneKnownWords.size / Object.keys(wordBank).length) * 100
         );
 
         const el = document.getElementById('intel-val');
@@ -806,7 +955,7 @@
             rendered = rendered.replace(
                 reg,
                 (match, surfaceForm) => {
-                    const resolved = resolvedWords.has(key);
+                    const resolved = vaneKnownWords.has(key);
 
                     const spanClass = resolved
                         ? "resolved"
@@ -838,7 +987,7 @@
             const finalKey = data.finalResolve.key;
 
             if (
-                !resolvedWords.has(finalKey) &&
+                !vaneKnownWords.has(finalKey) &&
                 isAcceptedGuess(finalKey, userDict[finalKey])
             ) {
                 if (resolveWord(finalKey)) {
@@ -947,15 +1096,15 @@
         resolutionBlock.style.display = "none";
         resolutionText.innerHTML = "";
 
-        const selectedText = selectedAnswers[viewingStep];
+        const selectedOptionId = selectedAnswers[viewingStep];
 
         let selectedOption = null;
 
         if (isCurrent && pendingOption) {
             selectedOption = pendingOption;
-        } else if (selectedText) {
+        } else if (selectedOptionId) {
             selectedOption =
-                data.opts.find(option => option.t === selectedText) || null;
+                data.opts.find(option => option.id === selectedOptionId) || null;
         }
 
         if (
@@ -1062,30 +1211,9 @@
                     b.innerText = `▶ ${o.t}`;
 
                     b.onclick = () => {
-                        selectedAnswers[currentStep] = o.t;
+                        selectedAnswers[currentStep] = o.id;
 
-                        if (o.interpretation) {
-                            if (
-                                Object.prototype.hasOwnProperty.call(
-                                    interpretationCounts,
-                                    o.interpretation
-                                )
-                            ) {
-                                interpretationCounts[o.interpretation]++;
-                            }
-
-                            if (
-                                o.axis &&
-                                Object.prototype.hasOwnProperty.call(
-                                    axisCounts,
-                                    o.axis
-                                )
-                            ) {
-                                axisCounts[o.axis]++;
-                            }
-                        }
-
-                        lovePoints += o.v;
+                        rebuildRunState();
 
                         pendingOption = o;
                         interactionPhase = "reaction";
@@ -1120,14 +1248,14 @@
 
                 b.className = 'opt-btn';
 
-                if (o.t === selectedAnswers[viewingStep]) {
+                if (o.id === selectedAnswers[viewingStep]) {
                     b.classList.add('my-choice');
                 }
 
                 b.disabled = true;
 
                 b.innerText =
-                    (o.t === selectedAnswers[viewingStep])
+                    (o.id === selectedAnswers[viewingStep])
                         ? `● ${o.t}`
                         : `▶ ${o.t}`;
 
@@ -1150,6 +1278,7 @@
     }
 </script>
 
+<script src="recollection.js"></script>
 <script src="endings.js"></script>
 </body>
 </html>
