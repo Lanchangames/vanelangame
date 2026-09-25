@@ -1,4 +1,4 @@
-　/*
+/*
     声を聴かせて、ランスロット！
     第5段階対応：20場面シナリオデータ
 
@@ -331,29 +331,38 @@ const scenario = [
 
         opts: [
             {
+                id: "s04_unknown",
                 t: "今日は軽めにする。だからそんな顔すんなって",
                 v: 25,
                 p: 0,
                 interpretation: "unknown",
                 axis: "daily",
+                endingImpact: true,
+                route: "twin",
                 reaction:
                     "ランスロットはヴェインの構えを確かめるように見てから、木剣を手に取った。"
             },
             {
+                id: "s04_misread",
                 t: "そんなに落ち着かないなら、今日は一本だけにしようぜ",
                 v: 15,
                 p: 0,
                 interpretation: "misread",
                 axis: "act",
+                endingImpact: true,
+                route: "glass",
                 reaction:
                     "ランスロットは一度瞬きをしてから、ヴェインの足元へ視線を落とした。"
             },
             {
+                id: "s04_understood",
                 t: "俺の調子を気にしてるのは分かった。でも、止め時は俺にも決めさせてくれ",
                 v: 10,
                 p: 0,
                 interpretation: "understood",
                 axis: "self",
+                endingImpact: true,
+                route: "resonance",
                 reaction:
                     "ランスロットはヴェインをしばらく見つめ、それから静かに頷いた。"
             }
@@ -607,29 +616,38 @@ const scenario = [
 
         opts: [
             {
+                id: "s09_unknown",
                 t: "悪かった。次からは無茶しない",
                 v: 30,
                 p: 0,
                 interpretation: "unknown",
                 axis: "act",
+                endingImpact: true,
+                route: "twin",
                 reaction:
                     "ランスロットは返事をせず、包帯の端をもう一度確かめた。"
             },
             {
+                id: "s09_misread",
                 t: "そんなにひどい怪我に見えたか？　もう平気だって",
                 v: 20,
                 p: 0,
                 interpretation: "misread",
                 axis: "self",
+                endingImpact: true,
+                route: "glass",
                 reaction:
                     "ランスロットはヴェインの腕から顔へ視線を移し、しばらく黙った。"
             },
             {
+                id: "s09_understood",
                 t: "俺がここからいなくなるところまで考えたのか？　……ちゃんと帰るよ",
                 v: 10,
                 p: 0,
                 interpretation: "understood",
                 axis: "listen",
+                endingImpact: true,
+                route: "resonance",
                 reaction:
                     "ランスロットは一瞬息を止めたように見えた。そのあと、張りつめていた肩がほんの少し下がった。"
             }
@@ -797,29 +815,38 @@ const scenario = [
 
         opts: [
             {
+                id: "s12_unknown",
                 t: "分かった。ちゃんと帰ってくる",
                 v: 30,
                 p: 0,
                 interpretation: "unknown",
                 axis: "self",
+                endingImpact: true,
+                route: "twin",
                 reaction:
                     "ランスロットは小さく頷いた。それでも視線はヴェインから離れなかった。"
             },
             {
+                id: "s12_misread",
                 t: "そんな長く待たせないって。さっさと片付けて戻るよ",
                 v: 20,
                 p: 0,
                 interpretation: "misread",
                 axis: "act",
+                endingImpact: true,
+                route: "glass",
                 reaction:
                     "ランスロットは何か言いかけたあと、結局そのままヴェインを見送った。"
             },
             {
+                id: "s12_understood",
                 t: "帰ってくるって、ちゃんと口にしておく。戻ったら今の続きも聞かせて",
                 v: 10,
                 p: 0,
                 interpretation: "understood",
                 axis: "listen",
+                endingImpact: true,
+                route: "resonance",
                 reaction:
                     "ランスロットはわずかに目を見開き、それからゆっくり頷いた。"
             }
@@ -868,29 +895,38 @@ const scenario = [
 
         opts: [
             {
+                id: "s13_unknown",
                 t: "次は勝手に行くな。せめて声かけろよ",
                 v: 30,
                 p: 0,
                 interpretation: "unknown",
                 axis: "act",
+                endingImpact: true,
+                route: "glass",
                 reaction:
                     "ランスロットは反論せず、火の向こうでヴェインの言葉を聞いていた。"
             },
             {
+                id: "s13_misread",
                 t: "俺を巻き込みたくなかったんだろ。でも、それで一人で行くな",
                 v: 20,
                 p: 0,
                 interpretation: "misread",
                 axis: "bond",
+                endingImpact: true,
+                route: "resonance",
                 reaction:
                     "ランスロットは視線を落としたまま、握っていた手をゆっくり開いた。"
             },
             {
+                id: "s13_understood",
                 t: "全部背負い込むんじゃなくて、俺にも任せろ。俺がいなくなるみたいな顔すんな",
                 v: 20,
                 p: 0,
                 interpretation: "understood",
                 axis: "self",
+                endingImpact: true,
+                route: "twin",
                 reaction:
                     "ランスロットはしばらく何も言わなかった。それでも、もう立ち去ろうとはしなかった。"
             }
@@ -941,29 +977,38 @@ const scenario = [
 
         opts: [
             {
+                id: "s14_unknown",
                 t: "全部は分からない。でも勝手に終わらせるな",
                 v: 30,
                 p: 0,
                 interpretation: "unknown",
                 axis: "listen",
+                endingImpact: true,
+                route: "glass",
                 reaction:
                     "ランスロットの肩が小さく揺れた。けれど、すぐには何も返さなかった。"
             },
             {
+                id: "s14_misread",
                 t: "俺が離れれば楽になるって思ってるのか？　そんな決め方すんな",
                 v: 30,
                 p: 0,
                 interpretation: "misread",
                 axis: "self",
+                endingImpact: true,
+                route: "resonance",
                 reaction:
                     "ランスロットは苦しそうに目を伏せた。口を開いたが、声は続かなかった。"
             },
             {
+                id: "s14_understood",
                 t: "俺たちのことをなかったことにして、自分だけ抱えるつもりか？　そんなの認めない",
                 v: 25,
                 p: 0,
                 interpretation: "understood",
                 axis: "bond",
+                endingImpact: true,
+                route: "twin",
                 reaction:
                     "ランスロットはヴェインを見つめたまま動かなかった。しばらくして、わずかに唇を噛んだ。"
             }
@@ -1020,29 +1065,38 @@ const scenario = [
 
         opts: [
             {
+                id: "s15_unknown",
                 t: "分からないなら何度でも聞く。だから黙るな",
                 v: 30,
                 p: 0,
                 interpretation: "unknown",
                 axis: "listen",
+                endingImpact: true,
+                route: "glass",
                 reaction:
                     "ランスロットは目を見開いた。何か言いかけ、今度は飲み込まずに息を吐いた。"
             },
             {
+                id: "s15_misread",
                 t: "俺、まだ取り違えてるかもしれない。でも話してくれなきゃ直せないだろ",
                 v: 30,
                 p: 0,
                 interpretation: "misread",
                 axis: "listen",
+                endingImpact: true,
+                route: "resonance",
                 reaction:
                     "ランスロットは一瞬驚いたように瞬きをしたあと、ヴェインから視線を逸らさなかった。"
             },
             {
+                id: "s15_understood",
                 t: "聞こえたところも、まだ掴めないところもある。それでも最後まで話せ",
                 v: 30,
                 p: 0,
                 interpretation: "understood",
                 axis: "listen",
+                endingImpact: true,
+                route: "twin",
                 reaction:
                     "ランスロットはしばらくヴェインを見つめ、やがて小さく息を吐いた。"
             }
@@ -1097,29 +1151,38 @@ const scenario = [
 
         opts: [
             {
+                id: "s16_unknown",
                 t: "全部は分からない。でも今、俺に向かって話してるのは分かる",
                 v: 30,
                 p: 0,
                 interpretation: "unknown",
                 axis: "listen",
+                endingImpact: true,
+                route: "resonance",
                 reaction:
                     "ランスロットは静かにヴェインを見返した。そのまま続きを話そうと息を吸った。"
             },
             {
+                id: "s16_misread",
                 t: "俺がここにいれば落ち着くってことか？　なら動かない",
                 v: 25,
                 p: 0,
                 interpretation: "misread",
                 axis: "self",
+                endingImpact: true,
+                route: "twin",
                 reaction:
                     "ランスロットは少し驚いた顔をしたあと、張りつめていた肩の力を抜いた。"
             },
             {
+                id: "s16_understood",
                 t: "俺がいなくなることを考えて、距離を取ってたんだな。だったら今度は勝手に離れるな",
                 v: 25,
                 p: 0,
                 interpretation: "understood",
                 axis: "bond",
+                endingImpact: true,
+                route: "glass",
                 reaction:
                     "ランスロットは目を伏せかけ、途中でやめた。今度はまっすぐヴェインを見た。"
             }
@@ -1174,29 +1237,38 @@ const scenario = [
 
         opts: [
             {
+                id: "s17_unknown",
                 t: "今度は最後まで話せたな。それでいい",
                 v: 30,
                 p: 0,
                 interpretation: "unknown",
                 axis: "listen",
+                endingImpact: true,
+                route: "resonance",
                 reaction:
                     "ランスロットは小さく頷いた。表情は以前よりずっと穏やかだった。"
             },
             {
+                id: "s17_misread",
                 t: "もう何でも俺に任せるってことか？　そこまで極端じゃなくていいぞ",
                 v: 25,
                 p: 0,
                 interpretation: "misread",
                 axis: "self",
+                endingImpact: true,
+                route: "twin",
                 reaction:
                     "ランスロットは少しだけ目を丸くしたあと、苦笑するように息を吐いた。"
             },
             {
+                id: "s17_understood",
                 t: "全部自分で抱え込まず、俺にも任せるってことだろ。なら俺も同じにする",
                 v: 30,
                 p: 0,
                 interpretation: "understood",
                 axis: "act",
+                endingImpact: true,
+                route: "glass",
                 reaction:
                     "ランスロットはしばらくヴェインを見つめ、それから穏やかに頷いた。"
             }
@@ -1331,29 +1403,38 @@ const scenario = [
 
         opts: [
             {
+                id: "s19_unknown",
                 t: "全部は分からない。でも最後まで聞く。何度でも",
                 v: 40,
                 p: 0,
                 interpretation: "unknown",
                 axis: "listen",
+                endingImpact: true,
+                route: "resonance",
                 reaction:
                     "ランスロットは静かに頷いた。もう言葉を途中で止めようとはしなかった。"
             },
             {
+                id: "s19_misread",
                 t: "まだ取り違えてるところがあるかもしれない。だったら、また聞き直す",
                 v: 35,
                 p: 0,
                 interpretation: "misread",
                 axis: "listen",
+                endingImpact: true,
+                route: "twin",
                 reaction:
                     "ランスロットは少し驚いたあと、ゆっくり表情を緩めた。"
             },
             {
+                id: "s19_understood",
                 t: "ここまで言ってくれたことは受け取った。……次は俺の番だ",
                 v: 35,
                 p: 0,
                 interpretation: "understood",
                 axis: "self",
+                endingImpact: true,
+                route: "glass",
                 reaction:
                     "ランスロットは何も遮らず、ヴェインの次の言葉を待った。"
             }
