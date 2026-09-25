@@ -206,7 +206,7 @@ function showEnd() {
         4 静寂のあとで
         ↓
         残った混合型を
-        act / self / listen+bond
+        daily / act / self / listen+bond
         の傾向から振り分ける。
     */
 
@@ -263,11 +263,22 @@ function showEnd() {
         const selfScore =
             axisCounts.self;
 
+        const dailyScore =
+            axisCounts.daily;
+
         const resonanceScore =
             axisCounts.listen +
             axisCounts.bond;
 
         if (
+            dailyScore > actScore &&
+            dailyScore > selfScore &&
+            dailyScore > resonanceScore
+        ) {
+            id = 4;
+        }
+
+        else if (
             actScore >= selfScore &&
             actScore >= resonanceScore
         ) {
