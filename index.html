@@ -837,11 +837,13 @@
         ) {
             const finalKey = data.finalResolve.key;
 
-            if (resolvedWords.has(finalKey)) {
-                pendingFinalLine = data.finalResolve.line || "";
-            } else if (isAcceptedGuess(finalKey, userDict[finalKey])) {
+            if (
+                !resolvedWords.has(finalKey) &&
+                isAcceptedGuess(finalKey, userDict[finalKey])
+            ) {
                 if (resolveWord(finalKey)) {
-                    pendingFinalLine = data.finalResolve.line || "";
+                    pendingFinalLine =
+                        data.finalResolve.line || "";
                 }
             }
         }
