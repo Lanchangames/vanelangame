@@ -143,7 +143,7 @@
                 <div class="badge" id="b-2" title="不滅の双璧">🤝</div>
                 <div class="badge" id="b-3" title="硝子の距離">⌛</div>
                 <div class="badge" id="b-4" title="終わらぬ静寂">❄️</div>
-                <div class="badge" id="b-5" title="プリンの迷宮">🍮</div>
+                <div class="badge" id="b-5" title="話を聞け、ヴェイン！">🍮</div>
                 <div class="badge gold" id="b-7" title="悠久の夜明け">🌅</div>
             </div>
             <span>解析: <b id="intel-val">0%</b> | 収集: <b id="col-val">0%</b></span>
@@ -424,12 +424,12 @@
         2: { title: "不滅の双璧", hint: "一定以上の愛をもつとたどり着けます" },
         3: { title: "硝子の距離", hint: "愛を欠いた対応は壁を作ります。" },
         4: { title: "終わらぬ静寂", hint: "ランスロットが何を言っているのか理解ができない。" },
-        5: { title: "プリンの迷宮", hint: "一番ヴェインがしなさそうな解答のみを選んでください" },
+        5: { title: "話を聞け、ヴェイン！", hint: "大事なところで、少しずつ話の芯を外し続けてみましょう。" },
         6: { title: "魂の共鳴", hint: "解析なんてしなくても、お前の顔を見ればわかる。" },
         7: { title: "悠久の夜明け", hint: "すべての記憶を知るヴェインだけが辿り着く結末。" }
     };
 
-    let currentStep = 0, viewingStep = 0, lovePoints = 0, userDict = {}, colSet = new Set(), pCount = 0;
+    let currentStep = 0, viewingStep = 0, lovePoints = 0, userDict = {}, colSet = new Set();
     let selectedAnswers = [];
     let resolvedWords = new Set();
     let wordSeenCounts = {};
@@ -438,6 +438,21 @@
     let pendingOption = null;
     let pendingResolvedKeys = [];
     let pendingFinalLine = "";
+
+    let interpretationCounts = {
+        unknown: 0,
+        misread: 0,
+        understood: 0
+    };
+
+    let axisCounts = {
+        listen: 0,
+        act: 0,
+        bond: 0,
+        self: 0,
+        daily: 0
+    };
+
     const maxLove = 450;
 
     function normalizeGuess(value) {
@@ -588,6 +603,20 @@
         pendingOption = null;
         pendingResolvedKeys = [];
         pendingFinalLine = "";
+
+        interpretationCounts = {
+            unknown: 0,
+            misread: 0,
+            understood: 0
+        };
+
+        axisCounts = {
+            listen: 0,
+            act: 0,
+            bond: 0,
+            self: 0,
+            daily: 0
+        };
 
         const savedWords = getSavedWords();
 
@@ -1043,8 +1072,25 @@
                     b.onclick = () => {
                         selectedAnswers[currentStep] = o.t;
 
-                        if (o.p === 1) {
-                            pCount++;
+                        if (o.interpretation) {
+                            if (
+                                Object.prototype.hasOwnProperty.call(
+                                    interpretationCounts,
+                                    o.interpretation
+                                )
+                            ) {
+                                interpretationCounts[o.interpretation]++;
+                            }
+
+                            if (
+                                o.axis &&
+                                Object.prototype.hasOwnProperty.call(
+                                    axisCounts,
+                                    o.axis
+                                )
+                            ) {
+                                axisCounts[o.axis]++;
+                            }
                         }
 
                         lovePoints += o.v;
@@ -1142,11 +1188,11 @@
                 '45'
             );
         }
-        else if (pCount >= 12) {
+        else if (interpretationCounts.misread >= 8) {
             id = 5;
             t = endingsData[5].title;
-            e = "🍮❓";
-            c = "ランスロットは呆れ果て、山ほどのプリンをヴェインに押し付けて去っていった。";
+            e = "⁉️💬";
+            c = "ヴェインは最後まで、ところどころ盛大に話の芯を外していた。ランスロットが一つずつ言葉を確かめ直すたび、ヴェインは目を丸くする。それでも二人は笑っていた。分からなければ聞けばいい。間違えたなら、また話せばいい。どうやら呪いの方が、そのことを最後まで分かっていなかったらしい。";
         }
         else if (intel >= 100 && loveRate >= 80) {
             id = 1;
