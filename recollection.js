@@ -6,217 +6,661 @@
     - game.js の重要27択に id / endingImpact / route がある
     - HTML側に rebuildRunState() がある
     - masteredWords / vaneKnownWords / vaneUnderstoodAt がある
+
+    現仕様:
+    - 声の鍵1個で
+      「END snapshot × Scene」の分岐地点を1つ永久解放する
+    - 一度解放した同じ分岐地点では再度鍵を消費しない
+    - Scene単位の全END共通解放は行わない
+    - 無料Sceneは設けない
+    - 初回クリア時に声の鍵+3
+    - 以降、新しい通常END初回回収ごとに声の鍵+1
+    - 同じENDの再回収では鍵を増やさない
+    - プレイヤーの解読実績 masteredWords と
+      現在世界線のヴェインの理解 vaneKnownWords は分離する
+    - END7は通常END判定では出現せず、
+      「最後の追憶」からのみ表示する
 */
 
-const RECOLLECTION_STORAGE_KEY = "vane_recollection_v4";
-const FREE_RECOLLECTION_SCENE_ID = 4;
+const RECOLLECTION_STORAGE_KEY =
+    "vane_recollection_v4";
 
-let runMode = "story"; // "story" | "recollection"
-let recollectionBaseEndingId = null;
+const RECOLLECTION_SCHEMA_VERSION =
+    5;
+
+let runMode =
+    "story"; // "story" | "recollection"
+
+let recollectionBaseEndingId =
+    null;
+
+/*
+    追憶画面を
+    タイトルから開いたのか、
+    ゲーム中／END画面から開いたのかを記録する。
+*/
+let recollectionOpenedFromGame =
+    false;
+
+
+// =========================================================
+// 基本ヘルパー
+// =========================================================
 
 function getImportantRecollectionScenes() {
-    return scenario.filter(scene =>
-        scene.opts.some(option => option.endingImpact === true)
+    return scenario.filter(
+        scene => {
+            return scene.opts.some(
+                option => {
+                    return (
+                        option.endingImpact ===
+                        true
+                    );
+                }
+            );
+        }
     );
 }
 
-function getSceneIndexById(sceneId) {
+function getSceneIndexById(
+    sceneId
+) {
     return scenario.findIndex(
-        scene => scene.id === Number(sceneId)
+        scene => {
+            return (
+                scene.id ===
+                Number(sceneId)
+            );
+        }
     );
 }
+
+function isValidNormalEndingId(
+    endingId
+) {
+    const id =
+        Number(endingId);
+
+    return (
+        Number.isInteger(id) &&
+        id >= 1 &&
+        id <= 6
+    );
+}
+
+function isValidImportantSceneId(
+    sceneId
+) {
+    const id =
+        Number(sceneId);
+
+    return getImportantRecollectionScenes()
+        .some(
+            scene => {
+                return (
+                    scene.id === id
+                );
+            }
+        );
+}
+
+/*
+    END snapshot × Scene を
+    一意に表すキー。
+
+    例:
+        END3 / Scene12
+        → end3_scene12
+*/
+function getRecollectionBranchKey(
+    endingId,
+    sceneId
+) {
+    return (
+        `end${Number(endingId)}` +
+        `_scene${Number(sceneId)}`
+    );
+}
+
+function getCurrentMasteredWordCount() {
+    if (
+        typeof masteredWords !==
+            "undefined" &&
+        masteredWords instanceof Set
+    ) {
+        return masteredWords.size;
+    }
+
+    if (
+        typeof getMasteredWordSet ===
+        "function"
+    ) {
+        return getMasteredWordSet()
+            .size;
+    }
+
+    return 0;
+}
+
+
+// =========================================================
+// セーブデータ
+// =========================================================
 
 function getDefaultRecollectionProgress() {
     return {
-        version: 4,
-        gameCleared: false,
-        voiceKeys: 0,
+        version:
+            RECOLLECTION_SCHEMA_VERSION,
+
+        gameCleared:
+            false,
+
+        voiceKeys:
+            0,
 
         /*
-            鍵はENDごとではなく、
-            「このSceneから開始できる権利」を永久解放する。
+            例:
+            [
+                "end3_scene12",
+                "end3_scene15",
+                "end4_scene12"
+            ]
+
+            同じSceneでも、
+            基準ENDが違えば別の分岐として扱う。
         */
-        unlockedSceneIds: [],
+        unlockedBranches:
+            [],
 
-        collectedNormalEndings: [],
-        endingSnapshots: {},
+        collectedNormalEndings:
+            [],
 
-        finalRecollectionUnlocked: false
+        endingSnapshots:
+            {},
+
+        finalRecollectionUnlocked:
+            false
     };
 }
 
-function normalizeRecollectionProgress(raw) {
-    const base = getDefaultRecollectionProgress();
+
+/*
+    保存済み進行データを
+    現行仕様へ正規化する。
+
+    旧v4の
+        unlockedSceneIds
+
+    が残っている場合は、
+
+        旧仕様で使用可能だった
+        回収済みEND × 解放済みScene
+
+    を unlockedBranches へ変換する。
+
+    これにより、
+    旧版ですでに得ていたアクセス権は失わせない。
+*/
+function normalizeRecollectionProgress(
+    raw
+) {
+    const base =
+        getDefaultRecollectionProgress();
 
     const src =
-        raw && typeof raw === "object"
+        raw &&
+        typeof raw === "object"
             ? raw
             : {};
 
-    const result = {
-        ...base,
-        ...src
-    };
+    const collectedNormalEndings =
+        Array.from(
+            new Set(
+                (
+                    Array.isArray(
+                        src.collectedNormalEndings
+                    )
+                        ? src
+                            .collectedNormalEndings
+                        : []
+                )
+                    .map(Number)
+                    .filter(
+                        id => {
+                            return (
+                                id >= 1 &&
+                                id <= 6
+                            );
+                        }
+                    )
+            )
+        );
 
-    result.voiceKeys =
-        Number.isFinite(Number(result.voiceKeys))
+    const endingSnapshots =
+        {};
+
+    if (
+        src.endingSnapshots &&
+        typeof src.endingSnapshots ===
+            "object"
+    ) {
+        Object.keys(
+            src.endingSnapshots
+        ).forEach(
+            key => {
+                const id =
+                    Number(key);
+
+                const snapshot =
+                    src.endingSnapshots[
+                        key
+                    ];
+
+                if (
+                    isValidNormalEndingId(
+                        id
+                    ) &&
+                    snapshot &&
+                    typeof snapshot ===
+                        "object"
+                ) {
+                    endingSnapshots[id] =
+                        snapshot;
+                }
+            }
+        );
+    }
+
+    const validBranches =
+        new Set();
+
+    /*
+        現行形式の
+        unlockedBranchesを読み込む。
+    */
+    const rawBranches =
+        Array.isArray(
+            src.unlockedBranches
+        )
+            ? src.unlockedBranches
+            : [];
+
+    rawBranches.forEach(
+        value => {
+            const match =
+                String(value)
+                    .match(
+                        /^end([1-6])_scene(-?\d+)$/
+                    );
+
+            if (!match) {
+                return;
+            }
+
+            const endingId =
+                Number(match[1]);
+
+            const sceneId =
+                Number(match[2]);
+
+            if (
+                !isValidNormalEndingId(
+                    endingId
+                ) ||
+                !isValidImportantSceneId(
+                    sceneId
+                )
+            ) {
+                return;
+            }
+
+            validBranches.add(
+                getRecollectionBranchKey(
+                    endingId,
+                    sceneId
+                )
+            );
+        }
+    );
+
+
+    /*
+        旧形式
+        unlockedSceneIds
+        からの移行。
+
+        旧版では一度Sceneを開くと
+        全END共通だったため、
+        その時点で所有していたENDについては
+        同じSceneを解放済みとして引き継ぐ。
+    */
+    const legacyUnlockedSceneIds =
+        Array.from(
+            new Set(
+                (
+                    Array.isArray(
+                        src.unlockedSceneIds
+                    )
+                        ? src
+                            .unlockedSceneIds
+                        : []
+                )
+                    .map(Number)
+                    .filter(
+                        sceneId => {
+                            return (
+                                isValidImportantSceneId(
+                                    sceneId
+                                )
+                            );
+                        }
+                    )
+            )
+        );
+
+    const migrationEndingIds =
+        Array.from(
+            new Set([
+                ...collectedNormalEndings,
+                ...Object.keys(
+                    endingSnapshots
+                )
+                    .map(Number)
+                    .filter(
+                        id => {
+                            return (
+                                isValidNormalEndingId(
+                                    id
+                                )
+                            );
+                        }
+                    )
+            ])
+        );
+
+    legacyUnlockedSceneIds
+        .forEach(
+            sceneId => {
+                migrationEndingIds
+                    .forEach(
+                        endingId => {
+                            validBranches.add(
+                                getRecollectionBranchKey(
+                                    endingId,
+                                    sceneId
+                                )
+                            );
+                        }
+                    );
+            }
+        );
+
+
+    const voiceKeys =
+        Number.isFinite(
+            Number(
+                src.voiceKeys
+            )
+        )
             ? Math.max(
                 0,
-                Math.floor(Number(result.voiceKeys))
+                Math.floor(
+                    Number(
+                        src.voiceKeys
+                    )
+                )
             )
             : 0;
 
-    result.unlockedSceneIds = Array.from(
-        new Set(
-            (
-                Array.isArray(result.unlockedSceneIds)
-                    ? result.unlockedSceneIds
-                    : []
-            )
-                .map(Number)
-                .filter(id => {
-                    return getSceneIndexById(id) >= 0;
-                })
-        )
-    );
 
-    result.collectedNormalEndings = Array.from(
-        new Set(
-            (
-                Array.isArray(
-                    result.collectedNormalEndings
-                )
-                    ? result.collectedNormalEndings
-                    : []
-            )
-                .map(Number)
-                .filter(id => {
-                    return id >= 1 && id <= 6;
-                })
-        )
-    );
+    const gameCleared =
+        Boolean(
+            src.gameCleared
+        ) ||
+        collectedNormalEndings
+            .length > 0;
 
-    if (
-        !result.endingSnapshots ||
-        typeof result.endingSnapshots !== "object"
-    ) {
-        result.endingSnapshots = {};
-    }
 
-    /*
-        初回クリア済みなら、
-        最初の重要選択Scene4は必ず無料解放。
-    */
-    if (
-        result.gameCleared &&
-        !result.unlockedSceneIds.includes(
-            FREE_RECOLLECTION_SCENE_ID
-        )
-    ) {
-        result.unlockedSceneIds.push(
-            FREE_RECOLLECTION_SCENE_ID
-        );
-    }
+    const masteredCount =
+        typeof getMasteredWordSet ===
+            "function"
+            ? getMasteredWordSet()
+                .size
+            : getCurrentMasteredWordCount();
 
-    return result;
+
+    const finalRecollectionUnlocked =
+        collectedNormalEndings
+            .length >= 3 &&
+        masteredCount ===
+            Object.keys(
+                wordBank
+            ).length;
+
+
+    return {
+        ...base,
+
+        version:
+            RECOLLECTION_SCHEMA_VERSION,
+
+        gameCleared,
+
+        voiceKeys,
+
+        unlockedBranches:
+            Array.from(
+                validBranches
+            ),
+
+        collectedNormalEndings,
+
+        endingSnapshots,
+
+        finalRecollectionUnlocked
+    };
 }
 
+
 function loadRecollectionProgress() {
-    let saved = null;
+    let saved =
+        null;
 
     try {
-        saved = JSON.parse(
-            localStorage.getItem(
-                RECOLLECTION_STORAGE_KEY
-            ) || "null"
-        );
-    } catch (e) {
-        saved = null;
+        saved =
+            JSON.parse(
+                localStorage.getItem(
+                    RECOLLECTION_STORAGE_KEY
+                ) || "null"
+            );
+    }
+    catch (e) {
+        saved =
+            null;
     }
 
-    if (saved) {
-        return normalizeRecollectionProgress(
-            saved
-        );
-    }
 
     /*
-        旧セーブから最低限だけ移行する。
+        現行／旧v4の
+        追憶セーブが存在する場合。
+    */
+    if (
+        saved &&
+        typeof saved === "object"
+    ) {
+        const normalized =
+            normalizeRecollectionProgress(
+                saved
+            );
 
-        END snapshotまでは復元できないため、
-        存在しない履歴を捏造しない。
+        /*
+            旧構造からの移行結果も
+            その場で保存する。
+        */
+        localStorage.setItem(
+            RECOLLECTION_STORAGE_KEY,
+            JSON.stringify(
+                normalized
+            )
+        );
+
+        return normalized;
+    }
+
+
+    /*
+        追憶セーブがまだ存在しない場合のみ、
+        vane_collection_v3 から最低限移行する。
+
+        END snapshotは存在しないため、
+        架空の履歴は作らない。
     */
     const migrated =
         getDefaultRecollectionProgress();
 
-    let oldCollection = [];
+    let oldCollection =
+        [];
 
     try {
-        oldCollection = JSON.parse(
-            localStorage.getItem(
-                "vane_collection_v3"
-            ) || "[]"
-        );
-    } catch (e) {
-        oldCollection = [];
+        oldCollection =
+            JSON.parse(
+                localStorage.getItem(
+                    "vane_collection_v3"
+                ) || "[]"
+            );
+    }
+    catch (e) {
+        oldCollection =
+            [];
     }
 
-    migrated.collectedNormalEndings =
-        Array.from(
-            new Set(
-                oldCollection
-                    .map(Number)
-                    .filter(id => {
-                        return id >= 1 && id <= 6;
-                    })
-            )
-        );
+
+    migrated
+        .collectedNormalEndings =
+            Array.from(
+                new Set(
+                    (
+                        Array.isArray(
+                            oldCollection
+                        )
+                            ? oldCollection
+                            : []
+                    )
+                        .map(Number)
+                        .filter(
+                            id => {
+                                return (
+                                    id >= 1 &&
+                                    id <= 6
+                                );
+                            }
+                        )
+                )
+            );
+
 
     /*
-        旧版ですでに通常ENDを持っている場合は、
-        追憶システム自体は解放済みとして扱う。
+        旧版ですでに通常ENDを
+        回収している場合、
+        追憶システム自体は解放済み扱い。
+
+        新システムの報酬仕様に合わせ、
+        初END +3、
+        2個目以降 +1として
+        未使用分の鍵を付与する。
+
+        例:
+        END1個 → 3個
+        END2個 → 4個
+        END3個 → 5個
     */
     if (
-        migrated.collectedNormalEndings.length > 0
+        migrated
+            .collectedNormalEndings
+            .length > 0
     ) {
-        migrated.gameCleared = true;
+        migrated.gameCleared =
+            true;
 
-        migrated.voiceKeys = 3;
-
-        migrated.unlockedSceneIds = [
-            FREE_RECOLLECTION_SCENE_ID
-        ];
+        migrated.voiceKeys =
+            3 +
+            (
+                migrated
+                    .collectedNormalEndings
+                    .length -
+                1
+            );
     }
 
+
+    /*
+        旧collectionしかない場合、
+        どのENDのどのSceneを
+        解放していたかは分からないので、
+        unlockedBranchesは作らない。
+    */
+    migrated.unlockedBranches =
+        [];
+
+
     const masteredNow =
-        typeof getMasteredWordSet === "function"
+        typeof getMasteredWordSet ===
+            "function"
             ? getMasteredWordSet()
             : new Set();
 
-    migrated.finalRecollectionUnlocked =
-        migrated.collectedNormalEndings.length >= 3 &&
-        masteredNow.size ===
-            Object.keys(wordBank).length;
+
+    migrated
+        .finalRecollectionUnlocked =
+            migrated
+                .collectedNormalEndings
+                .length >= 3 &&
+            masteredNow.size ===
+                Object.keys(
+                    wordBank
+                ).length;
+
+
+    const normalized =
+        normalizeRecollectionProgress(
+            migrated
+        );
+
 
     localStorage.setItem(
         RECOLLECTION_STORAGE_KEY,
-        JSON.stringify(migrated)
+        JSON.stringify(
+            normalized
+        )
     );
 
-    return normalizeRecollectionProgress(
-        migrated
-    );
+
+    return normalized;
 }
+
 
 let recollectionProgress =
     loadRecollectionProgress();
 
+
 function saveRecollectionProgress() {
+    recollectionProgress =
+        normalizeRecollectionProgress(
+            recollectionProgress
+        );
+
     localStorage.setItem(
         RECOLLECTION_STORAGE_KEY,
-        JSON.stringify(recollectionProgress)
+        JSON.stringify(
+            recollectionProgress
+        )
     );
 }
+
+
+// =========================================================
+// snapshot
+// =========================================================
 
 /*
     そのENDの記憶において、
@@ -224,39 +668,49 @@ function saveRecollectionProgress() {
     ヴェインが理解していた語だけを返す。
 
     startIndexと同じSceneで理解した語は、
-    Scene開始時点ではまだ知らないので含めない。
+    Scene開始時点ではまだ知らないため含めない。
 */
 function getSnapshotKnowledgeBeforeScene(
     snapshot,
     startIndex
 ) {
-    if (!snapshot) return [];
+    if (!snapshot) {
+        return [];
+    }
 
     const understoodAt =
         snapshot.vaneUnderstoodAt &&
-        typeof snapshot.vaneUnderstoodAt ===
+        typeof snapshot
+            .vaneUnderstoodAt ===
             "object"
             ? snapshot.vaneUnderstoodAt
             : {};
 
-    return Object.keys(wordBank).filter(
+
+    return Object.keys(
+        wordBank
+    ).filter(
         key => {
-            const at = Number(
-                understoodAt[key]
-            );
+            const at =
+                Number(
+                    understoodAt[key]
+                );
 
             return (
-                Number.isFinite(at) &&
+                Number.isFinite(
+                    at
+                ) &&
                 at < startIndex
             );
         }
     );
 }
 
+
 /*
-    Phase1以前に選択肢本文そのものを
-    保存していたデータが混ざった場合も
-    option.idへ変換できるようにする。
+    Phase1以前に
+    選択肢本文そのものを保存していたデータが
+    混ざっていてもoption.idへ変換する。
 */
 function normalizeSavedAnswer(
     optionValue,
@@ -266,16 +720,23 @@ function normalizeSavedAnswer(
         return null;
     }
 
-    const data = scenario[sceneIndex];
+    const data =
+        scenario[
+            sceneIndex
+        ];
 
     if (!data) {
         return null;
     }
 
+
     const byId =
         data.opts.find(
             option => {
-                return option.id === optionValue;
+                return (
+                    option.id ===
+                    optionValue
+                );
             }
         );
 
@@ -283,26 +744,36 @@ function normalizeSavedAnswer(
         return byId.id;
     }
 
+
     const byText =
         data.opts.find(
             option => {
-                return option.t === optionValue;
+                return (
+                    option.t ===
+                    optionValue
+                );
             }
         );
+
 
     return byText
         ? byText.id
         : null;
 }
 
+
 /*
-    現在の一周をEND用snapshotへ変換。
+    現在の一周を
+    END用snapshotへ変換する。
 */
 function snapshotCurrentRun() {
     return {
         selectedAnswers:
             selectedAnswers.map(
-                (value, index) => {
+                (
+                    value,
+                    index
+                ) => {
                     return normalizeSavedAnswer(
                         value,
                         index
@@ -311,10 +782,14 @@ function snapshotCurrentRun() {
             ),
 
         vaneKnownWords:
-            Array.from(vaneKnownWords),
+            Array.from(
+                vaneKnownWords
+            ),
 
         /*
-            「いつ理解したか」を保存しないと、
+            「いつ理解したか」を保存する。
+
+            これがないと、
             Scene15へ戻った時に
             Scene19で理解した語まで
             過去へ逆流してしまう。
@@ -328,22 +803,36 @@ function snapshotCurrentRun() {
             )
         },
 
-        clearedAt: Date.now()
+        clearedAt:
+            Date.now()
     };
 }
+
+
+// =========================================================
+// END進行・鍵報酬
+// =========================================================
 
 function updateFinalRecollectionUnlock() {
     const wasUnlocked =
         recollectionProgress
             .finalRecollectionUnlocked;
 
+
+    const masteredCount =
+        getCurrentMasteredWordCount();
+
+
     recollectionProgress
         .finalRecollectionUnlocked =
             recollectionProgress
                 .collectedNormalEndings
                 .length >= 3 &&
-            masteredWords.size ===
-                Object.keys(wordBank).length;
+            masteredCount ===
+                Object.keys(
+                    wordBank
+                ).length;
+
 
     return (
         !wasUnlocked &&
@@ -351,6 +840,7 @@ function updateFinalRecollectionUnlock() {
             .finalRecollectionUnlocked
     );
 }
+
 
 /*
     通常END1〜6へ到達した時、
@@ -368,151 +858,215 @@ function updateFinalRecollectionUnlock() {
 function recordEndingProgress(
     endingId
 ) {
-    const id = Number(endingId);
+    const id =
+        Number(
+            endingId
+        );
+
 
     if (
-        id < 1 ||
-        id > 6
+        !isValidNormalEndingId(
+            id
+        )
     ) {
         return {
-            isFirstClear: false,
-            isNewEnding: false,
-            keysGained: 0,
+            isFirstClear:
+                false,
+
+            isNewEnding:
+                false,
+
+            keysGained:
+                0,
+
             finalRecollectionUnlockedNow:
                 false
         };
     }
 
+
     const isFirstClear =
         !recollectionProgress
             .gameCleared;
 
+
     const alreadyCollected =
         recollectionProgress
             .collectedNormalEndings
-            .includes(id);
+            .includes(
+                id
+            );
 
-    let keysGained = 0;
+
+    let keysGained =
+        0;
+
 
     if (isFirstClear) {
         recollectionProgress
-            .gameCleared = true;
+            .gameCleared =
+                true;
 
         recollectionProgress
-            .voiceKeys += 3;
+            .voiceKeys +=
+                3;
 
-        keysGained = 3;
-
-        /*
-            最初の重要選択Scene4は
-            初回クリア時点で無料解放。
-        */
-        if (
-            !recollectionProgress
-                .unlockedSceneIds
-                .includes(
-                    FREE_RECOLLECTION_SCENE_ID
-                )
-        ) {
-            recollectionProgress
-                .unlockedSceneIds
-                .push(
-                    FREE_RECOLLECTION_SCENE_ID
-                );
-        }
+        keysGained =
+            3;
     }
-    else if (!alreadyCollected) {
+    else if (
+        !alreadyCollected
+    ) {
         recollectionProgress
-            .voiceKeys += 1;
+            .voiceKeys +=
+                1;
 
-        keysGained = 1;
+        keysGained =
+            1;
     }
 
-    if (!alreadyCollected) {
+
+    if (
+        !alreadyCollected
+    ) {
         recollectionProgress
             .collectedNormalEndings
-            .push(id);
+            .push(
+                id
+            );
     }
 
+
     /*
-        同じENDの別履歴で
-        基準snapshotを勝手に上書きしない。
+        同じENDを別ルートで再取得しても、
+        基準snapshotは勝手に上書きしない。
+
+        ENDごとに最初に保存された履歴を
+        基準記憶として扱う。
     */
     if (
         !recollectionProgress
-            .endingSnapshots[id]
+            .endingSnapshots[
+                id
+            ]
     ) {
         recollectionProgress
-            .endingSnapshots[id] =
+            .endingSnapshots[
+                id
+            ] =
                 snapshotCurrentRun();
     }
+
 
     const finalRecollectionUnlockedNow =
         updateFinalRecollectionUnlock();
 
+
     saveRecollectionProgress();
+
 
     return {
         isFirstClear,
+
         isNewEnding:
             !alreadyCollected,
+
         keysGained,
+
         finalRecollectionUnlockedNow
     };
 }
 
-function isRecollectionSceneUnlocked(
+
+// =========================================================
+// 分岐地点解放
+// =========================================================
+
+function isRecollectionBranchUnlocked(
+    endingId,
     sceneId
 ) {
+    const branchKey =
+        getRecollectionBranchKey(
+            endingId,
+            sceneId
+        );
+
+
     return recollectionProgress
-        .unlockedSceneIds
+        .unlockedBranches
         .includes(
-            Number(sceneId)
+            branchKey
         );
 }
 
+
 /*
-    声の鍵でSceneショートカットを
-    永久解放する。
+    声の鍵1個を使用し、
+
+    END snapshot × Scene
+
+    の分岐地点を永久解放する。
+
+    一度解放した同じ分岐地点では
+    再度鍵を消費しない。
 */
-function unlockRecollectionScene(
+function unlockRecollectionBranch(
+    endingId,
     sceneId
 ) {
-    const id = Number(sceneId);
+    const endId =
+        Number(
+            endingId
+        );
 
-    const validSceneIds =
-        getImportantRecollectionScenes()
-            .map(
-                scene => scene.id
-            );
+    const id =
+        Number(
+            sceneId
+        );
+
 
     if (
-        !validSceneIds.includes(id)
+        !isValidNormalEndingId(
+            endId
+        )
     ) {
         return false;
     }
 
+
     if (
-        isRecollectionSceneUnlocked(id)
+        !isValidImportantSceneId(
+            id
+        )
     ) {
-        return true;
+        return false;
     }
+
 
     /*
-        Scene4だけは無料。
+        基準snapshotが存在しないENDからは
+        分岐を作れない。
     */
     if (
-        id ===
-        FREE_RECOLLECTION_SCENE_ID
+        !recollectionProgress
+            .endingSnapshots[
+                endId
+            ]
     ) {
-        recollectionProgress
-            .unlockedSceneIds
-            .push(id);
+        return false;
+    }
 
-        saveRecollectionProgress();
 
+    if (
+        isRecollectionBranchUnlocked(
+            endId,
+            id
+        )
+    ) {
         return true;
     }
+
 
     if (
         recollectionProgress
@@ -521,37 +1075,58 @@ function unlockRecollectionScene(
         return false;
     }
 
+
     recollectionProgress
         .voiceKeys--;
 
+
     recollectionProgress
-        .unlockedSceneIds
-        .push(id);
+        .unlockedBranches
+        .push(
+            getRecollectionBranchKey(
+                endId,
+                id
+            )
+        );
+
 
     saveRecollectionProgress();
+
 
     return true;
 }
 
+
+// =========================================================
+// 世界線状態復元
+// =========================================================
+
 /*
     途中Sceneから開始するため、
-    そのSceneより前までに何回
-    各暗号を聞いたかを復元する。
+    そのSceneより前までに
+    各暗号を何回聞いたか復元する。
 */
 function rebuildSeenWordsBefore(
     startIndex
 ) {
-    wordSeenCounts = {};
-    seenSceneIds = new Set();
+    wordSeenCounts =
+        {};
+
+    seenSceneIds =
+        new Set();
+
 
     for (
         let i = 0;
         i < startIndex;
         i++
     ) {
-        registerSceneWords(i);
+        registerSceneWords(
+            i
+        );
     }
 }
+
 
 /*
     「このヴェインの状態にする」
@@ -559,6 +1134,10 @@ function rebuildSeenWordsBefore(
     requestedKeysのうち、
     masteredWordsに存在する語だけを
     現在世界線へ反映する。
+
+    常に
+        vaneKnownWords ⊆ masteredWords
+    を保つ。
 */
 function applyRecollectionKnowledge(
     requestedKeys,
@@ -571,14 +1150,11 @@ function applyRecollectionKnowledge(
         )
             ? requestedKeys
             : Array.from(
-                requestedKeys || []
+                requestedKeys ||
+                []
             );
 
-    /*
-        プレイヤーが一度も
-        解読したことのない語は
-        絶対に解放できない。
-    */
+
     const allowed =
         requested.filter(
             key => {
@@ -589,15 +1165,24 @@ function applyRecollectionKnowledge(
                             wordBank,
                             key
                         ) &&
-                    masteredWords.has(key)
+                    masteredWords
+                        .has(
+                            key
+                        )
                 );
             }
         );
 
-    vaneKnownWords =
-        new Set(allowed);
 
-    vaneUnderstoodAt = {};
+    vaneKnownWords =
+        new Set(
+            allowed
+        );
+
+
+    vaneUnderstoodAt =
+        {};
+
 
     const oldUnderstoodAt =
         snapshot &&
@@ -605,76 +1190,243 @@ function applyRecollectionKnowledge(
         typeof snapshot
             .vaneUnderstoodAt ===
             "object"
-            ? snapshot.vaneUnderstoodAt
+            ? snapshot
+                .vaneUnderstoodAt
             : {};
+
 
     allowed.forEach(
         key => {
             const oldAt =
                 Number(
-                    oldUnderstoodAt[key]
+                    oldUnderstoodAt[
+                        key
+                    ]
                 );
 
+
             if (
-                Number.isFinite(oldAt) &&
-                oldAt < startIndex
+                Number.isFinite(
+                    oldAt
+                ) &&
+                oldAt <
+                    startIndex
             ) {
                 /*
                     元の記憶でも
-                    このSceneより前に
-                    理解していた語。
+                    このScene以前に
+                    理解済みだった語。
                 */
-                vaneUnderstoodAt[key] =
+                vaneUnderstoodAt[
+                    key
+                ] =
                     oldAt;
             }
             else {
                 /*
-                    カスタム設定で
-                    この世界線へ持ち込んだ語。
+                    カスタム設定によって
+                    この追憶へ持ち込んだ語。
 
                     分岐開始直前から
                     理解済みとして扱う。
                 */
-                vaneUnderstoodAt[key] =
-                    startIndex - 1;
+                vaneUnderstoodAt[
+                    key
+                ] =
+                    startIndex -
+                    1;
             }
         }
     );
+
 
     Object.keys(
         wordBank
     ).forEach(
         key => {
-            userDict[key] =
-                vaneKnownWords.has(key)
-                    ? wordBank[key]
-                        .canonical
+            userDict[
+                key
+            ] =
+                vaneKnownWords
+                    .has(
+                        key
+                    )
+                    ? wordBank[
+                        key
+                    ].canonical
                     : "";
 
-            renderDictEntryState(key);
+
+            renderDictEntryState(
+                key
+            );
         }
     );
 
+
     updateIntelUI();
+
 
     return Array.from(
         vaneKnownWords
     );
 }
 
+
+// =========================================================
+// END画面から追憶へ戻るためのUI復元
+// =========================================================
+
 /*
-    実際に追憶を開始する。
+    endings.js はEND表示時に
+    #display.innerHTML を
+    エンディング本文へ置き換える。
+
+    その状態から直接追憶を開始すると、
+    updateUI() が必要とする
+
+        speaker-name
+        face-emoji
+        message-text
+        vane-thought-text
+        story-text
+        resolution-text
+
+    が存在しない。
+
+    そのため、追憶開始時に必要な場合だけ
+    元のゲーム表示DOMを復元する。
 */
+function restoreGameDisplayShell() {
+    const display =
+        document.getElementById(
+            "display"
+        );
+
+    if (!display) {
+        return;
+    }
+
+
+    if (
+        document.getElementById(
+            "message-text"
+        ) &&
+        document.getElementById(
+            "vane-thought-text"
+        ) &&
+        document.getElementById(
+            "story-text"
+        ) &&
+        document.getElementById(
+            "resolution-text"
+        )
+    ) {
+        return;
+    }
+
+
+    display.innerHTML = `
+        <div id="chara-header">
+            <span
+                id="face-emoji"
+                style="
+                    font-size:2em;
+                    margin-right:15px;
+                "
+            >
+                😊
+            </span>
+
+            <span
+                id="speaker-name"
+                style="
+                    font-weight:bold;
+                    letter-spacing:0.1em;
+                    color:var(--main);
+                "
+            >
+                LANCELOT
+            </span>
+        </div>
+
+        <div
+            class="bubble"
+            id="message-text"
+        >
+            ......
+        </div>
+
+        <div id="vane-thought-block">
+            <div class="block-label">
+                💭 VANE
+            </div>
+
+            <div
+                class="thought-bubble"
+                id="vane-thought-text"
+            ></div>
+        </div>
+
+        <div
+            id="story-block"
+            style="display:none;"
+        >
+            <div class="block-label">
+                STORY
+            </div>
+
+            <div
+                class="story-bubble"
+                id="story-text"
+            ></div>
+        </div>
+
+        <div
+            id="resolution-block"
+            style="display:none;"
+        >
+            <div class="block-label">
+                UNDERSTANDING
+            </div>
+
+            <div
+                class="resolution-bubble"
+                id="resolution-text"
+            ></div>
+        </div>
+    `;
+}
+
+
+// =========================================================
+// 追憶開始
+// =========================================================
+
 function startRecollection(
     baseEndingId,
     startSceneId,
     requestedKnowledgeKeys
 ) {
     const endingId =
-        Number(baseEndingId);
+        Number(
+            baseEndingId
+        );
 
     const sceneId =
-        Number(startSceneId);
+        Number(
+            startSceneId
+        );
+
+
+    if (
+        !isValidNormalEndingId(
+            endingId
+        )
+    ) {
+        return false;
+    }
+
 
     const snapshot =
         recollectionProgress
@@ -682,41 +1434,58 @@ function startRecollection(
                 endingId
             ];
 
+
     if (!snapshot) {
         return false;
     }
 
+
+    /*
+        このEND × このSceneが
+        解放済みでなければ開始不可。
+    */
     if (
-        !isRecollectionSceneUnlocked(
+        !isRecollectionBranchUnlocked(
+            endingId,
             sceneId
         )
     ) {
         return false;
     }
 
+
     const startIndex =
         getSceneIndexById(
             sceneId
         );
 
-    if (startIndex < 0) {
+
+    if (
+        startIndex < 0
+    ) {
         return false;
     }
+
 
     runMode =
         "recollection";
 
+
     recollectionBaseEndingId =
         endingId;
 
+
     /*
-        分岐地点より前の選択だけ、
-        元ENDの記憶を継承する。
+        分岐地点より前の選択だけ
+        元ENDのsnapshotを継承する。
     */
     selectedAnswers =
         new Array(
             scenario.length
-        ).fill(null);
+        ).fill(
+            null
+        );
+
 
     const savedAnswers =
         Array.isArray(
@@ -726,20 +1495,27 @@ function startRecollection(
                 .selectedAnswers
             : [];
 
+
     for (
         let i = 0;
         i < startIndex;
         i++
     ) {
-        selectedAnswers[i] =
+        selectedAnswers[
+            i
+        ] =
             normalizeSavedAnswer(
-                savedAnswers[i],
+                savedAnswers[
+                    i
+                ],
                 i
             );
     }
 
+
     /*
-        分岐地点以降は新しく選択。
+        分岐地点以降は
+        新しい世界線として選び直す。
     */
     currentStep =
         startIndex;
@@ -750,96 +1526,193 @@ function startRecollection(
     interactionPhase =
         "conversation";
 
-    pendingOption = null;
+    pendingOption =
+        null;
 
-    pendingResolvedKeys = [];
+    pendingResolvedKeys =
+        [];
 
-    pendingFinalLine = "";
+    pendingFinalLine =
+        "";
+
 
     /*
-        辞書DOMを未継承状態で
-        一度作り直してから、
-        追憶用理解状態を適用する。
+        END表示によって
+        #displayが書き換えられている場合だけ
+        ゲームUIを復元する。
+    */
+    restoreGameDisplayShell();
+
+
+    /*
+        辞書をいったん
+        現在世界線未設定状態へ戻す。
     */
     vaneKnownWords =
         new Set();
 
-    vaneUnderstoodAt = {};
+    vaneUnderstoodAt =
+        {};
 
-    initDict({});
 
+    initDict(
+        {}
+    );
+
+
+    /*
+        選択されたヴェインの理解状態を
+        適用する。
+    */
     applyRecollectionKnowledge(
         requestedKnowledgeKeys,
         snapshot,
         startIndex
     );
 
+
+    /*
+        分岐地点以前の暗号登場回数を復元。
+    */
     rebuildSeenWordsBefore(
         startIndex
     );
 
+
     /*
         通常startGame()と同じく、
-        現在Sceneの暗号登場回数も
+        現在Sceneの暗号も
         Scene開始時に登録する。
     */
     registerSceneWords(
         startIndex
     );
 
+
     /*
-        prefixの選択履歴から
-        interpretation / route等を
-        正確に再構築する。
+        分岐地点以前の選択履歴から
+        lovePoints /
+        interpretation /
+        axis /
+        route
+        を再構築する。
     */
     rebuildRunState();
+
 
     const overlay =
         document.getElementById(
             "recollection-overlay"
         );
 
+
     if (overlay) {
         overlay.style.display =
             "none";
     }
+
+
+    /*
+        タイトル画面から直接
+        追憶を開始した場合にも対応。
+    */
+    const deviceOverlay =
+        document.getElementById(
+            "device-check-overlay"
+        );
+
+    if (deviceOverlay) {
+        deviceOverlay.style.display =
+            "none";
+    }
+
+
+    const introOverlay =
+        document.getElementById(
+            "intro-overlay"
+        );
+
+    if (introOverlay) {
+        introOverlay.style.display =
+            "none";
+    }
+
+
+    const tutorialOverlay =
+        document.getElementById(
+            "tutorial-overlay"
+        );
+
+    if (tutorialOverlay) {
+        tutorialOverlay.style.display =
+            "none";
+    }
+
+
+    const loadOverlay =
+        document.getElementById(
+            "load-overlay"
+        );
+
+    if (loadOverlay) {
+        loadOverlay.style.display =
+            "none";
+    }
+
 
     document.getElementById(
         "game-container"
     ).style.display =
         "flex";
 
+
+    recollectionOpenedFromGame =
+        true;
+
+
     renderTabs();
 
-    updateUI(true);
+    updateUI(
+        true
+    );
+
 
     const display =
         document.getElementById(
             "display"
         );
 
+
     if (display) {
-        display.scrollTop = 0;
+        display.scrollTop =
+            0;
     }
+
 
     return true;
 }
+
+
+// =========================================================
+// 通常END判定
+// =========================================================
 
 /*
     通常END1〜6だけを決定する。
 
     END7は絶対に
-    この関数から出さない。
+    この関数から返さない。
 */
 function determineNormalEndingId() {
     rebuildRunState();
+
 
     /*
         END1 暁光の誓い
 
         プレイヤー全体の
         masteredWordsではなく、
-        この世界線の
+        現在世界線の
         vaneKnownWordsを見る。
     */
     if (
@@ -851,6 +1724,7 @@ function determineNormalEndingId() {
         return 1;
     }
 
+
     /*
         END5 プリンの迷宮
     */
@@ -861,6 +1735,7 @@ function determineNormalEndingId() {
         return 5;
     }
 
+
     /*
         END4 静寂のあとで
     */
@@ -870,6 +1745,7 @@ function determineNormalEndingId() {
     ) {
         return 4;
     }
+
 
     /*
         残りは
@@ -882,6 +1758,7 @@ function determineNormalEndingId() {
             routeCounts.resonance
         );
 
+
     const tiedRoutes =
         new Set(
             [
@@ -891,15 +1768,19 @@ function determineNormalEndingId() {
             ].filter(
                 route => {
                     return (
-                        routeCounts[route] ===
+                        routeCounts[
+                            route
+                        ] ===
                         maxRoute
                     );
                 }
             )
         );
 
+
     let winningRoute =
         "twin";
+
 
     /*
         route同数なら、
@@ -908,19 +1789,27 @@ function determineNormalEndingId() {
     */
     for (
         let i =
-            scenario.length - 1;
+            scenario.length -
+            1;
         i >= 0;
         i--
     ) {
         const optionId =
-            selectedAnswers[i];
+            selectedAnswers[
+                i
+            ];
+
 
         if (!optionId) {
             continue;
         }
 
+
         const data =
-            scenario[i];
+            scenario[
+                i
+            ];
+
 
         const option =
             data.opts.find(
@@ -931,6 +1820,7 @@ function determineNormalEndingId() {
                     );
                 }
             );
+
 
         if (
             option &&
@@ -946,12 +1836,14 @@ function determineNormalEndingId() {
         }
     }
 
+
     if (
         winningRoute ===
         "twin"
     ) {
         return 2;
     }
+
 
     if (
         winningRoute ===
@@ -960,13 +1852,14 @@ function determineNormalEndingId() {
         return 3;
     }
 
+
     return 6;
 }
 
 
-/* =========================================================
-   追憶UI
-   ========================================================= */
+// =========================================================
+// 追憶UI
+// =========================================================
 
 function ensureRecollectionOverlay() {
     if (
@@ -977,10 +1870,12 @@ function ensureRecollectionOverlay() {
         return;
     }
 
+
     const style =
         document.createElement(
             "style"
         );
+
 
     style.textContent = `
         #recollection-overlay {
@@ -1083,17 +1978,21 @@ function ensureRecollectionOverlay() {
         }
     `;
 
+
     document.head.appendChild(
         style
     );
+
 
     const overlay =
         document.createElement(
             "div"
         );
 
+
     overlay.id =
         "recollection-overlay";
+
 
     overlay.innerHTML = `
         <div id="recollection-panel">
@@ -1101,10 +2000,12 @@ function ensureRecollectionOverlay() {
         </div>
     `;
 
+
     document.body.appendChild(
         overlay
     );
 }
+
 
 const endingLabels = {
     1: "💍 暁光の誓い",
@@ -1115,24 +2016,64 @@ const endingLabels = {
     6: "🌌 魂の共鳴"
 };
 
+
 function openRecollection() {
     ensureRecollectionOverlay();
 
-    recollectionProgress =
-        normalizeRecollectionProgress(
-            loadRecollectionProgress()
+
+    const gameContainer =
+        document.getElementById(
+            "game-container"
         );
+
+
+    /*
+        閉じた時に
+        元の画面へ戻せるよう記録。
+    */
+    recollectionOpenedFromGame =
+        !!(
+            gameContainer &&
+            window.getComputedStyle(
+                gameContainer
+            ).display !==
+                "none"
+        );
+
+
+    /*
+        localStorageの最新状態と同期。
+    */
+    recollectionProgress =
+        loadRecollectionProgress();
+
+
+    /*
+        プレイヤー全体の解読実績も
+        最新状態へ同期する。
+    */
+    if (
+        typeof getMasteredWordSet ===
+        "function"
+    ) {
+        masteredWords =
+            getMasteredWordSet();
+    }
+
 
     const overlay =
         document.getElementById(
             "recollection-overlay"
         );
 
+
     overlay.style.display =
         "flex";
 
+
     renderRecollectionHome();
 }
+
 
 function closeRecollection() {
     const overlay =
@@ -1140,11 +2081,37 @@ function closeRecollection() {
             "recollection-overlay"
         );
 
+
     if (overlay) {
         overlay.style.display =
             "none";
     }
+
+
+    /*
+        タイトル画面から
+        追憶を開いていただけなら、
+        閉じた時にタイトル相当の
+        環境確認画面へ戻す。
+
+        これがないと黒画面になる。
+    */
+    if (
+        !recollectionOpenedFromGame
+    ) {
+        const deviceOverlay =
+            document.getElementById(
+                "device-check-overlay"
+            );
+
+
+        if (deviceOverlay) {
+            deviceOverlay.style.display =
+                "flex";
+        }
+    }
 }
+
 
 function renderRecollectionHome() {
     const content =
@@ -1152,56 +2119,76 @@ function renderRecollectionHome() {
             "recollection-content"
         );
 
+
     if (!content) {
         return;
     }
+
 
     const endings =
         recollectionProgress
             .collectedNormalEndings
             .slice()
             .sort(
-                (a, b) => {
-                    return a - b;
+                (
+                    a,
+                    b
+                ) => {
+                    return (
+                        a -
+                        b
+                    );
                 }
             );
 
+
     const endingButtons =
-        endings.map(
-            id => {
-                const hasSnapshot =
-                    !!recollectionProgress
-                        .endingSnapshots[id];
+        endings
+            .map(
+                id => {
+                    const hasSnapshot =
+                        !!recollectionProgress
+                            .endingSnapshots[
+                                id
+                            ];
 
-                return `
-                    <button
-                        class="recollection-card"
-                        ${
-                            hasSnapshot
-                                ? ""
-                                : "disabled"
-                        }
-                        onclick="renderRecollectionSceneSelect(${id})"
-                    >
-                        <b>
-                            ${
-                                endingLabels[id] ||
-                                `END ${id}`
-                            }
-                        </b>
-                        <br>
 
-                        <span class="recollection-note">
+                    return `
+                        <button
+                            class="recollection-card"
                             ${
                                 hasSnapshot
-                                    ? "この記憶から別の可能性を辿る"
-                                    : "追憶用の記録がありません。新形式で一度この結末へ到達すると使用できます。"
+                                    ? ""
+                                    : "disabled"
                             }
-                        </span>
-                    </button>
-                `;
-            }
-        ).join("");
+                            onclick="renderRecollectionSceneSelect(${id})"
+                        >
+                            <b>
+                                ${
+                                    endingLabels[
+                                        id
+                                    ] ||
+                                    `END ${id}`
+                                }
+                            </b>
+
+                            <br>
+
+                            <span class="recollection-note">
+                                ${
+                                    hasSnapshot
+                                        ? "この記憶から別の可能性を辿る"
+                                        : "追憶用の記録がありません。新形式で一度この結末へ到達すると使用できます。"
+                                }
+                            </span>
+                        </button>
+                    `;
+                }
+            )
+            .join(
+                ""
+            );
+
 
     const finalButton =
         recollectionProgress
@@ -1214,6 +2201,7 @@ function renderRecollectionHome() {
                     <b>
                         🌅 最後の追憶
                     </b>
+
                     <br>
 
                     <span class="recollection-note">
@@ -1223,6 +2211,7 @@ function renderRecollectionHome() {
                 </button>
             `
             : "";
+
 
     content.innerHTML = `
         <div class="recollection-head">
@@ -1244,6 +2233,7 @@ function renderRecollectionHome() {
 
             <div>
                 🔑 声の鍵
+
                 <b>
                     ${
                         recollectionProgress
@@ -1281,47 +2271,61 @@ function renderRecollectionHome() {
     `;
 }
 
+
 function renderRecollectionSceneSelect(
     endingId
 ) {
+    const endId =
+        Number(
+            endingId
+        );
+
+
     const content =
         document.getElementById(
             "recollection-content"
         );
 
+
     if (!content) {
         return;
     }
 
+
     const snapshot =
         recollectionProgress
             .endingSnapshots[
-                endingId
+                endId
             ];
+
 
     if (!snapshot) {
         renderRecollectionHome();
         return;
     }
 
+
     const sceneButtons =
         getImportantRecollectionScenes()
             .map(
                 scene => {
                     const unlocked =
-                        isRecollectionSceneUnlocked(
+                        isRecollectionBranchUnlocked(
+                            endId,
                             scene.id
                         );
+
 
                     if (unlocked) {
                         return `
                             <button
                                 class="recollection-card"
-                                onclick="renderKnowledgeSelect(${endingId}, ${scene.id})"
+                                onclick="renderKnowledgeSelect(${endId}, ${scene.id})"
                             >
                                 <b>
                                     Scene ${
-                                        scene.id + 1
+                                        scene.id +
+                                        1
                                     }
                                 </b>
 
@@ -1332,16 +2336,17 @@ function renderRecollectionSceneSelect(
                                 <br>
 
                                 <span class="recollection-note">
-                                    この場面から追憶する
+                                    この記憶のこの場面から追憶する
                                 </span>
                             </button>
                         `;
                     }
 
+
                     return `
                         <button
                             class="recollection-card"
-                            onclick="unlockSceneFromUI(${endingId}, ${scene.id})"
+                            onclick="unlockBranchFromUI(${endId}, ${scene.id})"
                             ${
                                 recollectionProgress
                                     .voiceKeys > 0
@@ -1351,7 +2356,8 @@ function renderRecollectionSceneSelect(
                         >
                             <b>
                                 🔒 Scene ${
-                                    scene.id + 1
+                                    scene.id +
+                                    1
                                 }
                             </b>
 
@@ -1362,15 +2368,18 @@ function renderRecollectionSceneSelect(
                             <br>
 
                             <span class="recollection-note">
-                                🔑1個で
-                                場面ショートカットを
+                                🔑1個で、
+                                この結末のこの分岐地点を
                                 永久解放
                             </span>
                         </button>
                     `;
                 }
             )
-            .join("");
+            .join(
+                ""
+            );
+
 
     content.innerHTML = `
         <div class="recollection-head">
@@ -1383,22 +2392,23 @@ function renderRecollectionSceneSelect(
                 >
                     ${
                         endingLabels[
-                            endingId
+                            endId
                         ]
                     }
                 </h2>
 
                 <div class="recollection-note">
+                    この結末の記憶から、
                     分岐地点を選んでください。
                     <br>
-                    解放した場面は、
-                    ほかの回収済みENDからも
-                    使用できます。
+                    解放状態は
+                    ENDごと・Sceneごとに保存されます。
                 </div>
             </div>
 
             <div>
                 🔑
+
                 <b>
                     ${
                         recollectionProgress
@@ -1427,46 +2437,87 @@ function renderRecollectionSceneSelect(
     `;
 }
 
-function unlockSceneFromUI(
+
+function unlockBranchFromUI(
     endingId,
     sceneId
 ) {
     if (
-        !unlockRecollectionScene(
+        !unlockRecollectionBranch(
+            endingId,
             sceneId
         )
     ) {
         return;
     }
 
+
     renderRecollectionSceneSelect(
         endingId
     );
 }
 
+
+// =========================================================
+// ヴェイン理解状態選択
+// =========================================================
+
 function renderKnowledgeSelect(
     endingId,
     sceneId
 ) {
+    const endId =
+        Number(
+            endingId
+        );
+
+    const id =
+        Number(
+            sceneId
+        );
+
+
     const content =
         document.getElementById(
             "recollection-content"
         );
 
+
     if (!content) {
         return;
     }
 
+
+    /*
+        解放していない分岐地点を
+        直接呼び出すことはできない。
+    */
+    if (
+        !isRecollectionBranchUnlocked(
+            endId,
+            id
+        )
+    ) {
+        renderRecollectionSceneSelect(
+            endId
+        );
+
+        return;
+    }
+
+
     const snapshot =
         recollectionProgress
             .endingSnapshots[
-                endingId
+                endId
             ];
+
 
     const startIndex =
         getSceneIndexById(
-            sceneId
+            id
         );
+
 
     if (
         !snapshot ||
@@ -1476,6 +2527,7 @@ function renderKnowledgeSelect(
         return;
     }
 
+
     const memoryKnowledge =
         new Set(
             getSnapshotKnowledgeBeforeScene(
@@ -1484,11 +2536,12 @@ function renderKnowledgeSelect(
             )
         );
 
+
     /*
         masteredWordsだけが選択可能。
 
         未解読語については
-        canonicalを見せない。
+        canonicalを表示しない。
     */
     const rows =
         Object.keys(
@@ -1498,12 +2551,18 @@ function renderKnowledgeSelect(
                 key => {
                     const mastered =
                         masteredWords
-                            .has(key);
+                            .has(
+                                key
+                            );
+
 
                     const checked =
                         mastered &&
                         memoryKnowledge
-                            .has(key);
+                            .has(
+                                key
+                            );
+
 
                     if (!mastered) {
                         return `
@@ -1514,8 +2573,9 @@ function renderKnowledgeSelect(
                                 "
                             >
                                 🔒 ${
-                                    wordBank[key]
-                                        .q
+                                    wordBank[
+                                        key
+                                    ].q
                                 }
 
                                 <div class="recollection-note">
@@ -1524,6 +2584,7 @@ function renderKnowledgeSelect(
                             </div>
                         `;
                     }
+
 
                     return `
                         <label
@@ -1541,21 +2602,26 @@ function renderKnowledgeSelect(
                             >
 
                             ${
-                                wordBank[key]
-                                    .q
+                                wordBank[
+                                    key
+                                ].q
                             }
 
                             ―
 
                             ${
-                                wordBank[key]
-                                    .canonical
+                                wordBank[
+                                    key
+                                ].canonical
                             }
                         </label>
                     `;
                 }
             )
-            .join("");
+            .join(
+                ""
+            );
+
 
     content.innerHTML = `
         <div class="recollection-head">
@@ -1571,7 +2637,8 @@ function renderKnowledgeSelect(
 
                 <div class="recollection-note">
                     Scene ${
-                        sceneId + 1
+                        id +
+                        1
                     }
 
                     「${
@@ -1602,7 +2669,7 @@ function renderKnowledgeSelect(
         </div>
 
         <p class="recollection-note">
-            プレイヤーが一度理解した実績は消えません。
+            プレイヤーが一度解読した実績は消えません。
             ここでは、この追憶のヴェインが
             どの言葉を理解している状態かだけを設定します。
             未解読の言葉は選択できません。
@@ -1614,12 +2681,12 @@ function renderKnowledgeSelect(
                 onclick="
                     setKnowledgePreset(
                         'memory',
-                        ${endingId},
-                        ${sceneId}
+                        ${endId},
+                        ${id}
                     )
                 "
             >
-                この記憶と同じ
+                この記憶での状態
             </button>
 
             <button
@@ -1627,12 +2694,12 @@ function renderKnowledgeSelect(
                 onclick="
                     setKnowledgePreset(
                         'zero',
-                        ${endingId},
-                        ${sceneId}
+                        ${endId},
+                        ${id}
                     )
                 "
             >
-                理解 0
+                初見の状態
             </button>
 
             <button
@@ -1640,12 +2707,12 @@ function renderKnowledgeSelect(
                 onclick="
                     setKnowledgePreset(
                         'max',
-                        ${endingId},
-                        ${sceneId}
+                        ${endId},
+                        ${id}
                     )
                 "
             >
-                現在の理解をすべて反映
+                現在利用できる最大状態
             </button>
         </div>
 
@@ -1662,8 +2729,8 @@ function renderKnowledgeSelect(
                 "
                 onclick="
                     startSelectedRecollection(
-                        ${endingId},
-                        ${sceneId}
+                        ${endId},
+                        ${id}
                     )
                 "
             >
@@ -1678,7 +2745,7 @@ function renderKnowledgeSelect(
                 "
                 onclick="
                     renderRecollectionSceneSelect(
-                        ${endingId}
+                        ${endId}
                     )
                 "
             >
@@ -1688,6 +2755,7 @@ function renderKnowledgeSelect(
     `;
 }
 
+
 function getKnowledgeCheckboxes() {
     return Array.from(
         document.querySelectorAll(
@@ -1696,11 +2764,15 @@ function getKnowledgeCheckboxes() {
     );
 }
 
+
 function setKnowledgeCheckboxes(
     keys
 ) {
     const target =
-        new Set(keys);
+        new Set(
+            keys
+        );
+
 
     getKnowledgeCheckboxes()
         .forEach(
@@ -1713,6 +2785,7 @@ function setKnowledgeCheckboxes(
         );
 }
 
+
 function setKnowledgePreset(
     mode,
     endingId,
@@ -1721,13 +2794,17 @@ function setKnowledgePreset(
     const snapshot =
         recollectionProgress
             .endingSnapshots[
-                endingId
+                Number(
+                    endingId
+                )
             ];
+
 
     const startIndex =
         getSceneIndexById(
             sceneId
         );
+
 
     if (
         !snapshot ||
@@ -1736,8 +2813,14 @@ function setKnowledgePreset(
         return;
     }
 
+
+    /*
+        そのEND snapshotの
+        そのScene開始時点と同じ状態。
+    */
     if (
-        mode === "memory"
+        mode ===
+        "memory"
     ) {
         setKnowledgeCheckboxes(
             getSnapshotKnowledgeBeforeScene(
@@ -1749,8 +2832,15 @@ function setKnowledgePreset(
         return;
     }
 
+
+    /*
+        解読実績そのものは消さず、
+        現在世界線のヴェインだけ
+        0語理解状態へする。
+    */
     if (
-        mode === "zero"
+        mode ===
+        "zero"
     ) {
         setKnowledgeCheckboxes(
             []
@@ -1759,8 +2849,15 @@ function setKnowledgePreset(
         return;
     }
 
+
+    /*
+        プレイヤーがこれまでに
+        解読した全単語を
+        現在世界線へ反映する。
+    */
     if (
-        mode === "max"
+        mode ===
+        "max"
     ) {
         setKnowledgeCheckboxes(
             Array.from(
@@ -1770,6 +2867,7 @@ function setKnowledgePreset(
     }
 }
 
+
 function startSelectedRecollection(
     endingId,
     sceneId
@@ -1778,14 +2876,19 @@ function startSelectedRecollection(
         getKnowledgeCheckboxes()
             .filter(
                 input => {
-                    return input.checked;
+                    return (
+                        input.checked
+                    );
                 }
             )
             .map(
                 input => {
-                    return input.value;
+                    return (
+                        input.value
+                    );
                 }
             );
+
 
     startRecollection(
         endingId,
@@ -1794,9 +2897,14 @@ function startSelectedRecollection(
     );
 }
 
+
+// =========================================================
+// END7
+// =========================================================
+
 /*
     END7は通常END判定からではなく、
-    「最後の追憶」専用入口からだけ表示。
+    「最後の追憶」専用入口からだけ表示する。
 */
 function startFinalRecollectionFromUI() {
     if (
@@ -1806,6 +2914,7 @@ function startFinalRecollectionFromUI() {
         return;
     }
 
+
     if (
         typeof window
             .showSpecialEnding ===
@@ -1813,16 +2922,48 @@ function startFinalRecollectionFromUI() {
     ) {
         closeRecollection();
 
+
+        /*
+            タイトル画面から
+            最後の追憶を開いた場合でも、
+            END表示領域を見える状態にする。
+        */
+        const gameContainer =
+            document.getElementById(
+                "game-container"
+            );
+
+
+        if (gameContainer) {
+            gameContainer.style.display =
+                "flex";
+        }
+
+
+        const deviceOverlay =
+            document.getElementById(
+                "device-check-overlay"
+            );
+
+
+        if (deviceOverlay) {
+            deviceOverlay.style.display =
+                "none";
+        }
+
+
         window.showSpecialEnding(
             7
         );
 
+
         return;
     }
 
+
     /*
-        endings.js側の接続前に
-        通常ENDへ誤遷移しないよう止める。
+        endings.js側が
+        まだ接続されていない場合のみ。
     */
     alert(
         "最後の追憶は解放されています。END7表示処理を接続すると使用できます。"
