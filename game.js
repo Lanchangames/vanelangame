@@ -1,104 +1,3 @@
-/*
-    声を聴かせて、ランスロット！
-    第5段階対応：20場面シナリオデータ
-
-    【重要ルール】
-
-    1. 解読対象となる15語は、暗号部分以外の
-       ・ランスロットの台詞
-       ・ヴェインの心の声
-       ・選択肢
-       ・リアクション
-       ・設問後ストーリー
-       ・次場面への引き
-       には直接書かない。
-
-    2. 活用する語は、解読対象となる部分だけを暗号化し、
-       助動詞、否定、過去、仮定などの文法情報は外へ残す。
-
-       例：
-       [[W6|守れ]]なかった
-       [[W13|頼れ]]ば
-       [[W15|伝え]]られる
-       [[W7|忘れ]]て
-
-       未解読時：
-       ΘΞΦなかった
-
-       解読後：
-       守れなかった
-
-    3. プレイヤーがノートへ入力する答えは基本形。
-
-    4. 初出時点で意味が確定しなくてもよい。
-       同じ記号が別の文脈で再登場することで絞り込ませる。
-
-    5. 第16場面以降は新規暗号語を追加しない。
-
-    6. 選択肢は「正解／不正解」を選ばせるものにしない。
-       ヴェインがランスロットへどう向き合うかの方向性を選ばせる。
-
-    7. 入力した瞬間には正解判定を行わない。
-       resolveChecks に含まれる語だけを、
-       その場面終了時に理解判定する。
-
-    8. resolveChecks は「その場面で初めて解禁される語」ではなく、
-       「その場面終了時点で理解判定してよい語」の累積一覧。
-       そのため、理解可能地点を過ぎてから仮説を修正した場合も
-       後続場面の終了時に再判定できる。
-
-    9. W11「愛している」は特殊語。
-       場面15・18では正しい仮説でも解読済みにせず、
-       場面20でのみ最終理解判定を行う。
-
-    10. ランスロットの reaction は暗号の答え合わせに使用しない。
-        「違う」「そういう意味ではない」等の訂正は禁止。
-        表情、間、仕草、感情の揺れのみを描く。
-
-    11. 重要選択肢の axis は、将来のエンディング分岐用メタデータ。
-        現時点では以下を使用する。
-
-        listen : 言葉を最後まで聞こうとする
-        act    : 行動によって関係を築く
-        bond   : 二人のこれまでの積み重ねを重視する
-        self   : ヴェイン自身の意思・感情を返す
-        daily  : 日常の距離感を保つ
-
-        axis は正解・不正解を意味しない。
-
-    12. v / p は現行HTMLとの互換性のため残す。
-        第6～7段階で分岐システムを再設計するまでは既存値を維持する。
-        v の大小を選択肢の正誤とは扱わない。
-
-    13. ヴェインの心の声は暗号の解説役にしない。
-        基本的に以下だけを扱う。
-
-        ・ランスロットの表情、視線、声、仕草
-        ・ヴェイン自身がその場で感じたこと
-        ・必要な場合のみ「前にも聞いた気がする」程度の弱い既視感
-
-        意味カテゴリー、品詞、文法、類義語などを
-        ヴェイン自身に分析させない。
-
-    14. 暗号を解くのはプレイヤー、
-        ランスロットの感情を感じ取るのはヴェイン、
-        という役割分担を維持する。
-
-    15. afterStory は暗号の正解を説明する場所ではない。
-        選択後の表情、仕草、距離感、会話の変化を描き、
-        二人の関係がどう動いたかを示す。
-
-        通常場面        ：100～180字程度
-        軽い日常場面    ：100～200字程度
-        少しすれ違う場面：150～250字程度
-        重要な感情場面  ：300～400字程度
-        終盤の重い場面  ：350～500字程度
-
-    16. 終盤でもヴェインを「名探偵」にしない。
-        解読率が低くても、表情・行動・積み重ねによって
-        二人の心が通じる展開が成立するようにする。
-*/
-
 const scenario = [
 
     // =========================================================
@@ -338,7 +237,7 @@ const scenario = [
                 interpretation: "unknown",
                 axis: "daily",
                 endingImpact: true,
-                route: "twin",
+                route: "resonance",
                 reaction:
                     "ランスロットはヴェインの構えを確かめるように見てから、木剣を手に取った。"
             },
@@ -350,7 +249,7 @@ const scenario = [
                 interpretation: "misread",
                 axis: "act",
                 endingImpact: true,
-                route: "glass",
+                route: "twin",
                 reaction:
                     "ランスロットは一度瞬きをしてから、ヴェインの足元へ視線を落とした。"
             },
@@ -362,7 +261,7 @@ const scenario = [
                 interpretation: "understood",
                 axis: "self",
                 endingImpact: true,
-                route: "resonance",
+                route: "glass",
                 reaction:
                     "ランスロットはヴェインをしばらく見つめ、それから静かに頷いた。"
             }
@@ -902,7 +801,7 @@ const scenario = [
                 interpretation: "unknown",
                 axis: "act",
                 endingImpact: true,
-                route: "glass",
+                route: "resonance",
                 reaction:
                     "ランスロットは反論せず、火の向こうでヴェインの言葉を聞いていた。"
             },
@@ -914,7 +813,7 @@ const scenario = [
                 interpretation: "misread",
                 axis: "bond",
                 endingImpact: true,
-                route: "resonance",
+                route: "glass",
                 reaction:
                     "ランスロットは視線を落としたまま、握っていた手をゆっくり開いた。"
             },
@@ -984,7 +883,7 @@ const scenario = [
                 interpretation: "unknown",
                 axis: "listen",
                 endingImpact: true,
-                route: "glass",
+                route: "resonance",
                 reaction:
                     "ランスロットの肩が小さく揺れた。けれど、すぐには何も返さなかった。"
             },
@@ -996,7 +895,7 @@ const scenario = [
                 interpretation: "misread",
                 axis: "self",
                 endingImpact: true,
-                route: "resonance",
+                route: "glass",
                 reaction:
                     "ランスロットは苦しそうに目を伏せた。口を開いたが、声は続かなかった。"
             },
@@ -1072,7 +971,7 @@ const scenario = [
                 interpretation: "unknown",
                 axis: "listen",
                 endingImpact: true,
-                route: "glass",
+                route: "twin",
                 reaction:
                     "ランスロットは目を見開いた。何か言いかけ、今度は飲み込まずに息を吐いた。"
             },
@@ -1084,7 +983,7 @@ const scenario = [
                 interpretation: "misread",
                 axis: "listen",
                 endingImpact: true,
-                route: "resonance",
+                route: "glass",
                 reaction:
                     "ランスロットは一瞬驚いたように瞬きをしたあと、ヴェインから視線を逸らさなかった。"
             },
@@ -1096,7 +995,7 @@ const scenario = [
                 interpretation: "understood",
                 axis: "listen",
                 endingImpact: true,
-                route: "twin",
+                route: "resonance",
                 reaction:
                     "ランスロットはしばらくヴェインを見つめ、やがて小さく息を吐いた。"
             }
@@ -1256,7 +1155,7 @@ const scenario = [
                 interpretation: "misread",
                 axis: "self",
                 endingImpact: true,
-                route: "twin",
+                route: "glass",
                 reaction:
                     "ランスロットは少しだけ目を丸くしたあと、苦笑するように息を吐いた。"
             },
@@ -1268,7 +1167,7 @@ const scenario = [
                 interpretation: "understood",
                 axis: "act",
                 endingImpact: true,
-                route: "glass",
+                route: "twin",
                 reaction:
                     "ランスロットはしばらくヴェインを見つめ、それから穏やかに頷いた。"
             }
