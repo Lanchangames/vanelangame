@@ -222,14 +222,15 @@ function renderEndingScreen(
             progressResult.keysGained === 3
         ) {
             progressMessages.push(
-                "🔑 声の鍵を3個手に入れた。<br>追憶から別の可能性を辿れるようになった。"
+                "追憶が解放されました。<br>✨「追憶の欠片」を3個獲得しました。<br>欠片を使うことで、過去の分岐地点から別の可能性を辿ることができます。"
             );
         }
-        else if (
-            progressResult.keysGained === 1
+
+        if (
+            progressResult.recollectionUnlimitedUnlockedNow
         ) {
             progressMessages.push(
-                "🔑 声の鍵を1個手に入れた。"
+                "追憶が完全解放されました。<br>記憶の流れが定着し、すべての分岐地点を自由に辿れるようになりました。"
             );
         }
 
