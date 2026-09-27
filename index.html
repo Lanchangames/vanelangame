@@ -157,102 +157,86 @@
         }
 
         /*
-            会話・STORY・UNDERSTANDINGは
-            同じ表示領域を入れ替えて使用する
+            第9-C段階
+            左側の余白を減らし、会話を上から自然に詰める
         */
         #display {
-            flex: 1;
+            flex: 0 1 auto;
             min-height: 0;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
-            gap: 12px;
-            padding: 28px 40px 24px;
+            gap: 8px;
+            padding: 18px 34px 12px;
             background: #fff;
             overflow-y: auto;
             box-sizing: border-box;
         }
 
-        /*
-            キャラクター名
-            固定高さをやめ、内容の直後へ自然につなげる
-        */
         #chara-header {
-            width: 85%;
+            width: 90%;
             flex: 0 0 auto;
             display: flex;
             align-items: center;
             box-sizing: border-box;
-            min-height: 36px;
+            min-height: 32px;
         }
 
-        /*
-            LANCELOTの台詞
-            固定150pxを廃止
-        */
         .bubble {
             background: #fff;
             border-left: 6px solid var(--main);
-            padding: 22px 28px;
-            width: 85%;
+            padding: 17px 22px;
+            width: 90%;
             box-sizing: border-box;
-            font-size: 1.28rem;
-            line-height: 2;
+            font-size: 1.2rem;
+            line-height: 1.85;
             text-align: left;
-            box-shadow: 0 8px 24px rgba(44, 62, 80, 0.07);
+            box-shadow: 0 6px 18px rgba(44, 62, 80, 0.06);
         }
 
-        /*
-            ヴェインの心の声
-            固定104pxを廃止
-        */
         #vane-thought-block {
-            width: 85%;
+            width: 90%;
             box-sizing: border-box;
             flex: 0 0 auto;
         }
 
-        /*
-            STORY / UNDERSTANDING は
-            通常会話と同じ場所へ差し替えて表示
-        */
         #story-block,
         #resolution-block {
-            width: 85%;
+            width: 90%;
             box-sizing: border-box;
             flex: 0 0 auto;
         }
 
         .block-label {
-            height: 20px;
-            line-height: 20px;
+            height: 18px;
+            line-height: 18px;
             box-sizing: border-box;
-            font-size: 0.72em;
+            font-size: 0.7em;
             font-weight: bold;
             letter-spacing: 0.1em;
             color: #98a0a6;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
         .thought-bubble {
             background: #f7f8f9;
             border-left: 3px solid #b6bec4;
-            padding: 14px 20px;
+            padding: 11px 16px;
             box-sizing: border-box;
-            line-height: 1.75;
+            line-height: 1.65;
             text-align: left;
             color: #69747b;
-            font-size: 0.93em;
+            font-size: 0.91em;
             font-style: italic;
         }
 
         .story-bubble {
             background: #fffaf3;
             border-left: 4px solid #d8a45d;
-            padding: 20px 22px;
+            padding: 17px 20px;
             box-sizing: border-box;
-            line-height: 1.85;
+            line-height: 1.8;
             text-align: left;
             color: #34495e;
         }
@@ -260,9 +244,9 @@
         .resolution-bubble {
             background: #f3fbf5;
             border-left: 5px solid var(--correct);
-            padding: 20px 22px;
+            padding: 17px 20px;
             box-sizing: border-box;
-            line-height: 1.85;
+            line-height: 1.8;
             text-align: left;
             color: #2c3e50;
             box-shadow: 0 5px 18px rgba(39, 174, 96, 0.06);
@@ -270,7 +254,7 @@
 
         .selected-reply {
             font-weight: bold;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             color: #8e5b22;
         }
 
@@ -316,15 +300,14 @@
         }
 
         /*
-            選択肢領域は従来通り固定
+            第9-C段階
+            選択肢領域の固定190pxを廃止。
+            会話の直下に必要な分だけ表示する。
         */
         .controls {
-            height: 190px;
-            min-height: 190px;
-            max-height: 190px;
-            flex: 0 0 190px;
+            flex: 0 0 auto;
             box-sizing: border-box;
-            padding: 16px 28px;
+            padding: 10px 34px 12px;
             background: #fafafa;
             border-top: 1px solid #e1e4e7;
             overflow-y: auto;
@@ -332,15 +315,15 @@
 
         .opt-btn {
             width: 100%;
-            min-height: 46px;
+            min-height: 42px;
             box-sizing: border-box;
-            padding: 12px 16px;
-            margin: 5px 0;
+            padding: 10px 14px;
+            margin: 4px 0;
             border: 1px solid #e7c69f;
             border-left: 4px solid #ddb27f;
             background: var(--opt-bg);
             cursor: pointer;
-            font-size: 0.98rem;
+            font-size: 0.96rem;
             text-align: left;
             transition: 0.2s;
             border-radius: 2px;
@@ -364,6 +347,144 @@
             border-left: 4px solid #e67e22;
             background: var(--selected);
             font-weight: bold;
+        }
+
+        /*
+            第9-C段階
+            過去LOG
+        */
+        #log-section {
+            flex: 1 1 auto;
+            min-height: 42px;
+            display: flex;
+            flex-direction: column;
+            background: #f7f8f9;
+            border-top: 1px solid #dfe3e6;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        #log-toggle {
+            height: 42px;
+            min-height: 42px;
+            flex: 0 0 42px;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0 34px;
+            border: none;
+            background: #f1f3f4;
+            color: #667078;
+            font-family: inherit;
+            font-size: 0.78em;
+            font-weight: bold;
+            letter-spacing: 0.12em;
+            text-align: left;
+            cursor: pointer;
+            border-bottom: 1px solid transparent;
+            transition: 0.2s;
+        }
+
+        #log-toggle:hover {
+            background: #e9edef;
+            color: #34495e;
+        }
+
+        #log-section.open #log-toggle {
+            border-bottom-color: #dfe3e6;
+        }
+
+        #log-toggle-mark {
+            display: inline-block;
+            width: 18px;
+            color: #9aa2a7;
+        }
+
+        #log-panel {
+            display: none;
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding: 18px 34px 28px;
+            box-sizing: border-box;
+            background: #fbfcfc;
+        }
+
+        #log-section.open #log-panel {
+            display: block;
+        }
+
+        .log-empty {
+            color: #9ba2a7;
+            font-size: 0.82em;
+            line-height: 1.8;
+            text-align: center;
+            padding: 22px 0;
+        }
+
+        .log-entry {
+            width: 90%;
+            margin: 0 auto 20px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #e3e6e8;
+            box-sizing: border-box;
+        }
+
+        .log-entry:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+
+        .log-scene {
+            margin-bottom: 8px;
+            color: #9aa1a6;
+            font-size: 0.68em;
+            font-weight: bold;
+            letter-spacing: 0.12em;
+        }
+
+        .log-speaker {
+            margin-bottom: 5px;
+            color: var(--main);
+            font-size: 0.72em;
+            font-weight: bold;
+            letter-spacing: 0.08em;
+        }
+
+        .log-dialogue {
+            color: #34495e;
+            font-size: 0.9em;
+            line-height: 1.8;
+        }
+
+        .log-thought-label {
+            margin-top: 10px;
+            margin-bottom: 4px;
+            color: #9aa1a6;
+            font-size: 0.68em;
+            font-weight: bold;
+            letter-spacing: 0.08em;
+        }
+
+        .log-thought {
+            color: #747d83;
+            font-size: 0.82em;
+            line-height: 1.7;
+            font-style: italic;
+        }
+
+        /*
+            右ノートで選択中の暗号だけ
+            LOG内で少し強く見せる
+        */
+        .log-symbol-active {
+            outline: 2px solid #d8a45d;
+            background: #fff1cf;
+            color: #4b4338;
+        }
+
+        .log-symbol-active:hover {
+            outline: 2px solid #c88d3f;
+            background: #ffe8b3;
         }
 
         #dictionary {
@@ -826,6 +947,19 @@
             class="controls"
             id="action-area"
         ></div>
+
+        <div id="log-section">
+            <button
+                type="button"
+                id="log-toggle"
+                onclick="toggleLog()"
+            >
+                <span id="log-toggle-mark">＋</span>
+                過去LOG
+            </button>
+
+            <div id="log-panel"></div>
+        </div>
     </div>
 
     <div id="dictionary">
@@ -1083,6 +1217,12 @@
 
     let activeDictKey = null;
 
+    /*
+        第9-C段階
+        過去LOGの開閉状態
+    */
+    let logOpen = false;
+
     let interpretationCounts = {
         unknown: 0,
         misread: 0,
@@ -1309,6 +1449,13 @@
         activeDictKey = key;
         renderActiveDictEntry();
 
+        /*
+            第9-C段階
+            ノートで選択中の語が変わったら
+            LOG内の強調も更新する
+        */
+        renderPastLog();
+
         const input =
             document.getElementById(`input-${key}`);
 
@@ -1376,6 +1523,230 @@
         list.appendChild(div);
 
         renderDictEntryState(key);
+    }
+
+    /*
+        第9-C段階
+        LOG内の会話表示。
+
+        通常本文と同じく現在のヴェインが理解している語は
+        通常語として表示する。
+
+        activeDictKey と一致する暗号だけ
+        log-symbol-active を付与する。
+    */
+    function renderLogDialogueText(text) {
+        let rendered =
+            text || "";
+
+        for (let key in wordBank) {
+            const reg =
+                new RegExp(
+                    "\\[\\[" +
+                    key +
+                    "(?:\\|([^\\]]+))?\\]\\]",
+                    "g"
+                );
+
+            rendered =
+                rendered.replace(
+                    reg,
+                    (match, surfaceForm) => {
+                        const resolved =
+                            vaneKnownWords.has(key);
+
+                        const spanClass =
+                            resolved
+                                ? "resolved"
+                                : "symbol";
+
+                        const activeClass =
+                            key === activeDictKey
+                                ? " log-symbol-active"
+                                : "";
+
+                        const displayVal =
+                            resolved
+                                ? (
+                                    surfaceForm ||
+                                    wordBank[key].canonical
+                                )
+                                : wordBank[key].q;
+
+                        return (
+                            `<span class="${spanClass}${activeClass}" onclick="jumpToDict('${key}')">${displayVal}</span>`
+                        );
+                    }
+                );
+        }
+
+        return rendered.replace(
+            /\n/g,
+            "<br>"
+        );
+    }
+
+    /*
+        第9-C段階
+        現在までに到達したシーンだけをLOGへ表示する。
+
+        LOGには現段階では
+        ・ランスロットの台詞
+        ・ヴェインの心の声
+        だけを載せる。
+
+        選択肢、リアクション、afterStory、nextHookは
+        まだ追加しない。
+    */
+    function renderPastLog() {
+        const panel =
+            document.getElementById(
+                'log-panel'
+            );
+
+        if (!panel) return;
+
+        const maxIndex =
+            Math.min(
+                currentStep,
+                scenario.length - 1
+            );
+
+        if (
+            maxIndex < 0 ||
+            scenario.length === 0
+        ) {
+            panel.innerHTML = `
+                <div class="log-empty">
+                    まだ記録はありません。
+                </div>
+            `;
+            return;
+        }
+
+        const entries = [];
+
+        for (
+            let index = 0;
+            index <= maxIndex;
+            index++
+        ) {
+            /*
+                実際に到達したシーンのみ表示。
+                通常進行だけでなく追憶開始にも対応する。
+            */
+            if (
+                !seenSceneIds.has(index) &&
+                index !== currentStep
+            ) {
+                continue;
+            }
+
+            const data =
+                scenario[index];
+
+            if (!data) continue;
+
+            const thought =
+                (data.vaneThought || "")
+                    .replace(/\n/g, "<br>");
+
+            entries.push(`
+                <div class="log-entry">
+                    <div class="log-scene">
+                        SCENE ${String(index + 1).padStart(2, "0")}
+                    </div>
+
+                    <div class="log-speaker">
+                        LANCELOT
+                    </div>
+
+                    <div class="log-dialogue">
+                        ${renderLogDialogueText(data.q)}
+                    </div>
+
+                    ${
+                        thought
+                            ? `
+                                <div class="log-thought-label">
+                                    💭 VANE
+                                </div>
+
+                                <div class="log-thought">
+                                    ${thought}
+                                </div>
+                            `
+                            : ""
+                    }
+                </div>
+            `);
+        }
+
+        if (entries.length === 0) {
+            panel.innerHTML = `
+                <div class="log-empty">
+                    まだ記録はありません。
+                </div>
+            `;
+            return;
+        }
+
+        panel.innerHTML =
+            entries.join("");
+    }
+
+    function updateLogToggleUI() {
+        const section =
+            document.getElementById(
+                'log-section'
+            );
+
+        const mark =
+            document.getElementById(
+                'log-toggle-mark'
+            );
+
+        if (!section || !mark) {
+            return;
+        }
+
+        if (logOpen) {
+            section.classList.add(
+                'open'
+            );
+
+            mark.innerText =
+                "－";
+        }
+        else {
+            section.classList.remove(
+                'open'
+            );
+
+            mark.innerText =
+                "＋";
+        }
+    }
+
+    function toggleLog() {
+        logOpen =
+            !logOpen;
+
+        updateLogToggleUI();
+
+        if (logOpen) {
+            renderPastLog();
+
+            const panel =
+                document.getElementById(
+                    'log-panel'
+                );
+
+            if (panel) {
+                panel.scrollTop =
+                    panel.scrollHeight;
+            }
+        }
     }
 
     window.onload = () => {
@@ -1472,6 +1843,8 @@
         }
 
         initDict({});
+        updateLogToggleUI();
+        renderPastLog();
     };
 
     function startGame(inherit) {
@@ -1519,6 +1892,12 @@
 
         activeDictKey = null;
 
+        /*
+            新規開始時はLOGを閉じる。
+        */
+        logOpen = false;
+        updateLogToggleUI();
+
         rebuildRunState();
 
         const savedWords =
@@ -1531,6 +1910,7 @@
         registerSceneWords(currentStep);
         renderTabs();
         updateUI();
+        renderPastLog();
     }
 
     function initDict(initialWords) {
@@ -1684,6 +2064,12 @@
                     (wordSeenCounts[key] || 0) + 1;
             }
         }
+
+        /*
+            第9-C段階
+            到達シーンが増えたらLOGも更新。
+        */
+        renderPastLog();
     }
 
     function resolveWord(key) {
@@ -1725,6 +2111,12 @@
 
         renderDictEntryState(key);
         updateIntelUI();
+
+        /*
+            解読状態が変わった場合、
+            LOG内の表示も現在の理解状態へ更新。
+        */
+        renderPastLog();
 
         return true;
     }
@@ -1929,6 +2321,7 @@
 
             renderTabs();
             updateUI(true);
+            renderPastLog();
 
             const display =
                 document.getElementById(
@@ -2214,6 +2607,14 @@
 
             resolutionBlock.style.display =
                 "block";
+        }
+
+        /*
+            LOGを開いたままシーンが変わった場合も
+            内容を同期する。
+        */
+        if (logOpen) {
+            renderPastLog();
         }
 
         const light =
