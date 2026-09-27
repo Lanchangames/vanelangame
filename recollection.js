@@ -1,10 +1,8 @@
-
-
 const RECOLLECTION_STORAGE_KEY =
     "vane_recollection_v4";
 
 const RECOLLECTION_SCHEMA_VERSION =
-    5;
+    6;
 
 let runMode =
     "story"; // "story" | "recollection"
@@ -133,8 +131,26 @@ function getDefaultRecollectionProgress() {
         gameCleared:
             false,
 
+        /*
+            内部名voiceKeysは
+            既存セーブ互換のため維持する。
+
+            画面上では
+            「追憶の欠片」として扱う。
+        */
         voiceKeys:
             0,
+
+        /*
+            追憶から通常ENDへ
+            もう一度到達するとtrue。
+
+            true以降は、
+            すべてのEND snapshot × Sceneへ
+            欠片を消費せずアクセスできる。
+        */
+        recollectionUnlimited:
+            false,
 
         /*
             例:
@@ -146,6 +162,9 @@ function getDefaultRecollectionProgress() {
 
             同じSceneでも、
             基準ENDが違えば別の分岐として扱う。
+
+            追憶完全解放前に
+            欠片で開けた分岐を保存する。
         */
         unlockedBranches:
             [],
@@ -399,6 +418,12 @@ function normalizeRecollectionProgress(
             .length > 0;
 
 
+    const recollectionUnlimited =
+        Boolean(
+            src.recollectionUnlimited
+        );
+
+
     const masteredCount =
         typeof getMasteredWordSet ===
             "function"
@@ -425,6 +450,8 @@ function normalizeRecollectionProgress(
         gameCleared,
 
         voiceKeys,
+
+        recollectionUnlimited,
 
         unlockedBranches:
             Array.from(
@@ -459,7 +486,7 @@ function loadRecollectionProgress() {
 
 
     /*
-        現行／旧v4の
+        現行／旧v4・v5の
         追憶セーブが存在する場合。
     */
     if (
@@ -542,15 +569,12 @@ function loadRecollectionProgress() {
         回収している場合、
         追憶システム自体は解放済み扱い。
 
-        新システムの報酬仕様に合わせ、
-        初END +3、
-        2個目以降 +1として
-        未使用分の鍵を付与する。
+        現仕様では、
+        初回クリア報酬として
+        追憶の欠片を3個付与する。
 
-        例:
-        END1個 → 3個
-        END2個 → 4個
-        END3個 → 5個
+        2個目以降のENDによる
+        追加付与は行わない。
     */
     if (
         migrated
@@ -561,13 +585,7 @@ function loadRecollectionProgress() {
             true;
 
         migrated.voiceKeys =
-            3 +
-            (
-                migrated
-                    .collectedNormalEndings
-                    .length -
-                1
-            );
+            3;
     }
 
 
@@ -788,7 +806,7 @@ function snapshotCurrentRun() {
 
 
 // =========================================================
-// END進行・鍵報酬
+// END進行・追憶報酬
 // =========================================================
 
 function updateFinalRecollectionUnlock() {
@@ -824,14 +842,14 @@ function updateFinalRecollectionUnlock() {
     通常END1〜6へ到達した時、
     endings.jsから1回だけ呼ぶ。
 
-    初回:
-      鍵 +3
+    初回クリア:
+      追憶の欠片 +3
 
-    2個目以降の新END:
-      鍵 +1
+    追憶から通常ENDへ再到達:
+      追憶を完全解放
 
-    同じEND:
-      +0
+    新しい通常ENDを回収しても、
+    追憶の欠片は追加付与しない。
 */
 function recordEndingProgress(
     endingId
@@ -856,6 +874,9 @@ function recordEndingProgress(
 
             keysGained:
                 0,
+
+            recollectionUnlimitedUnlockedNow:
+                false,
 
             finalRecollectionUnlockedNow:
                 false
@@ -892,15 +913,33 @@ function recordEndingProgress(
         keysGained =
             3;
     }
-    else if (
-        !alreadyCollected
+
+
+    let recollectionUnlimitedUnlockedNow =
+        false;
+
+
+    /*
+        初回クリア後、
+        追憶から通常ENDへ
+        一度でも再到達した時点で、
+        全分岐地点を完全解放する。
+
+        同じENDへの再到達でもよい。
+    */
+    if (
+        !isFirstClear &&
+        runMode ===
+            "recollection" &&
+        !recollectionProgress
+            .recollectionUnlimited
     ) {
         recollectionProgress
-            .voiceKeys +=
-                1;
+            .recollectionUnlimited =
+                true;
 
-        keysGained =
-            1;
+        recollectionUnlimitedUnlockedNow =
+            true;
     }
 
 
@@ -951,6 +990,8 @@ function recordEndingProgress(
 
         keysGained,
 
+        recollectionUnlimitedUnlockedNow,
+
         finalRecollectionUnlockedNow
     };
 }
@@ -964,6 +1005,14 @@ function isRecollectionBranchUnlocked(
     endingId,
     sceneId
 ) {
+    if (
+        recollectionProgress
+            .recollectionUnlimited
+    ) {
+        return true;
+    }
+
+
     const branchKey =
         getRecollectionBranchKey(
             endingId,
@@ -980,14 +1029,17 @@ function isRecollectionBranchUnlocked(
 
 
 /*
-    声の鍵1個を使用し、
+    追憶の欠片1個を使用し、
 
     END snapshot × Scene
 
     の分岐地点を永久解放する。
 
     一度解放した同じ分岐地点では
-    再度鍵を消費しない。
+    再度欠片を消費しない。
+
+    追憶完全解放後は
+    欠片を消費せず利用できる。
 */
 function unlockRecollectionBranch(
     endingId,
@@ -1033,6 +1085,14 @@ function unlockRecollectionBranch(
             ]
     ) {
         return false;
+    }
+
+
+    if (
+        recollectionProgress
+            .recollectionUnlimited
+    ) {
+        return true;
     }
 
 
@@ -1421,6 +1481,9 @@ function startRecollection(
     /*
         このEND × このSceneが
         解放済みでなければ開始不可。
+
+        追憶完全解放後は
+        すべての分岐が解放済み扱い。
     */
     if (
         !isRecollectionBranchUnlocked(
@@ -2191,6 +2254,28 @@ function renderRecollectionHome() {
             : "";
 
 
+    const accessStatus =
+        recollectionProgress
+            .recollectionUnlimited
+            ? `
+                <div>
+                    ✨ 追憶完全解放
+                </div>
+            `
+            : `
+                <div>
+                    ✨ 追憶の欠片
+
+                    <b>
+                        ${
+                            recollectionProgress
+                                .voiceKeys
+                        }
+                    </b>
+                </div>
+            `;
+
+
     content.innerHTML = `
         <div class="recollection-head">
             <div>
@@ -2209,16 +2294,7 @@ function renderRecollectionHome() {
                 </div>
             </div>
 
-            <div>
-                🔑 声の鍵
-
-                <b>
-                    ${
-                        recollectionProgress
-                            .voiceKeys
-                    }
-                </b>
-            </div>
+            ${accessStatus}
         </div>
 
         <div class="recollection-grid">
@@ -2346,7 +2422,7 @@ function renderRecollectionSceneSelect(
                             <br>
 
                             <span class="recollection-note">
-                                🔑1個で、
+                                ✨追憶の欠片1個で、
                                 この結末のこの分岐地点を
                                 永久解放
                             </span>
@@ -2357,6 +2433,47 @@ function renderRecollectionSceneSelect(
             .join(
                 ""
             );
+
+
+    const accessStatus =
+        recollectionProgress
+            .recollectionUnlimited
+            ? `
+                <div>
+                    ✨ 追憶完全解放
+                </div>
+            `
+            : `
+                <div>
+                    ✨ 追憶の欠片
+
+                    <b>
+                        ${
+                            recollectionProgress
+                                .voiceKeys
+                        }
+                    </b>
+                </div>
+            `;
+
+
+    const accessNote =
+        recollectionProgress
+            .recollectionUnlimited
+            ? `
+                この結末の記憶から、
+                分岐地点を選んでください。
+                <br>
+                追憶は完全解放されています。
+                すべての分岐地点を自由に辿れます。
+            `
+            : `
+                この結末の記憶から、
+                分岐地点を選んでください。
+                <br>
+                解放状態は
+                ENDごと・Sceneごとに保存されます。
+            `;
 
 
     content.innerHTML = `
@@ -2376,24 +2493,11 @@ function renderRecollectionSceneSelect(
                 </h2>
 
                 <div class="recollection-note">
-                    この結末の記憶から、
-                    分岐地点を選んでください。
-                    <br>
-                    解放状態は
-                    ENDごと・Sceneごとに保存されます。
+                    ${accessNote}
                 </div>
             </div>
 
-            <div>
-                🔑
-
-                <b>
-                    ${
-                        recollectionProgress
-                            .voiceKeys
-                    }
-                </b>
-            </div>
+            ${accessStatus}
         </div>
 
         <div class="recollection-grid">
@@ -2469,6 +2573,9 @@ function renderKnowledgeSelect(
     /*
         解放していない分岐地点を
         直接呼び出すことはできない。
+
+        追憶完全解放後は
+        すべて解放済み扱い。
     */
     if (
         !isRecollectionBranchUnlocked(
