@@ -119,8 +119,7 @@
 
         /*
             第9-A / B段階
-            進行表示とステータスは高さを固定し、
-            二重ヘッダー感を弱める
+            左側上部は 34px + 36px = 70px
         */
         #progress-bar {
             height: 34px;
@@ -158,8 +157,8 @@
         }
 
         /*
-            第9-A段階
-            会話領域の高さ・間隔を安定させる
+            会話・STORY・UNDERSTANDINGは
+            同じ表示領域を入れ替えて使用する
         */
         #display {
             flex: 1;
@@ -168,7 +167,7 @@
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
             padding: 28px 40px 24px;
             background: #fff;
             overflow-y: auto;
@@ -176,53 +175,53 @@
         }
 
         /*
-            第9-B段階
-            キャラクター名は「会話の見出し」として整理
+            キャラクター名
+            固定高さをやめ、内容の直後へ自然につなげる
         */
         #chara-header {
             width: 85%;
-            height: 40px;
-            min-height: 40px;
-            flex: 0 0 40px;
+            flex: 0 0 auto;
             display: flex;
             align-items: center;
             box-sizing: border-box;
+            min-height: 36px;
         }
 
         /*
-            LANCELOTの台詞を画面の主役にする
+            LANCELOTの台詞
+            固定150pxを廃止
         */
         .bubble {
             background: #fff;
             border-left: 6px solid var(--main);
-            padding: 24px 28px;
+            padding: 22px 28px;
             width: 85%;
-            height: 150px;
-            min-height: 150px;
-            max-height: 150px;
             box-sizing: border-box;
             font-size: 1.28rem;
             line-height: 2;
             text-align: left;
-            overflow-y: auto;
             box-shadow: 0 8px 24px rgba(44, 62, 80, 0.07);
         }
 
         /*
-            ヴェインの心の声は一段控えめにする
+            ヴェインの心の声
+            固定104pxを廃止
         */
         #vane-thought-block {
             width: 85%;
-            height: 104px;
-            min-height: 104px;
-            max-height: 104px;
             box-sizing: border-box;
+            flex: 0 0 auto;
         }
 
+        /*
+            STORY / UNDERSTANDING は
+            通常会話と同じ場所へ差し替えて表示
+        */
         #story-block,
         #resolution-block {
             width: 85%;
             box-sizing: border-box;
+            flex: 0 0 auto;
         }
 
         .block-label {
@@ -246,14 +245,8 @@
             color: #69747b;
             font-size: 0.93em;
             font-style: italic;
-            height: 80px;
-            overflow-y: auto;
         }
 
-        /*
-            STORYは通常会話より控えめだが、
-            発生時には一つのまとまったイベントとして見える
-        */
         .story-bubble {
             background: #fffaf3;
             border-left: 4px solid #d8a45d;
@@ -262,13 +255,8 @@
             line-height: 1.85;
             text-align: left;
             color: #34495e;
-            max-height: 210px;
-            overflow-y: auto;
         }
 
-        /*
-            理解発生時だけ少し強く見せる
-        */
         .resolution-bubble {
             background: #f3fbf5;
             border-left: 5px solid var(--correct);
@@ -277,8 +265,6 @@
             line-height: 1.85;
             text-align: left;
             color: #2c3e50;
-            max-height: 170px;
-            overflow-y: auto;
             box-shadow: 0 5px 18px rgba(39, 174, 96, 0.06);
         }
 
@@ -295,10 +281,6 @@
             color: var(--correct);
         }
 
-        /*
-            暗号はクリック対象だと分かる程度に見せる。
-            主張しすぎない。
-        */
         .symbol,
         .resolved,
         .wrong-resolved {
@@ -334,9 +316,7 @@
         }
 
         /*
-            第9-A段階
-            選択肢領域の高さを固定して、
-            3択→次への切り替えでも画面を跳ねさせない
+            選択肢領域は従来通り固定
         */
         .controls {
             height: 190px;
@@ -350,11 +330,6 @@
             overflow-y: auto;
         }
 
-        /*
-            第9-B段階
-            ボタンを「独立したカード」より
-            「会話への返答」に寄せる
-        */
         .opt-btn {
             width: 100%;
             min-height: 46px;
@@ -391,11 +366,6 @@
             font-weight: bold;
         }
 
-        /*
-            第9-A / B段階
-            右側を「別画面」ではなく、
-            常時置かれているノートとして整理
-        */
         #dictionary {
             flex: 0 0 330px;
             min-width: 300px;
@@ -407,14 +377,22 @@
             box-sizing: border-box;
         }
 
+        /*
+            左側の
+            progress 34px + status 36px
+            と完全に同じ70pxにする
+        */
         #dict-header {
-            height: 106px;
-            min-height: 106px;
-            flex: 0 0 106px;
+            height: 70px;
+            min-height: 70px;
+            flex: 0 0 70px;
             box-sizing: border-box;
-            padding: 22px 24px 18px;
-            border-bottom: 1px solid #d8d3c7;
+            padding: 10px 24px 8px;
+            border-bottom: 1px solid #ddd;
             background: #fbf9f3;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         #dict-header h3 {
@@ -422,13 +400,14 @@
             font-size: 1.02em;
             letter-spacing: 0.05em;
             color: #3f474c;
+            line-height: 1.2;
         }
 
         #dict-header p {
-            margin: 8px 0 0;
-            font-size: 0.7em;
+            margin: 5px 0 0;
+            font-size: 0.67em;
             color: #8d918d;
-            line-height: 1.55;
+            line-height: 1.35;
         }
 
         #dict-list {
@@ -541,9 +520,6 @@
             gap: 5px;
         }
 
-        /*
-            バッジは残すが、会話より目立たないよう縮小
-        */
         .badge {
             width: 19px;
             height: 19px;
@@ -859,7 +835,7 @@
             </h3>
 
             <p>
-                聞き取れない言葉を選び、<br>
+                聞き取れない言葉を選び、
                 思いついた意味を書き留める。
             </p>
         </div>
@@ -873,19 +849,6 @@
 <script>
     /*
         第2段階確定版 wordBank
-
-        canonical   : ノート上の正式な代表形
-        variants    : 正解として許容する表記揺れ
-                      ※活用形は含めない
-        synonyms    : 正解として許容する同義語
-                      ※基本形・言い切り形のみ
-        nearMisses  : 意味は近いが、このゲームでは別概念として扱う語
-        meaning     : この語の意味の核
-        boundary    : 他語との境界
-        appearances : 初出・2回目・3回目の予定場面
-        difficulty  : 推測難度
-        finalRole   : 最終盤での役割
-        minClues    : 現段階での暫定理解判定に必要な登場回数
     */
     const wordBank = {
         "W1": {
@@ -1118,7 +1081,6 @@
     let pendingResolvedKeys = [];
     let pendingFinalLine = "";
 
-    /* 第9-A段階：現在ノートに表示している語 */
     let activeDictKey = null;
 
     let interpretationCounts = {
@@ -1307,7 +1269,6 @@
             }).length;
     }
 
-    // 環境チェック
     function checkEnvironment() {
         const isMobile =
             /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
@@ -1342,11 +1303,6 @@
         return arr;
     }
 
-    /*
-        第9-A段階：
-        旧「一覧の該当欄までスクロール」を、
-        「その一語をノートへ表示」に変更。
-    */
     function jumpToDict(key) {
         if (!wordBank[key]) return;
 
@@ -1606,12 +1562,6 @@
     }
 
     function renderDictEntryState(key) {
-        /*
-            第9-A段階ではDOM上に存在するのは
-            現在選択中の一語だけ。
-            解読ロジック自体は従来通り。
-        */
-
         if (key !== activeDictKey) {
             return;
         }
@@ -1994,10 +1944,6 @@
         }
     }
 
-    /*
-        関数名は既存コードとの互換性のため維持。
-        数字タブは生成せず、現在位置だけ更新する。
-    */
     function renderTabs() {
         const current =
             document.getElementById(
@@ -2034,6 +1980,11 @@
 
         const data =
             scenario[viewingStep];
+
+        const charaHeader =
+            document.getElementById(
+                'chara-header'
+            );
 
         const speaker =
             document.getElementById(
@@ -2094,12 +2045,34 @@
         message.innerHTML =
             renderDialogueText(data.q);
 
-        thoughtBlock.style.display =
-            "block";
-
         thoughtText.innerHTML =
             (data.vaneThought || "")
                 .replace(/\n/g, "<br>");
+
+        /*
+            表示領域は常に一種類だけ表示する。
+
+            conversation:
+                LANCELOT + VANE
+
+            reaction:
+                STORY
+
+            resolution:
+                UNDERSTANDING
+
+            過去シーン:
+                選択済みなら STORY
+                未選択なら会話
+        */
+        charaHeader.style.display =
+            "none";
+
+        message.style.display =
+            "none";
+
+        thoughtBlock.style.display =
+            "none";
 
         storyBlock.style.display =
             "none";
@@ -2134,14 +2107,34 @@
                 ) || null;
         }
 
-        if (
+        const showConversation =
+            isCurrent
+                ? interactionPhase === "conversation"
+                : !selectedOption;
+
+        const showStory =
             selectedOption &&
             (
                 !isCurrent ||
-                interactionPhase === "reaction" ||
-                interactionPhase === "resolution"
-            )
-        ) {
+                interactionPhase === "reaction"
+            );
+
+        const showResolution =
+            isCurrent &&
+            interactionPhase === "resolution";
+
+        if (showConversation) {
+            charaHeader.style.display =
+                "flex";
+
+            message.style.display =
+                "block";
+
+            thoughtBlock.style.display =
+                "block";
+        }
+
+        if (showStory) {
             const storyParts = [];
 
             storyParts.push(
@@ -2189,11 +2182,7 @@
                 "block";
         }
 
-        if (
-            isCurrent &&
-            interactionPhase ===
-                "resolution"
-        ) {
+        if (showResolution) {
             const resolutionParts = [];
 
             if (
@@ -2304,6 +2293,15 @@
                             "reaction";
 
                         updateUI(true);
+
+                        const display =
+                            document.getElementById(
+                                'display'
+                            );
+
+                        if (display) {
+                            display.scrollTop = 0;
+                        }
                     };
 
                     area.appendChild(b);
