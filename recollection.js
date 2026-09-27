@@ -1,26 +1,4 @@
-/*
-    声を聴かせて、ランスロット！
-    追憶システム
 
-    前提:
-    - game.js の重要27択に id / endingImpact / route がある
-    - HTML側に rebuildRunState() がある
-    - masteredWords / vaneKnownWords / vaneUnderstoodAt がある
-
-    現仕様:
-    - 声の鍵1個で
-      「END snapshot × Scene」の分岐地点を1つ永久解放する
-    - 一度解放した同じ分岐地点では再度鍵を消費しない
-    - Scene単位の全END共通解放は行わない
-    - 無料Sceneは設けない
-    - 初回クリア時に声の鍵+3
-    - 以降、新しい通常END初回回収ごとに声の鍵+1
-    - 同じENDの再回収では鍵を増やさない
-    - プレイヤーの解読実績 masteredWords と
-      現在世界線のヴェインの理解 vaneKnownWords は分離する
-    - END7は通常END判定では出現せず、
-      「最後の追憶」からのみ表示する
-*/
 
 const RECOLLECTION_STORAGE_KEY =
     "vane_recollection_v4";
