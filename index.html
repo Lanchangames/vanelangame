@@ -173,7 +173,6 @@ body {
 
 #legacy-state { display:none; }
 
-/* ENDING COLLECTION */
 .ending-collection {
     display:flex;
     align-items:center;
@@ -241,7 +240,6 @@ body {
     white-space:nowrap;
 }
 
-/* スタート画面のボタンを縦並び */
 #check-action {
     display:flex;
     flex-direction:column;
@@ -258,7 +256,6 @@ body {
     margin-top:10px;
 }
 
-/* タブは会話領域と区別しやすい薄い水色 */
 #main-view-tabs {
     height:50px;
     min-height:50px;
@@ -669,10 +666,11 @@ body {
     box-sizing:border-box;
 }
 
+/* 左の SCENE 34px + ENDING 42px = 76px に揃える */
 #dict-header {
-    height:70px;
-    min-height:70px;
-    flex:0 0 70px;
+    height:76px;
+    min-height:76px;
+    flex:0 0 76px;
     box-sizing:border-box;
     padding:10px 24px 8px;
     border-bottom:1px solid var(--line);
@@ -935,12 +933,30 @@ body {
     transition:.15s;
 }
 
-.word-row:hover { background:var(--surface-hover); }
+.word-row:hover:not(:disabled) {
+    background:var(--surface-hover);
+}
 
 .word-row.active {
-    background:var(--main-soft);
+    background:#dceef5;
     border-color:var(--line-strong);
     border-radius:5px;
+    box-shadow:inset 3px 0 0 var(--main);
+}
+
+/* 最初から表示するが、まだ遭遇していない語は操作不可 */
+.word-row.unencountered {
+    opacity:.38;
+    cursor:default;
+    background:transparent;
+}
+
+.word-row.unencountered:hover {
+    background:transparent;
+}
+
+.word-row:disabled {
+    color:inherit;
 }
 
 .word-symbol {
@@ -1403,6 +1419,12 @@ function jumpToLogScene(sceneIndex,key){
 function jumpToDict(key){
     if(!wordBank[key]) return;
 
+    const encountered=getEncounteredScenesForWord(key).length>0;
+    const understood=vaneKnownWords.has(key);
+
+    /* 未遭遇かつ未理解の単語は一覧には表示するが選択不可 */
+    if(!encountered&&!understood) return;
+
     activeDictKey=key;
     renderActiveDictEntry();
     renderPastLog();
@@ -1527,22 +1549,9 @@ function renderPastLog(){
     panel.scrollTop=previousScrollTop;
 }
 
+/* 最初から全単語を一覧に表示 */
 function getVisibleWordKeys(){
-    const keys=[];
-
-    scenario.forEach((scene,sceneIndex)=>{
-        if(!seenSceneIds.has(sceneIndex)) return;
-
-        Object.keys(wordBank).forEach(key=>{
-            if(sceneContainsWord(scene.q,key)&&!keys.includes(key)) keys.push(key);
-        });
-    });
-
-    Object.keys(wordBank).forEach(key=>{
-        if(vaneKnownWords.has(key)&&!keys.includes(key)) keys.push(key);
-    });
-
-    return keys;
+    return Object.keys(wordBank);
 }
 
 function renderWordList(){
@@ -1551,32 +1560,44 @@ function renderWordList(){
 
     const keys=getVisibleWordKeys();
 
-    if(keys.length===0){
-        list.innerHTML=`<div class="word-list-empty">まだ聞き取れない言葉は記録されていません。</div>`;
-        return;
-    }
-
     list.innerHTML=keys.map(key=>{
         const understood=vaneKnownWords.has(key);
-        const guess=understood?wordBank[key].canonical:(userDict[key]||"").trim();
+        const encountered=getEncounteredScenesForWord(key).length>0;
+        const selectable=encountered||understood;
 
-        let statusText="未推測";
+        const guess=understood
+            ? wordBank[key].canonical
+            : (userDict[key]||"").trim();
+
+        let statusText="未遭遇";
         let statusClass="";
 
         if(understood){
             statusText="理解した";
             statusClass=" understood";
-        }else if(guess){
+        }else if(encountered&&guess){
             statusText="推測中";
             statusClass=" guessing";
+        }else if(encountered){
+            statusText="未推測";
         }
 
         const guessText=guess||"―";
-        const guessClass=understood?" understood":(guess?"":" empty");
+        const guessClass=understood
+            ? " understood"
+            : (guess?"":" empty");
+
         const activeClass=key===activeDictKey?" active":"";
+        const unencounteredClass=!selectable?" unencountered":"";
+        const disabledAttribute=!selectable?" disabled":"";
 
         return `
-            <button type="button" class="word-row${activeClass}" onclick="jumpToDict('${key}')">
+            <button
+                type="button"
+                class="word-row${activeClass}${unencounteredClass}"
+                onclick="jumpToDict('${key}')"
+                ${disabledAttribute}
+            >
                 <span class="word-symbol">${wordBank[key].q}</span>
                 <span class="word-guess${guessClass}">${guessText}</span>
                 <span class="word-status${statusClass}">${statusText}</span>
@@ -1643,7 +1664,6 @@ window.onload=()=>{
 };
 
 function startGame(inherit){
-    /* 新しい周回では必ずSCENE 1から開始する */
     currentStep=0;
     viewingStep=0;
 
