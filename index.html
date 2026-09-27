@@ -9,9 +9,9 @@
             --main: #2c3e50;
             --correct: #27ae60;
             --wrong: #e74c3c;
-            --opt-bg: #fff3e0;
-            --opt-hover: #ffe0b2;
-            --selected: #ffcc80;
+            --opt-bg: #fff8ef;
+            --opt-hover: #fff0dc;
+            --selected: #ffdfb8;
             --love-hue: 210;
             --love-light: 10%;
             --love-sat: 20%;
@@ -117,18 +117,24 @@
             height: 100%;
         }
 
-        /* 第9-A段階：20個の数字タブを廃止し、現在位置だけ表示 */
+        /*
+            第9-A / B段階
+            進行表示とステータスは高さを固定し、
+            二重ヘッダー感を弱める
+        */
         #progress-bar {
-            height: 42px;
-            flex-shrink: 0;
-            background: #1a1a1a;
-            color: #bdc3c7;
+            height: 34px;
+            min-height: 34px;
+            flex: 0 0 34px;
+            background: #202326;
+            color: #9ea7ad;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 0.78em;
-            letter-spacing: 0.12em;
-            border-bottom: 1px solid #333;
+            font-size: 0.72em;
+            letter-spacing: 0.14em;
+            border-bottom: 1px solid #2d3135;
+            box-sizing: border-box;
         }
 
         #progress-current {
@@ -136,37 +142,83 @@
             font-weight: bold;
         }
 
+        .status-bar {
+            height: 36px;
+            min-height: 36px;
+            flex: 0 0 36px;
+            box-sizing: border-box;
+            padding: 0 18px;
+            background: #292d31;
+            color: #dfe4e7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.72em;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /*
+            第9-A段階
+            会話領域の高さ・間隔を安定させる
+        */
         #display {
             flex: 1;
+            min-height: 0;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
-            gap: 16px;
-            padding: 40px;
+            gap: 14px;
+            padding: 28px 40px 24px;
             background: #fff;
             overflow-y: auto;
+            box-sizing: border-box;
         }
 
+        /*
+            第9-B段階
+            キャラクター名は「会話の見出し」として整理
+        */
         #chara-header {
             width: 85%;
-            flex-shrink: 0;
+            height: 40px;
+            min-height: 40px;
+            flex: 0 0 40px;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
         }
 
+        /*
+            LANCELOTの台詞を画面の主役にする
+        */
         .bubble {
-            background: #fdfdfd;
+            background: #fff;
             border-left: 6px solid var(--main);
-            padding: 30px;
+            padding: 24px 28px;
             width: 85%;
+            height: 150px;
+            min-height: 150px;
+            max-height: 150px;
             box-sizing: border-box;
-            font-size: 1.3rem;
+            font-size: 1.28rem;
             line-height: 2;
             text-align: left;
-            min-height: 100px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(44, 62, 80, 0.07);
         }
 
-        #vane-thought-block,
+        /*
+            ヴェインの心の声は一段控えめにする
+        */
+        #vane-thought-block {
+            width: 85%;
+            height: 104px;
+            min-height: 104px;
+            max-height: 104px;
+            box-sizing: border-box;
+        }
+
         #story-block,
         #resolution-block {
             width: 85%;
@@ -174,42 +226,60 @@
         }
 
         .block-label {
-            font-size: 0.8em;
+            height: 20px;
+            line-height: 20px;
+            box-sizing: border-box;
+            font-size: 0.72em;
             font-weight: bold;
-            letter-spacing: 0.08em;
-            color: #7f8c8d;
-            margin-bottom: 6px;
+            letter-spacing: 0.1em;
+            color: #98a0a6;
+            margin-bottom: 4px;
         }
 
         .thought-bubble {
-            background: #f6f8fa;
-            border-left: 4px solid #95a5a6;
-            padding: 18px 22px;
+            background: #f7f8f9;
+            border-left: 3px solid #b6bec4;
+            padding: 14px 20px;
             box-sizing: border-box;
-            line-height: 1.8;
+            line-height: 1.75;
             text-align: left;
-            color: #566573;
+            color: #69747b;
+            font-size: 0.93em;
             font-style: italic;
+            height: 80px;
+            overflow-y: auto;
         }
 
+        /*
+            STORYは通常会話より控えめだが、
+            発生時には一つのまとまったイベントとして見える
+        */
         .story-bubble {
             background: #fffaf3;
             border-left: 4px solid #d8a45d;
-            padding: 22px;
-            box-sizing: border-box;
-            line-height: 1.9;
-            text-align: left;
-            color: #2c3e50;
-        }
-
-        .resolution-bubble {
-            background: #f0fff4;
-            border-left: 4px solid var(--correct);
             padding: 20px 22px;
             box-sizing: border-box;
-            line-height: 1.9;
+            line-height: 1.85;
+            text-align: left;
+            color: #34495e;
+            max-height: 210px;
+            overflow-y: auto;
+        }
+
+        /*
+            理解発生時だけ少し強く見せる
+        */
+        .resolution-bubble {
+            background: #f3fbf5;
+            border-left: 5px solid var(--correct);
+            padding: 20px 22px;
+            box-sizing: border-box;
+            line-height: 1.85;
             text-align: left;
             color: #2c3e50;
+            max-height: 170px;
+            overflow-y: auto;
+            box-shadow: 0 5px 18px rgba(39, 174, 96, 0.06);
         }
 
         .selected-reply {
@@ -225,186 +295,24 @@
             color: var(--correct);
         }
 
+        /*
+            暗号はクリック対象だと分かる程度に見せる。
+            主張しすぎない。
+        */
         .symbol,
         .resolved,
         .wrong-resolved {
             cursor: pointer;
             transition: 0.2s;
-            padding: 0 4px;
-            border-radius: 2px;
+            padding: 1px 5px;
+            border-radius: 3px;
         }
 
         .symbol:hover,
         .resolved:hover,
         .wrong-resolved:hover {
-            background: #dfe6e9;
-            outline: 1px solid var(--main);
-        }
-
-        .controls {
-            padding: 25px;
-            background: #f8f9fa;
-            border-top: 1px solid #ddd;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .opt-btn {
-            width: 100%;
-            padding: 15px;
-            margin: 8px 0;
-            border: 1px solid #e0b17b;
-            background: var(--opt-bg);
-            cursor: pointer;
-            font-size: 1rem;
-            text-align: left;
-            transition: 0.2s;
-            border-radius: 4px;
-            color: #2c3e50;
-        }
-
-        .opt-btn:hover:not(:disabled) {
-            border-color: #d89c56;
-            background: var(--opt-hover);
-            transform: translateX(5px);
-        }
-
-        .opt-btn:disabled {
-            cursor: default;
-            opacity: 0.7;
-        }
-
-        .opt-btn.my-choice {
-            border: 2px solid #e67e22;
-            background: var(--selected);
-            font-weight: bold;
-        }
-
-        /* 第9-A段階：右側は一語だけを表示する常設ノート */
-        #dictionary {
-            flex: 0 0 330px;
-            background: #fcfcfc;
-            display: flex;
-            flex-direction: column;
-            min-width: 300px;
-            border-left: 1px solid #ddd;
-            height: 100%;
-        }
-
-        #dict-header {
-            padding: 24px 24px 20px;
-            border-bottom: 1px solid #ddd;
-            background: #fff;
-        }
-
-        #dict-header h3 {
-            margin: 0;
-            font-size: 1.05em;
-            letter-spacing: 0.05em;
-        }
-
-        #dict-header p {
-            margin: 8px 0 0;
-            font-size: 0.72em;
-            color: #95a5a6;
-            line-height: 1.6;
-        }
-
-        #dict-list {
-            flex: 1;
-            padding: 32px 24px;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            overflow-y: auto;
-        }
-
-        .dict-placeholder {
-            width: 100%;
-            margin-top: 45px;
-            text-align: center;
-            color: #95a5a6;
-            line-height: 2;
-            font-size: 0.9em;
-        }
-
-        .dict-placeholder-symbol {
-            font-family: monospace;
-            font-size: 2em;
-            color: #bdc3c7;
-            margin-bottom: 18px;
-        }
-
-        .dict-entry {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 24px;
-            background: white;
-            border: 1px solid #e5e5e5;
-            border-radius: 4px;
-            transition: background 0.5s;
-        }
-
-        .dict-entry.correct {
-            border-left: 6px solid var(--correct);
-            background: #f0fff4;
-        }
-
-        .dict-entry.guessing {
-            border-left: 6px solid #3498db;
-            background: #f4f9ff;
-        }
-
-        .dict-entry.highlight-flash {
-            background: #fff9c4;
-        }
-
-        .dict-entry label {
-            font-size: 1.6em;
-            color: #59636b;
-            display: block;
-            margin-bottom: 16px;
-            font-family: monospace;
-            font-weight: bold;
-            text-align: center;
-            letter-spacing: 0.12em;
-        }
-
-        .dict-entry input {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 12px;
-            border: 1px solid #ddd;
-            font-size: 1rem;
-            outline: none;
-            border-radius: 4px;
-            font-family: inherit;
-        }
-
-        .dict-entry input:focus {
-            border-color: #7f8c8d;
-        }
-
-        .dict-entry input.wrong-text {
-            color: var(--wrong);
-            font-weight: bold;
-            border-color: var(--wrong);
-        }
-
-        .dict-status {
-            font-size: 0.78em;
-            color: #95a5a6;
-            margin-bottom: 14px;
-            text-align: center;
-        }
-
-        .dict-entry.guessing .dict-status {
-            color: #2980b9;
-        }
-
-        .dict-entry.correct .dict-status {
-            color: var(--correct);
-            font-weight: bold;
+            background: #e5e9ec;
+            outline: 1px solid #aeb7bd;
         }
 
         .resolved {
@@ -419,46 +327,242 @@
         }
 
         .symbol {
-            color: #59636b;
+            color: #4d5961;
             font-family: monospace;
-            background: #eef0f2;
+            background: #eef1f3;
             font-weight: bold;
         }
 
-        .status-bar {
-            padding: 10px 20px;
-            background: #1a1a1a;
-            color: white;
+        /*
+            第9-A段階
+            選択肢領域の高さを固定して、
+            3択→次への切り替えでも画面を跳ねさせない
+        */
+        .controls {
+            height: 190px;
+            min-height: 190px;
+            max-height: 190px;
+            flex: 0 0 190px;
+            box-sizing: border-box;
+            padding: 16px 28px;
+            background: #fafafa;
+            border-top: 1px solid #e1e4e7;
+            overflow-y: auto;
+        }
+
+        /*
+            第9-B段階
+            ボタンを「独立したカード」より
+            「会話への返答」に寄せる
+        */
+        .opt-btn {
+            width: 100%;
+            min-height: 46px;
+            box-sizing: border-box;
+            padding: 12px 16px;
+            margin: 5px 0;
+            border: 1px solid #e7c69f;
+            border-left: 4px solid #ddb27f;
+            background: var(--opt-bg);
+            cursor: pointer;
+            font-size: 0.98rem;
+            text-align: left;
+            transition: 0.2s;
+            border-radius: 2px;
+            color: #34495e;
+        }
+
+        .opt-btn:hover:not(:disabled) {
+            border-color: #d89c56;
+            border-left-color: #d89c56;
+            background: var(--opt-hover);
+            transform: translateX(3px);
+        }
+
+        .opt-btn:disabled {
+            cursor: default;
+            opacity: 0.68;
+        }
+
+        .opt-btn.my-choice {
+            border: 1px solid #e67e22;
+            border-left: 4px solid #e67e22;
+            background: var(--selected);
+            font-weight: bold;
+        }
+
+        /*
+            第9-A / B段階
+            右側を「別画面」ではなく、
+            常時置かれているノートとして整理
+        */
+        #dictionary {
+            flex: 0 0 330px;
+            min-width: 300px;
+            height: 100%;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8em;
+            flex-direction: column;
+            background: #f7f4ec;
+            border-left: 1px solid #d8d3c7;
+            box-sizing: border-box;
+        }
+
+        #dict-header {
+            height: 106px;
+            min-height: 106px;
+            flex: 0 0 106px;
+            box-sizing: border-box;
+            padding: 22px 24px 18px;
+            border-bottom: 1px solid #d8d3c7;
+            background: #fbf9f3;
+        }
+
+        #dict-header h3 {
+            margin: 0;
+            font-size: 1.02em;
+            letter-spacing: 0.05em;
+            color: #3f474c;
+        }
+
+        #dict-header p {
+            margin: 8px 0 0;
+            font-size: 0.7em;
+            color: #8d918d;
+            line-height: 1.55;
+        }
+
+        #dict-list {
+            flex: 1;
+            min-height: 0;
+            padding: 30px 24px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        .dict-placeholder {
+            width: 100%;
+            margin-top: 48px;
+            text-align: center;
+            color: #9d9d97;
+            line-height: 1.9;
+            font-size: 0.86em;
+        }
+
+        .dict-placeholder-symbol {
+            font-family: monospace;
+            font-size: 1.8em;
+            color: #b9b8b1;
+            margin-bottom: 16px;
+        }
+
+        .dict-entry {
+            width: 100%;
+            min-height: 190px;
+            box-sizing: border-box;
+            padding: 26px 22px;
+            background: rgba(255,255,255,0.7);
+            border: 1px solid #ddd8cc;
+            border-radius: 2px;
+            transition: background 0.5s;
+            box-shadow: 0 5px 18px rgba(70, 60, 40, 0.04);
+        }
+
+        .dict-entry.correct {
+            border-left: 5px solid var(--correct);
+            background: #f1faf3;
+        }
+
+        .dict-entry.guessing {
+            border-left: 5px solid #7d9bb0;
+            background: #f5f8fa;
+        }
+
+        .dict-entry.highlight-flash {
+            background: #fff9c4;
+        }
+
+        .dict-entry label {
+            font-size: 1.55em;
+            color: #535b60;
+            display: block;
+            margin-bottom: 14px;
+            font-family: monospace;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 0.12em;
+        }
+
+        .dict-entry input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px 12px;
+            border: 1px solid #d5d2ca;
+            background: rgba(255,255,255,0.9);
+            font-size: 1rem;
+            outline: none;
+            border-radius: 2px;
+            font-family: inherit;
+            color: #34495e;
+        }
+
+        .dict-entry input:focus {
+            border-color: #82939e;
+            box-shadow: 0 0 0 2px rgba(130,147,158,0.1);
+        }
+
+        .dict-entry input.wrong-text {
+            color: var(--wrong);
+            font-weight: bold;
+            border-color: var(--wrong);
+        }
+
+        .dict-status {
+            min-height: 18px;
+            font-size: 0.75em;
+            color: #9b9c96;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .dict-entry.guessing .dict-status {
+            color: #597b91;
+        }
+
+        .dict-entry.correct .dict-status {
+            color: var(--correct);
+            font-weight: bold;
         }
 
         .badge-container {
             display: flex;
-            gap: 6px;
+            gap: 5px;
         }
 
+        /*
+            バッジは残すが、会話より目立たないよう縮小
+        */
         .badge {
-            width: 22px;
-            height: 22px;
+            width: 19px;
+            height: 19px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #333;
-            font-size: 10px;
+            background: #3b3f43;
+            font-size: 9px;
             filter: grayscale(1);
-            opacity: 0.3;
+            opacity: 0.27;
             transition: 0.5s;
             cursor: help;
         }
 
         .badge.unlocked {
             filter: grayscale(0);
-            opacity: 1;
-            box-shadow: 0 0 10px rgba(255,255,255,0.2);
+            opacity: 0.9;
+            box-shadow: none;
         }
 
         .badge.gold {
@@ -486,61 +590,153 @@
     </style>
 </head>
 <body>
+
 <div id="bg-layer"></div>
 
 <div id="device-check-overlay">
     <div class="device-box">
-        <h2 id="check-title" style="color: var(--gold);">CHECKING ENVIRONMENT...</h2>
-        <p id="check-msg">本ゲームはPCブラウザ環境でのプレイを前提として設計されています。</p>
+        <h2 id="check-title" style="color: var(--gold);">
+            CHECKING ENVIRONMENT...
+        </h2>
+
+        <p id="check-msg">
+            本ゲームはPCブラウザ環境でのプレイを前提として設計されています。
+        </p>
+
         <div id="check-action">
-            <button id="entry-btn" class="btn-style" style="background: var(--gold); color: #000; display: none;">物語を始める</button>
-            <button id="recollection-entry-btn" class="btn-style" style="background: #2c3e50; color: #fff; display: none;">追憶を辿る</button>
-            <p id="error-msg" style="color: var(--wrong); display: none;"><b>MOBILE DEVICE DETECTED</b><br>スマートフォン等のモバイル環境ではプレイできません。</p>
+            <button
+                id="entry-btn"
+                class="btn-style"
+                style="background: var(--gold); color: #000; display: none;"
+            >
+                物語を始める
+            </button>
+
+            <button
+                id="recollection-entry-btn"
+                class="btn-style"
+                style="background: #2c3e50; color: #fff; display: none;"
+            >
+                追憶を辿る
+            </button>
+
+            <p
+                id="error-msg"
+                style="color: var(--wrong); display: none;"
+            >
+                <b>MOBILE DEVICE DETECTED</b><br>
+                スマートフォン等のモバイル環境ではプレイできません。
+            </p>
         </div>
     </div>
 </div>
 
 <div id="intro-overlay">
     <div class="content-box">
-        <h1 style="color: #d4af37; font-size: 2.5em;">声を聴かせて、ランスロット！</h1>
-        <p>ある任務にて魔物の前に飛び出したランスロット。<br>
-        目の前の人を助けるのに夢中で、背後から魔物が放った呪いに気づけなかった。<br>大好きな幼馴染を守るために身を投げ出したヴェインは、呪いを全身に浴びてしまう。<br>
-        <br>それは、人と人との絆を断つ呪い。<br>
-        普通の言葉は聞こえるのに、ランスロットがヴェインへ向ける感情や願い、二人の関係にとって大切な言葉ほど、意味不明な音に変わってしまう。<br><br>
-        ____俺は絶対にあきらめない！このままランちゃんの声がわからないなんていやだ。<br>ヴェインはランスロットの言葉に耳を傾け、<br>聞き取れない言葉をひとつひとつ記録していくことにした。<br>いつかまた、お前の言葉を理解できるように。
-        <br>あの日以来暗い表情のままの幼馴染の笑顔を取り戻して、<br>大好きだよ、と伝えるために。</p>
-        <button id="to-tutorial" class="btn-style" style="background: #d4af37; color: #000;">次へ</button>
+        <h1 style="color: #d4af37; font-size: 2.5em;">
+            声を聴かせて、ランスロット！
+        </h1>
+
+        <p>
+            ある任務にて魔物の前に飛び出したランスロット。<br>
+            目の前の人を助けるのに夢中で、背後から魔物が放った呪いに気づけなかった。<br>
+            大好きな幼馴染を守るために身を投げ出したヴェインは、呪いを全身に浴びてしまう。<br>
+            <br>
+            それは、人と人との絆を断つ呪い。<br>
+            普通の言葉は聞こえるのに、ランスロットがヴェインへ向ける感情や願い、二人の関係にとって大切な言葉ほど、意味不明な音に変わってしまう。<br><br>
+            ____俺は絶対にあきらめない！このままランちゃんの声がわからないなんていやだ。<br>
+            ヴェインはランスロットの言葉に耳を傾け、<br>
+            聞き取れない言葉をひとつひとつ記録していくことにした。<br>
+            いつかまた、お前の言葉を理解できるように。
+            <br>
+            あの日以来暗い表情のままの幼馴染の笑顔を取り戻して、<br>
+            大好きだよ、と伝えるために。
+        </p>
+
+        <button
+            id="to-tutorial"
+            class="btn-style"
+            style="background: #d4af37; color: #000;"
+        >
+            次へ
+        </button>
     </div>
 </div>
 
 <div id="tutorial-overlay">
     <div class="content-box">
-        <h2 style="color: #3498db;">プレイ方法</h2>
-        <div style="text-align: left; background: rgba(255,255,255,0.05); padding: 25px; border-radius: 10px; font-size: 0.9em;">
-            <p><b>【解析】</b><br>
-            プレイヤーはヴェインとしてこのゲームを進めます。<br>
-            ランスロットの言葉はすべてが聞こえないわけではなく、二人の絆にとって重要な部分ほど虫食いのような記号に聞こえます。意味を推測し、ノートに書きこんでください。<br>
-            虫食いになっている言葉を選択すると、対応する入力欄へ移動できます。ノートへ書き込んだ言葉は、入力した時点では正解かどうか判定されません。会話を重ね、十分な手掛かりが揃ったときにヴェインが意味を理解します。<br><br>
-            同じ記号は、同じ言葉を表します。文章によって「頼って」「頼れば」のように形が変わる場合がありますが、ノートには「頼る」のような<b>基本の形・言い切りの形</b>で推測してください。</p><br>
+        <h2 style="color: #3498db;">
+            プレイ方法
+        </h2>
 
-            <p><b>【返答】</b><br>
-            ランスロットの言葉への返答を選択肢から選んでください。<br>
-            返答によってランスロットの気持ちが変化し、エンディングに影響します。<br>
-            一度返答すると、ゲームの終了まで返答を変えることはできません。</p><br>
+        <div
+            style="
+                text-align: left;
+                background: rgba(255,255,255,0.05);
+                padding: 25px;
+                border-radius: 10px;
+                font-size: 0.9em;
+            "
+        >
+            <p>
+                <b>【解析】</b><br>
+                プレイヤーはヴェインとしてこのゲームを進めます。<br>
+                ランスロットの言葉はすべてが聞こえないわけではなく、二人の絆にとって重要な部分ほど虫食いのような記号に聞こえます。意味を推測し、ノートに書きこんでください。<br>
+                虫食いになっている言葉を選択すると、対応する入力欄へ移動できます。ノートへ書き込んだ言葉は、入力した時点では正解かどうか判定されません。会話を重ね、十分な手掛かりが揃ったときにヴェインが意味を理解します。<br><br>
+                同じ記号は、同じ言葉を表します。文章によって「頼って」「頼れば」のように形が変わる場合がありますが、ノートには「頼る」のような<b>基本の形・言い切りの形</b>で推測してください。
+            </p>
+            <br>
 
-            <p><b>【継承】</b><br>
-            理解した言葉を保持したまま、2周目以降をプレイすることができます。</p><br>
+            <p>
+                <b>【返答】</b><br>
+                ランスロットの言葉への返答を選択肢から選んでください。<br>
+                返答によってランスロットの気持ちが変化し、エンディングに影響します。<br>
+                一度返答すると、ゲームの終了まで返答を変えることはできません。
+            </p>
+            <br>
+
+            <p>
+                <b>【継承】</b><br>
+                理解した言葉を保持したまま、2周目以降をプレイすることができます。
+            </p>
+            <br>
         </div>
-        <button id="start-init-btn" class="btn-style" style="background: #3498db; color: #fff;">物語を開始する</button>
+
+        <button
+            id="start-init-btn"
+            class="btn-style"
+            style="background: #3498db; color: #fff;"
+        >
+            物語を開始する
+        </button>
     </div>
 </div>
 
 <div id="load-overlay">
     <div class="content-box">
-        <h2 style="color: #27ae60;">記憶の継承</h2>
-        <p>過去に理解した単語を、最初からノートに引き継ぎますか？</p>
-        <button id="load-yes" class="btn-style" style="background: #27ae60; color: #fff;">継承する</button>
-        <button id="load-no" class="btn-style" style="background: #7f8c8d; color: #fff;">最初から解く</button>
+        <h2 style="color: #27ae60;">
+            記憶の継承
+        </h2>
+
+        <p>
+            過去に理解した単語を、最初からノートに引き継ぎますか？
+        </p>
+
+        <button
+            id="load-yes"
+            class="btn-style"
+            style="background: #27ae60; color: #fff;"
+        >
+            継承する
+        </button>
+
+        <button
+            id="load-no"
+            class="btn-style"
+            style="background: #7f8c8d; color: #fff;"
+        >
+            最初から解く
+        </button>
     </div>
 </div>
 
@@ -556,7 +752,11 @@
 
         <div class="status-bar">
             <span>KNIGHT: VANE</span>
-            <div class="badge-container" id="badge-area">
+
+            <div
+                class="badge-container"
+                id="badge-area"
+            >
                 <div class="badge" id="b-1" title="暁光の誓い">💍</div>
                 <div class="badge" id="b-6" title="魂の共鳴">🌌</div>
                 <div class="badge" id="b-2" title="不滅の双璧">🤝</div>
@@ -565,39 +765,99 @@
                 <div class="badge" id="b-5" title="プリンの迷宮">🍮</div>
                 <div class="badge gold" id="b-7" title="悠久の夜明け">🌅</div>
             </div>
-            <span>解析: <b id="intel-val">0%</b> | 収集: <b id="col-val">0%</b></span>
+
+            <span>
+                解析:
+                <b id="intel-val">0%</b>
+                |
+                収集:
+                <b id="col-val">0%</b>
+            </span>
         </div>
 
         <div id="display">
             <div id="chara-header">
-                <span id="face-emoji" style="font-size: 2em; margin-right: 15px;">😊</span>
-                <span id="speaker-name" style="font-weight:bold; letter-spacing: 0.1em; color: var(--main);">LANCELOT</span>
+                <span
+                    id="face-emoji"
+                    style="
+                        font-size: 2em;
+                        margin-right: 15px;
+                    "
+                >
+                    😊
+                </span>
+
+                <span
+                    id="speaker-name"
+                    style="
+                        font-weight: bold;
+                        letter-spacing: 0.1em;
+                        color: var(--main);
+                    "
+                >
+                    LANCELOT
+                </span>
             </div>
 
-            <div class="bubble" id="message-text">......</div>
+            <div
+                class="bubble"
+                id="message-text"
+            >
+                ......
+            </div>
 
             <div id="vane-thought-block">
-                <div class="block-label">💭 VANE</div>
-                <div class="thought-bubble" id="vane-thought-text"></div>
+                <div class="block-label">
+                    💭 VANE
+                </div>
+
+                <div
+                    class="thought-bubble"
+                    id="vane-thought-text"
+                ></div>
             </div>
 
-            <div id="story-block" style="display:none;">
-                <div class="block-label">STORY</div>
-                <div class="story-bubble" id="story-text"></div>
+            <div
+                id="story-block"
+                style="display:none;"
+            >
+                <div class="block-label">
+                    STORY
+                </div>
+
+                <div
+                    class="story-bubble"
+                    id="story-text"
+                ></div>
             </div>
 
-            <div id="resolution-block" style="display:none;">
-                <div class="block-label">UNDERSTANDING</div>
-                <div class="resolution-bubble" id="resolution-text"></div>
+            <div
+                id="resolution-block"
+                style="display:none;"
+            >
+                <div class="block-label">
+                    UNDERSTANDING
+                </div>
+
+                <div
+                    class="resolution-bubble"
+                    id="resolution-text"
+                ></div>
             </div>
         </div>
 
-        <div class="controls" id="action-area"></div>
+        <div
+            class="controls"
+            id="action-area"
+        ></div>
     </div>
 
     <div id="dictionary">
         <div id="dict-header">
-            <h3>ヴェインのノート</h3>
+            <h3>
+                ヴェインのノート
+            </h3>
+
             <p>
                 聞き取れない言葉を選び、<br>
                 思いついた意味を書き留める。
@@ -2153,5 +2413,6 @@
 
 <script src="recollection.js"></script>
 <script src="endings.js"></script>
+
 </body>
 </html>
