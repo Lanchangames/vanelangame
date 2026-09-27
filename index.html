@@ -5,73 +5,484 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>声を聴かせて、ランスロット！</title>
     <style>
-        :root { --main: #2c3e50; --correct: #27ae60; --wrong: #e74c3c; --opt-bg: #fff3e0; --opt-hover: #ffe0b2; --selected: #ffcc80; --love-hue: 210; --love-light: 10%; --love-sat: 20%; --gold: #d4af37; }
-        body { background: #000; font-family: 'serif', 'Hiragino Mincho ProN', serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: #ecf0f1; overflow: hidden; }
-        #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #000 0%, hsl(var(--love-hue), var(--love-sat), var(--love-light)) 100%); z-index: -1; transition: 2s ease; }
-        
+        :root {
+            --main: #2c3e50;
+            --correct: #27ae60;
+            --wrong: #e74c3c;
+            --opt-bg: #fff3e0;
+            --opt-hover: #ffe0b2;
+            --selected: #ffcc80;
+            --love-hue: 210;
+            --love-light: 10%;
+            --love-sat: 20%;
+            --gold: #d4af37;
+        }
+
+        body {
+            background: #000;
+            font-family: 'serif', 'Hiragino Mincho ProN', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #ecf0f1;
+            overflow: hidden;
+        }
+
+        #bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                135deg,
+                #000 0%,
+                hsl(
+                    var(--love-hue),
+                    var(--love-sat),
+                    var(--love-light)
+                ) 100%
+            );
+            z-index: -1;
+            transition: 2s ease;
+        }
+
         /* 環境確認オーバーレイ */
-        #device-check-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 200; display: flex; justify-content: center; align-items: center; text-align: center; }
-        .device-box { border: 1px solid #d4af37; padding: 40px; border-radius: 8px; background: rgba(255,255,255,0.05); }
+        #device-check-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 200;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
 
-        #intro-overlay, #tutorial-overlay, #load-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 100; display: none; justify-content: center; align-items: center; text-align: center; }
-        .content-box { max-width: 700px; width: 90%; line-height: 2.2; max-height: 90vh; overflow-y: auto; padding: 20px; }
+        .device-box {
+            border: 1px solid #d4af37;
+            padding: 40px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+        }
 
-        #game-container { width: 98vw; max-width: 1200px; height: 92vh; background: rgba(255, 255, 255, 0.98); display: none; border-radius: 4px; overflow: hidden; color: #2c3e50; box-shadow: 0 0 70px rgba(0,0,0,1); }
-        
-        #main-screen { flex: 2; display: flex; flex-direction: column; border-right: 1px solid #ddd; min-width: 0; height: 100%; }
-        #tab-bar { display: grid; grid-template-columns: repeat(10, 1fr); background: #1a1a1a; flex-shrink: 0; }
-        .tab { padding: 12px; cursor: pointer; color: #7f8c8d; border: 0.5px solid #333; font-size: 0.8em; transition: 0.3s; }
-        .tab.active { background: #fff; color: #2c3e50; font-weight: bold; }
-        .tab.locked { opacity: 0.2; cursor: not-allowed; }
-        
-        #display { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; gap: 16px; padding: 40px; background: #fff; overflow-y: auto; }
-        #chara-header { width: 85%; flex-shrink: 0; }
-        .bubble { background: #fdfdfd; border-left: 6px solid var(--main); padding: 30px; width: 85%; box-sizing: border-box; font-size: 1.3rem; line-height: 2; text-align: left; min-height: 100px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        #intro-overlay,
+        #tutorial-overlay,
+        #load-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.98);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
 
-        #vane-thought-block, #story-block, #resolution-block { width: 85%; box-sizing: border-box; }
-        .block-label { font-size: 0.8em; font-weight: bold; letter-spacing: 0.08em; color: #7f8c8d; margin-bottom: 6px; }
-        .thought-bubble { background: #f6f8fa; border-left: 4px solid #95a5a6; padding: 18px 22px; box-sizing: border-box; line-height: 1.8; text-align: left; color: #566573; font-style: italic; }
-        .story-bubble { background: #fffaf3; border-left: 4px solid #d8a45d; padding: 22px; box-sizing: border-box; line-height: 1.9; text-align: left; color: #2c3e50; }
-        .resolution-bubble { background: #f0fff4; border-left: 4px solid var(--correct); padding: 20px 22px; box-sizing: border-box; line-height: 1.9; text-align: left; color: #2c3e50; }
-        .selected-reply { font-weight: bold; margin-bottom: 14px; color: #8e5b22; }
-        .final-resolve-line { font-size: 1.3em; font-weight: bold; margin-top: 14px; color: var(--correct); }
-        
-        .symbol, .resolved, .wrong-resolved { cursor: pointer; transition: 0.2s; padding: 0 4px; border-radius: 2px; }
-        .symbol:hover, .resolved:hover, .wrong-resolved:hover { background: #dfe6e9; outline: 1px solid var(--main); }
+        .content-box {
+            max-width: 700px;
+            width: 90%;
+            line-height: 2.2;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 20px;
+        }
 
-        .controls { padding: 25px; background: #f8f9fa; border-top: 1px solid #ddd; max-height: 300px; overflow-y: auto; }
-        .opt-btn { width: 100%; padding: 15px; margin: 8px 0; border: 1px solid #e0b17b; background: var(--opt-bg); cursor: pointer; font-size: 1rem; text-align: left; transition: 0.2s; border-radius: 4px; color: #2c3e50; }
-        .opt-btn:hover:not(:disabled) { border-color: #d89c56; background: var(--opt-hover); transform: translateX(5px); }
-        .opt-btn:disabled { cursor: default; opacity: 0.7; }
-        .opt-btn.my-choice { border: 2px solid #e67e22; background: var(--selected); font-weight: bold; }
+        #game-container {
+            width: 98vw;
+            max-width: 1200px;
+            height: 92vh;
+            background: rgba(255, 255, 255, 0.98);
+            display: none;
+            border-radius: 4px;
+            overflow: hidden;
+            color: #2c3e50;
+            box-shadow: 0 0 70px rgba(0,0,0,1);
+        }
 
-        #dictionary { flex: 1; background: #fcfcfc; display: flex; flex-direction: column; min-width: 320px; border-left: 1px solid #ddd; height: 100%; }
-        #dict-list { flex: 1; overflow-y: auto; padding: 20px; scroll-behavior: smooth; }
-        .dict-entry { margin-bottom: 15px; padding: 15px; background: white; border: 1px solid #eee; border-radius: 4px; transition: background 0.5s; }
-        .dict-entry.correct { border-left: 8px solid var(--correct); background: #f0fff4; }
-        .dict-entry.guessing { border-left: 8px solid #3498db; background: #f4f9ff; }
-        .dict-entry.highlight-flash { background: #fff9c4; }
-        
-        .dict-entry label { font-size: 0.9em; color: #95a5a6; display: block; margin-bottom: 8px; font-family: monospace; font-weight: bold; }
-        .dict-entry input { width: calc(100% - 24px); padding: 10px; border: 1px solid #ddd; font-size: 1rem; outline: none; border-radius: 4px; }
-        .dict-entry input.wrong-text { color: var(--wrong); font-weight: bold; border-color: var(--wrong); }
+        #main-screen {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #ddd;
+            min-width: 0;
+            height: 100%;
+        }
 
-        .dict-status { font-size: 0.75em; color: #95a5a6; margin-bottom: 6px; }
-        .dict-entry.guessing .dict-status { color: #2980b9; }
-        .dict-entry.correct .dict-status { color: var(--correct); font-weight: bold; }
-        
-        .resolved { color: var(--correct); font-weight: bold; }
-        .wrong-resolved { color: var(--wrong); font-weight: bold; text-decoration: underline wavy var(--wrong); }
-        .symbol { color: #95a5a6; font-family: monospace; background: #eee; }
+        /* 第9-A段階：20個の数字タブを廃止し、現在位置だけ表示 */
+        #progress-bar {
+            height: 42px;
+            flex-shrink: 0;
+            background: #1a1a1a;
+            color: #bdc3c7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.78em;
+            letter-spacing: 0.12em;
+            border-bottom: 1px solid #333;
+        }
 
-        .status-bar { padding: 10px 20px; background: #1a1a1a; color: white; display: flex; justify-content: space-between; align-items: center; font-size: 0.8em; }
-        .badge-container { display: flex; gap: 6px; }
-        .badge { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #333; font-size: 10px; filter: grayscale(1); opacity: 0.3; transition: 0.5s; cursor: help; }
-        .badge.unlocked { filter: grayscale(0); opacity: 1; box-shadow: 0 0 10px rgba(255,255,255,0.2); }
-        .badge.gold { border: 1px solid var(--gold); }
-        
-        .hint-text { font-size: 0.9em; color: #7f8c8d; margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 10px; font-style: italic; }
-        .btn-style { padding: 15px 50px; cursor: pointer; border: none; font-size: 1.1em; border-radius: 5px; margin: 10px; transition: 0.3s; }
+        #progress-current {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        #display {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 16px;
+            padding: 40px;
+            background: #fff;
+            overflow-y: auto;
+        }
+
+        #chara-header {
+            width: 85%;
+            flex-shrink: 0;
+        }
+
+        .bubble {
+            background: #fdfdfd;
+            border-left: 6px solid var(--main);
+            padding: 30px;
+            width: 85%;
+            box-sizing: border-box;
+            font-size: 1.3rem;
+            line-height: 2;
+            text-align: left;
+            min-height: 100px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        #vane-thought-block,
+        #story-block,
+        #resolution-block {
+            width: 85%;
+            box-sizing: border-box;
+        }
+
+        .block-label {
+            font-size: 0.8em;
+            font-weight: bold;
+            letter-spacing: 0.08em;
+            color: #7f8c8d;
+            margin-bottom: 6px;
+        }
+
+        .thought-bubble {
+            background: #f6f8fa;
+            border-left: 4px solid #95a5a6;
+            padding: 18px 22px;
+            box-sizing: border-box;
+            line-height: 1.8;
+            text-align: left;
+            color: #566573;
+            font-style: italic;
+        }
+
+        .story-bubble {
+            background: #fffaf3;
+            border-left: 4px solid #d8a45d;
+            padding: 22px;
+            box-sizing: border-box;
+            line-height: 1.9;
+            text-align: left;
+            color: #2c3e50;
+        }
+
+        .resolution-bubble {
+            background: #f0fff4;
+            border-left: 4px solid var(--correct);
+            padding: 20px 22px;
+            box-sizing: border-box;
+            line-height: 1.9;
+            text-align: left;
+            color: #2c3e50;
+        }
+
+        .selected-reply {
+            font-weight: bold;
+            margin-bottom: 14px;
+            color: #8e5b22;
+        }
+
+        .final-resolve-line {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-top: 14px;
+            color: var(--correct);
+        }
+
+        .symbol,
+        .resolved,
+        .wrong-resolved {
+            cursor: pointer;
+            transition: 0.2s;
+            padding: 0 4px;
+            border-radius: 2px;
+        }
+
+        .symbol:hover,
+        .resolved:hover,
+        .wrong-resolved:hover {
+            background: #dfe6e9;
+            outline: 1px solid var(--main);
+        }
+
+        .controls {
+            padding: 25px;
+            background: #f8f9fa;
+            border-top: 1px solid #ddd;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .opt-btn {
+            width: 100%;
+            padding: 15px;
+            margin: 8px 0;
+            border: 1px solid #e0b17b;
+            background: var(--opt-bg);
+            cursor: pointer;
+            font-size: 1rem;
+            text-align: left;
+            transition: 0.2s;
+            border-radius: 4px;
+            color: #2c3e50;
+        }
+
+        .opt-btn:hover:not(:disabled) {
+            border-color: #d89c56;
+            background: var(--opt-hover);
+            transform: translateX(5px);
+        }
+
+        .opt-btn:disabled {
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        .opt-btn.my-choice {
+            border: 2px solid #e67e22;
+            background: var(--selected);
+            font-weight: bold;
+        }
+
+        /* 第9-A段階：右側は一語だけを表示する常設ノート */
+        #dictionary {
+            flex: 0 0 330px;
+            background: #fcfcfc;
+            display: flex;
+            flex-direction: column;
+            min-width: 300px;
+            border-left: 1px solid #ddd;
+            height: 100%;
+        }
+
+        #dict-header {
+            padding: 24px 24px 20px;
+            border-bottom: 1px solid #ddd;
+            background: #fff;
+        }
+
+        #dict-header h3 {
+            margin: 0;
+            font-size: 1.05em;
+            letter-spacing: 0.05em;
+        }
+
+        #dict-header p {
+            margin: 8px 0 0;
+            font-size: 0.72em;
+            color: #95a5a6;
+            line-height: 1.6;
+        }
+
+        #dict-list {
+            flex: 1;
+            padding: 32px 24px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        .dict-placeholder {
+            width: 100%;
+            margin-top: 45px;
+            text-align: center;
+            color: #95a5a6;
+            line-height: 2;
+            font-size: 0.9em;
+        }
+
+        .dict-placeholder-symbol {
+            font-family: monospace;
+            font-size: 2em;
+            color: #bdc3c7;
+            margin-bottom: 18px;
+        }
+
+        .dict-entry {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 24px;
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            transition: background 0.5s;
+        }
+
+        .dict-entry.correct {
+            border-left: 6px solid var(--correct);
+            background: #f0fff4;
+        }
+
+        .dict-entry.guessing {
+            border-left: 6px solid #3498db;
+            background: #f4f9ff;
+        }
+
+        .dict-entry.highlight-flash {
+            background: #fff9c4;
+        }
+
+        .dict-entry label {
+            font-size: 1.6em;
+            color: #59636b;
+            display: block;
+            margin-bottom: 16px;
+            font-family: monospace;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 0.12em;
+        }
+
+        .dict-entry input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            border: 1px solid #ddd;
+            font-size: 1rem;
+            outline: none;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .dict-entry input:focus {
+            border-color: #7f8c8d;
+        }
+
+        .dict-entry input.wrong-text {
+            color: var(--wrong);
+            font-weight: bold;
+            border-color: var(--wrong);
+        }
+
+        .dict-status {
+            font-size: 0.78em;
+            color: #95a5a6;
+            margin-bottom: 14px;
+            text-align: center;
+        }
+
+        .dict-entry.guessing .dict-status {
+            color: #2980b9;
+        }
+
+        .dict-entry.correct .dict-status {
+            color: var(--correct);
+            font-weight: bold;
+        }
+
+        .resolved {
+            color: var(--correct);
+            font-weight: bold;
+        }
+
+        .wrong-resolved {
+            color: var(--wrong);
+            font-weight: bold;
+            text-decoration: underline wavy var(--wrong);
+        }
+
+        .symbol {
+            color: #59636b;
+            font-family: monospace;
+            background: #eef0f2;
+            font-weight: bold;
+        }
+
+        .status-bar {
+            padding: 10px 20px;
+            background: #1a1a1a;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8em;
+        }
+
+        .badge-container {
+            display: flex;
+            gap: 6px;
+        }
+
+        .badge {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #333;
+            font-size: 10px;
+            filter: grayscale(1);
+            opacity: 0.3;
+            transition: 0.5s;
+            cursor: help;
+        }
+
+        .badge.unlocked {
+            filter: grayscale(0);
+            opacity: 1;
+            box-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
+
+        .badge.gold {
+            border: 1px solid var(--gold);
+        }
+
+        .hint-text {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 15px;
+            border-top: 1px dashed #ccc;
+            padding-top: 10px;
+            font-style: italic;
+        }
+
+        .btn-style {
+            padding: 15px 50px;
+            cursor: pointer;
+            border: none;
+            font-size: 1.1em;
+            border-radius: 5px;
+            margin: 10px;
+            transition: 0.3s;
+        }
     </style>
 </head>
 <body>
@@ -135,7 +546,14 @@
 
 <div id="game-container">
     <div id="main-screen">
-        <div id="tab-bar"></div>
+
+        <div id="progress-bar">
+            SCENE&nbsp;
+            <span id="progress-current">01</span>
+            &nbsp;/&nbsp;
+            <span id="progress-total">20</span>
+        </div>
+
         <div class="status-bar">
             <span>KNIGHT: VANE</span>
             <div class="badge-container" id="badge-area">
@@ -178,13 +596,14 @@
     </div>
 
     <div id="dictionary">
-        <div style="padding: 20px; border-bottom: 2px solid #2c3e50; background: #fff;">
-            <h3 style="margin:0;">📓 ヴェインのノート</h3>
-            <p style="margin:8px 0 0; font-size:0.75em; color:#7f8c8d; line-height:1.6;">
-                同じ記号でも文章に合わせて形が変わります。<br>
-                「頼って → 頼る」のように、基本の形で入力してください。
+        <div id="dict-header">
+            <h3>ヴェインのノート</h3>
+            <p>
+                聞き取れない言葉を選び、<br>
+                思いついた意味を書き留める。
             </p>
         </div>
+
         <div id="dict-list"></div>
     </div>
 </div>
@@ -420,7 +839,12 @@
         }
     };
 
-    let currentStep = 0, viewingStep = 0, lovePoints = 0, userDict = {}, colSet = new Set();
+    let currentStep = 0,
+        viewingStep = 0,
+        lovePoints = 0,
+        userDict = {},
+        colSet = new Set();
+
     let selectedAnswers = [];
 
     let masteredWords = new Set();
@@ -433,6 +857,9 @@
     let pendingOption = null;
     let pendingResolvedKeys = [];
     let pendingFinalLine = "";
+
+    /* 第9-A段階：現在ノートに表示している語 */
+    let activeDictKey = null;
 
     let interpretationCounts = {
         unknown: 0,
@@ -563,7 +990,9 @@
 
     function getSavedWords() {
         try {
-            return JSON.parse(localStorage.getItem('vane_solved_words') || "{}");
+            return JSON.parse(
+                localStorage.getItem('vane_solved_words') || "{}"
+            );
         } catch (e) {
             return {};
         }
@@ -603,23 +1032,35 @@
     }
 
     function sceneContainsWord(text, key) {
-        const reg = new RegExp("\\[\\[" + key + "(?:\\||\\]\\])");
+        const reg =
+            new RegExp("\\[\\[" + key + "(?:\\||\\]\\])");
+
         return reg.test(text);
     }
 
     const wordTotalClueScenes = {};
+
     for (let key in wordBank) {
-        wordTotalClueScenes[key] = scenario.filter(data => {
-            return sceneContainsWord(data.q, key);
-        }).length;
+        wordTotalClueScenes[key] =
+            scenario.filter(data => {
+                return sceneContainsWord(data.q, key);
+            }).length;
     }
 
     // 環境チェック
     function checkEnvironment() {
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (window.innerWidth < 800);
-        const title = document.getElementById('check-title');
-        const entryBtn = document.getElementById('entry-btn');
-        const errorMsg = document.getElementById('error-msg');
+        const isMobile =
+            /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+            (window.innerWidth < 800);
+
+        const title =
+            document.getElementById('check-title');
+
+        const entryBtn =
+            document.getElementById('entry-btn');
+
+        const errorMsg =
+            document.getElementById('error-msg');
 
         if (isMobile) {
             title.innerText = "ACCESS DENIED";
@@ -641,26 +1082,84 @@
         return arr;
     }
 
+    /*
+        第9-A段階：
+        旧「一覧の該当欄までスクロール」を、
+        「その一語をノートへ表示」に変更。
+    */
     function jumpToDict(key) {
-        const entry = document.getElementById(`entry-${key}`);
-        const input = document.getElementById(`input-${key}`);
+        if (!wordBank[key]) return;
 
-        if (entry && input) {
-            entry.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
+        activeDictKey = key;
+        renderActiveDictEntry();
 
-            entry.classList.add('highlight-flash');
+        const input =
+            document.getElementById(`input-${key}`);
 
-            setTimeout(() => {
-                entry.classList.remove('highlight-flash');
-            }, 1000);
-
-            if (!input.disabled) {
-                input.focus();
-            }
+        if (input && !input.disabled) {
+            input.focus();
         }
+    }
+
+    function renderDictPlaceholder() {
+        const list =
+            document.getElementById('dict-list');
+
+        if (!list) return;
+
+        list.innerHTML = `
+            <div class="dict-placeholder">
+                <div class="dict-placeholder-symbol">―――</div>
+                会話の中の聞き取れない言葉を<br>
+                選んでください。
+            </div>
+        `;
+    }
+
+    function renderActiveDictEntry() {
+        const list =
+            document.getElementById('dict-list');
+
+        if (!list) return;
+
+        if (
+            !activeDictKey ||
+            !wordBank[activeDictKey]
+        ) {
+            renderDictPlaceholder();
+            return;
+        }
+
+        const key = activeDictKey;
+
+        list.innerHTML = "";
+
+        const div =
+            document.createElement('div');
+
+        div.className = 'dict-entry';
+        div.id = `entry-${key}`;
+
+        div.innerHTML = `
+            <label>${wordBank[key].q}</label>
+
+            <div
+                class="dict-status"
+                id="status-${key}"
+            ></div>
+
+            <input
+                type="text"
+                id="input-${key}"
+                placeholder="意味を推測して入力"
+                value=""
+                oninput="updateGuess('${key}', this.value)"
+            >
+        `;
+
+        list.appendChild(div);
+
+        renderDictEntryState(key);
     }
 
     window.onload = () => {
@@ -672,7 +1171,9 @@
             document.getElementById('entry-btn');
 
         const recollectionEntryBtn =
-            document.getElementById('recollection-entry-btn');
+            document.getElementById(
+                'recollection-entry-btn'
+            );
 
         const isMobile =
             /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
@@ -684,40 +1185,73 @@
             recollectionProgress.gameCleared
         ) {
             entryBtn.innerText = "はじめから";
-            recollectionEntryBtn.style.display = "inline-block";
+            recollectionEntryBtn.style.display =
+                "inline-block";
         }
 
         entryBtn.onclick = () => {
-            document.getElementById('device-check-overlay').style.display = 'none';
-            document.getElementById('intro-overlay').style.display = 'flex';
+            document.getElementById(
+                'device-check-overlay'
+            ).style.display = 'none';
+
+            document.getElementById(
+                'intro-overlay'
+            ).style.display = 'flex';
         };
 
         recollectionEntryBtn.onclick = () => {
-            document.getElementById('device-check-overlay').style.display = 'none';
+            document.getElementById(
+                'device-check-overlay'
+            ).style.display = 'none';
+
             openRecollection();
         };
 
-        document.getElementById('to-tutorial').onclick = () => {
-            document.getElementById('intro-overlay').style.display = 'none';
-            document.getElementById('tutorial-overlay').style.display = 'flex';
+        document.getElementById(
+            'to-tutorial'
+        ).onclick = () => {
+            document.getElementById(
+                'intro-overlay'
+            ).style.display = 'none';
+
+            document.getElementById(
+                'tutorial-overlay'
+            ).style.display = 'flex';
         };
 
-        document.getElementById('start-init-btn').onclick = () => {
+        document.getElementById(
+            'start-init-btn'
+        ).onclick = () => {
             if (hasCompatibleSavedWords()) {
-                document.getElementById('tutorial-overlay').style.display = 'none';
-                document.getElementById('load-overlay').style.display = 'flex';
+                document.getElementById(
+                    'tutorial-overlay'
+                ).style.display = 'none';
+
+                document.getElementById(
+                    'load-overlay'
+                ).style.display = 'flex';
             } else {
                 startGame(false);
             }
         };
 
-        document.getElementById('load-yes').onclick = () => startGame(true);
-        document.getElementById('load-no').onclick = () => startGame(false);
+        document.getElementById(
+            'load-yes'
+        ).onclick = () => startGame(true);
 
-        const savedCol = localStorage.getItem('vane_collection_v3');
+        document.getElementById(
+            'load-no'
+        ).onclick = () => startGame(false);
+
+        const savedCol =
+            localStorage.getItem(
+                'vane_collection_v3'
+            );
 
         if (savedCol) {
-            colSet = new Set(JSON.parse(savedCol));
+            colSet =
+                new Set(JSON.parse(savedCol));
+
             updateColUI();
         }
 
@@ -725,22 +1259,39 @@
     };
 
     function startGame(inherit) {
-        document.getElementById('tutorial-overlay').style.display = 'none';
-        document.getElementById('load-overlay').style.display = 'none';
-        document.getElementById('game-container').style.display = 'flex';
+        document.getElementById(
+            'tutorial-overlay'
+        ).style.display = 'none';
 
-        if (typeof runMode !== "undefined") {
+        document.getElementById(
+            'load-overlay'
+        ).style.display = 'none';
+
+        document.getElementById(
+            'game-container'
+        ).style.display = 'flex';
+
+        if (
+            typeof runMode !== "undefined"
+        ) {
             runMode = "story";
         }
 
-        if (typeof recollectionBaseEndingId !== "undefined") {
+        if (
+            typeof recollectionBaseEndingId !== "undefined"
+        ) {
             recollectionBaseEndingId = null;
         }
 
-        selectedAnswers = new Array(scenario.length).fill(null);
+        selectedAnswers =
+            new Array(scenario.length).fill(null);
 
-        masteredWords = getMasteredWordSet();
-        vaneKnownWords = new Set();
+        masteredWords =
+            getMasteredWordSet();
+
+        vaneKnownWords =
+            new Set();
+
         vaneUnderstoodAt = {};
 
         wordSeenCounts = {};
@@ -750,130 +1301,214 @@
         pendingResolvedKeys = [];
         pendingFinalLine = "";
 
+        activeDictKey = null;
+
         rebuildRunState();
 
-        const savedWords = getSavedWords();
+        const savedWords =
+            getSavedWords();
 
-        initDict(inherit ? savedWords : {});
+        initDict(
+            inherit ? savedWords : {}
+        );
+
         registerSceneWords(currentStep);
         renderTabs();
         updateUI();
     }
 
     function initDict(initialWords) {
-        const list = document.getElementById('dict-list');
-
-        list.innerHTML = "";
         userDict = {};
+        activeDictKey = null;
 
         for (let key in wordBank) {
-            const div = document.createElement('div');
-
-            div.className = 'dict-entry';
-            div.id = `entry-${key}`;
-
             const isInherited =
                 initialWords[key] &&
-                isAcceptedGuess(key, initialWords[key]);
+                isAcceptedGuess(
+                    key,
+                    initialWords[key]
+                );
 
-            userDict[key] = isInherited
-                ? wordBank[key].canonical
-                : "";
+            userDict[key] =
+                isInherited
+                    ? wordBank[key].canonical
+                    : "";
 
             if (isInherited) {
                 masteredWords.add(key);
                 vaneKnownWords.add(key);
                 vaneUnderstoodAt[key] = -1;
             }
-
-            div.innerHTML = `
-                <label>${wordBank[key].q}</label>
-                <div class="dict-status" id="status-${key}"></div>
-                <input
-                    type="text"
-                    id="input-${key}"
-                    placeholder="基本の形で入力"
-                    value="${isInherited ? wordBank[key].canonical : ''}"
-                    oninput="updateGuess('${key}', this.value)"
-                >
-            `;
-
-            list.appendChild(div);
-            renderDictEntryState(key);
         }
 
+        renderDictPlaceholder();
         updateIntelUI();
     }
 
     function renderDictEntryState(key) {
-        const entry = document.getElementById(`entry-${key}`);
-        const input = document.getElementById(`input-${key}`);
-        const status = document.getElementById(`status-${key}`);
+        /*
+            第9-A段階ではDOM上に存在するのは
+            現在選択中の一語だけ。
+            解読ロジック自体は従来通り。
+        */
 
-        if (!entry || !input || !status) return;
+        if (key !== activeDictKey) {
+            return;
+        }
 
-        entry.classList.remove('correct', 'guessing');
-        input.classList.remove('wrong-text');
+        const entry =
+            document.getElementById(
+                `entry-${key}`
+            );
+
+        const input =
+            document.getElementById(
+                `input-${key}`
+            );
+
+        const status =
+            document.getElementById(
+                `status-${key}`
+            );
+
+        if (
+            !entry ||
+            !input ||
+            !status
+        ) {
+            return;
+        }
+
+        entry.classList.remove(
+            'correct',
+            'guessing'
+        );
+
+        input.classList.remove(
+            'wrong-text'
+        );
 
         if (vaneKnownWords.has(key)) {
-            entry.classList.add('correct');
-            status.innerText = "理解した";
+            entry.classList.add(
+                'correct'
+            );
+
+            status.innerText =
+                "理解した";
+
             input.disabled = true;
-            input.value = wordBank[key].canonical;
-        } else if ((userDict[key] || "").trim().length > 0) {
-            entry.classList.add('guessing');
+
+            input.value =
+                wordBank[key].canonical;
+        }
+        else if (
+            (userDict[key] || "")
+                .trim()
+                .length > 0
+        ) {
+            entry.classList.add(
+                'guessing'
+            );
+
             status.innerText =
                 masteredWords.has(key)
                     ? "推測中（解読実績あり）"
                     : "推測中";
+
             input.disabled = false;
-        } else {
+
+            input.value =
+                userDict[key] || "";
+        }
+        else {
             status.innerText =
                 masteredWords.has(key)
                     ? "解読済み／このヴェインは未理解"
                     : "未推測";
+
             input.disabled = false;
+            input.value = "";
         }
     }
 
     function updateGuess(key, val) {
-        if (vaneKnownWords.has(key)) return;
+        if (
+            vaneKnownWords.has(key)
+        ) {
+            return;
+        }
 
-        userDict[key] = val.trim();
+        userDict[key] =
+            val.trim();
+
         renderDictEntryState(key);
     }
 
     function registerSceneWords(index) {
-        if (index < 0 || index >= scenario.length) return;
-        if (seenSceneIds.has(index)) return;
+        if (
+            index < 0 ||
+            index >= scenario.length
+        ) {
+            return;
+        }
+
+        if (
+            seenSceneIds.has(index)
+        ) {
+            return;
+        }
 
         seenSceneIds.add(index);
 
-        const text = scenario[index].q;
+        const text =
+            scenario[index].q;
 
         for (let key in wordBank) {
-            if (sceneContainsWord(text, key)) {
-                wordSeenCounts[key] = (wordSeenCounts[key] || 0) + 1;
+            if (
+                sceneContainsWord(
+                    text,
+                    key
+                )
+            ) {
+                wordSeenCounts[key] =
+                    (wordSeenCounts[key] || 0) + 1;
             }
         }
     }
 
     function resolveWord(key) {
-        if (vaneKnownWords.has(key)) return false;
+        if (
+            vaneKnownWords.has(key)
+        ) {
+            return false;
+        }
 
-        const guess = (userDict[key] || "").trim();
+        const guess =
+            (userDict[key] || "").trim();
 
-        if (!isAcceptedGuess(key, guess)) {
+        if (
+            !isAcceptedGuess(
+                key,
+                guess
+            )
+        ) {
             return false;
         }
 
         vaneKnownWords.add(key);
-        vaneUnderstoodAt[key] = currentStep;
 
-        const canonical = wordBank[key].canonical;
-        userDict[key] = canonical;
+        vaneUnderstoodAt[key] =
+            currentStep;
 
-        if (!masteredWords.has(key)) {
+        const canonical =
+            wordBank[key].canonical;
+
+        userDict[key] =
+            canonical;
+
+        if (
+            !masteredWords.has(key)
+        ) {
             masteredWords.add(key);
             persistMasteredWord(key);
         }
@@ -887,19 +1522,31 @@
     function evaluateUnderstanding(data) {
         let candidates;
 
-        if (Array.isArray(data.resolveChecks)) {
-            candidates = [...data.resolveChecks];
-        } else {
-            candidates = Object.keys(wordBank).filter(key => {
-                const totalClues = wordTotalClueScenes[key] || 1;
+        if (
+            Array.isArray(
+                data.resolveChecks
+            )
+        ) {
+            candidates =
+                [...data.resolveChecks];
+        }
+        else {
+            candidates =
+                Object.keys(wordBank)
+                    .filter(key => {
+                        const totalClues =
+                            wordTotalClueScenes[key] || 1;
 
-                const requiredClues = Math.min(
-                    wordBank[key].minClues || 2,
-                    totalClues
-                );
+                        const requiredClues =
+                            Math.min(
+                                wordBank[key].minClues || 2,
+                                totalClues
+                            );
 
-                return (wordSeenCounts[key] || 0) >= requiredClues;
-            });
+                        return (
+                            wordSeenCounts[key] || 0
+                        ) >= requiredClues;
+                    });
         }
 
         if (
@@ -907,9 +1554,13 @@
             data.finalResolve.special &&
             data.finalResolve.key
         ) {
-            candidates = candidates.filter(key => {
-                return key !== data.finalResolve.key;
-            });
+            candidates =
+                candidates.filter(key => {
+                    return (
+                        key !==
+                        data.finalResolve.key
+                    );
+                });
         }
 
         const resolvedNow = [];
@@ -924,19 +1575,30 @@
     }
 
     function updateIntelUI() {
-        const intel = Math.floor(
-            (vaneKnownWords.size / Object.keys(wordBank).length) * 100
-        );
+        const intel =
+            Math.floor(
+                (
+                    vaneKnownWords.size /
+                    Object.keys(wordBank).length
+                ) * 100
+            );
 
-        const el = document.getElementById('intel-val');
+        const el =
+            document.getElementById(
+                'intel-val'
+            );
 
         if (el) {
-            el.innerText = intel + "%";
+            el.innerText =
+                intel + "%";
         }
     }
 
     function getReactionText(option) {
-        if (option && option.reaction) {
+        if (
+            option &&
+            option.reaction
+        ) {
             return option.reaction;
         }
 
@@ -944,39 +1606,58 @@
     }
 
     function renderDialogueText(text) {
-        let rendered = text || "";
+        let rendered =
+            text || "";
 
         for (let key in wordBank) {
-            const reg = new RegExp(
-                "\\[\\[" + key + "(?:\\|([^\\]]+))?\\]\\]",
-                "g"
-            );
+            const reg =
+                new RegExp(
+                    "\\[\\[" +
+                    key +
+                    "(?:\\|([^\\]]+))?\\]\\]",
+                    "g"
+                );
 
-            rendered = rendered.replace(
-                reg,
-                (match, surfaceForm) => {
-                    const resolved = vaneKnownWords.has(key);
+            rendered =
+                rendered.replace(
+                    reg,
+                    (match, surfaceForm) => {
+                        const resolved =
+                            vaneKnownWords.has(key);
 
-                    const spanClass = resolved
-                        ? "resolved"
-                        : "symbol";
+                        const spanClass =
+                            resolved
+                                ? "resolved"
+                                : "symbol";
 
-                    const displayVal = resolved
-                        ? (surfaceForm || wordBank[key].canonical)
-                        : wordBank[key].q;
+                        const displayVal =
+                            resolved
+                                ? (
+                                    surfaceForm ||
+                                    wordBank[key].canonical
+                                )
+                                : wordBank[key].q;
 
-                    return `<span class="${spanClass}" onclick="jumpToDict('${key}')">${displayVal}</span>`;
-                }
-            );
+                        return (
+                            `<span class="${spanClass}" onclick="jumpToDict('${key}')">${displayVal}</span>`
+                        );
+                    }
+                );
         }
 
-        return rendered.replace(/\n/g, "<br>");
+        return rendered.replace(
+            /\n/g,
+            "<br>"
+        );
     }
 
     function continueFromReaction() {
-        const data = scenario[currentStep];
+        const data =
+            scenario[currentStep];
 
-        pendingResolvedKeys = evaluateUnderstanding(data);
+        pendingResolvedKeys =
+            evaluateUnderstanding(data);
+
         pendingFinalLine = "";
 
         if (
@@ -984,13 +1665,19 @@
             data.finalResolve.special &&
             data.finalResolve.key
         ) {
-            const finalKey = data.finalResolve.key;
+            const finalKey =
+                data.finalResolve.key;
 
             if (
                 !vaneKnownWords.has(finalKey) &&
-                isAcceptedGuess(finalKey, userDict[finalKey])
+                isAcceptedGuess(
+                    finalKey,
+                    userDict[finalKey]
+                )
             ) {
-                if (resolveWord(finalKey)) {
+                if (
+                    resolveWord(finalKey)
+                ) {
                     pendingFinalLine =
                         data.finalResolve.line || "";
                 }
@@ -1001,9 +1688,12 @@
             pendingResolvedKeys.length > 0 ||
             pendingFinalLine
         ) {
-            interactionPhase = "resolution";
+            interactionPhase =
+                "resolution";
+
             updateUI(true);
-        } else {
+        }
+        else {
             advanceScene();
         }
     }
@@ -1012,99 +1702,176 @@
         pendingOption = null;
         pendingResolvedKeys = [];
         pendingFinalLine = "";
-        interactionPhase = "conversation";
+        interactionPhase =
+            "conversation";
 
         currentStep++;
-        viewingStep = currentStep;
+        viewingStep =
+            currentStep;
 
-        if (currentStep < scenario.length) {
-            registerSceneWords(currentStep);
+        if (
+            currentStep <
+            scenario.length
+        ) {
+            registerSceneWords(
+                currentStep
+            );
+
             renderTabs();
             updateUI(true);
 
-            const display = document.getElementById('display');
+            const display =
+                document.getElementById(
+                    'display'
+                );
+
             if (display) {
                 display.scrollTop = 0;
             }
-        } else {
+        }
+        else {
             showEnd();
         }
     }
 
+    /*
+        関数名は既存コードとの互換性のため維持。
+        数字タブは生成せず、現在位置だけ更新する。
+    */
     function renderTabs() {
-        const bar = document.getElementById('tab-bar');
+        const current =
+            document.getElementById(
+                'progress-current'
+            );
 
-        bar.innerHTML = '';
+        const total =
+            document.getElementById(
+                'progress-total'
+            );
 
-        scenario.forEach((_, i) => {
-            const tab = document.createElement('div');
+        if (current) {
+            current.innerText =
+                String(viewingStep + 1)
+                    .padStart(2, "0");
+        }
 
-            tab.className =
-                `tab ${i === viewingStep ? 'active' : ''} ${i > currentStep ? 'locked' : ''}`;
-
-            tab.innerText = i + 1;
-
-            tab.onclick = () => {
-                if (i <= currentStep) {
-                    viewingStep = i;
-                    renderTabs();
-                    updateUI();
-
-                    const display = document.getElementById('display');
-                    if (display) {
-                        display.scrollTop = 0;
-                    }
-                }
-            };
-
-            bar.appendChild(tab);
-        });
+        if (total) {
+            total.innerText =
+                String(scenario.length)
+                    .padStart(2, "0");
+        }
     }
 
     function updateUI(redo = true) {
-        if (currentStep >= scenario.length) return;
+        if (
+            currentStep >=
+            scenario.length
+        ) {
+            return;
+        }
 
-        const data = scenario[viewingStep];
-        const speaker = document.getElementById('speaker-name');
-        const face = document.getElementById('face-emoji');
-        const message = document.getElementById('message-text');
+        renderTabs();
 
-        const thoughtBlock = document.getElementById('vane-thought-block');
-        const thoughtText = document.getElementById('vane-thought-text');
+        const data =
+            scenario[viewingStep];
 
-        const storyBlock = document.getElementById('story-block');
-        const storyText = document.getElementById('story-text');
+        const speaker =
+            document.getElementById(
+                'speaker-name'
+            );
 
-        const resolutionBlock = document.getElementById('resolution-block');
-        const resolutionText = document.getElementById('resolution-text');
+        const face =
+            document.getElementById(
+                'face-emoji'
+            );
+
+        const message =
+            document.getElementById(
+                'message-text'
+            );
+
+        const thoughtBlock =
+            document.getElementById(
+                'vane-thought-block'
+            );
+
+        const thoughtText =
+            document.getElementById(
+                'vane-thought-text'
+            );
+
+        const storyBlock =
+            document.getElementById(
+                'story-block'
+            );
+
+        const storyText =
+            document.getElementById(
+                'story-text'
+            );
+
+        const resolutionBlock =
+            document.getElementById(
+                'resolution-block'
+            );
+
+        const resolutionText =
+            document.getElementById(
+                'resolution-text'
+            );
 
         updateIntelUI();
 
-        const isCurrent = viewingStep === currentStep;
+        const isCurrent =
+            viewingStep === currentStep;
 
-        speaker.innerText = "LANCELOT";
-        face.innerText = data.face;
-        message.innerHTML = renderDialogueText(data.q);
+        speaker.innerText =
+            "LANCELOT";
 
-        thoughtBlock.style.display = "block";
+        face.innerText =
+            data.face;
+
+        message.innerHTML =
+            renderDialogueText(data.q);
+
+        thoughtBlock.style.display =
+            "block";
+
         thoughtText.innerHTML =
-            (data.vaneThought || "").replace(/\n/g, "<br>");
+            (data.vaneThought || "")
+                .replace(/\n/g, "<br>");
 
-        storyBlock.style.display = "none";
+        storyBlock.style.display =
+            "none";
+
         storyText.innerHTML = "";
 
-        resolutionBlock.style.display = "none";
+        resolutionBlock.style.display =
+            "none";
+
         resolutionText.innerHTML = "";
 
-        const selectedOptionId = selectedAnswers[viewingStep];
+        const selectedOptionId =
+            selectedAnswers[viewingStep];
 
         let selectedOption = null;
 
-        if (isCurrent && pendingOption) {
-            selectedOption = pendingOption;
-        } else if (selectedOptionId) {
+        if (
+            isCurrent &&
+            pendingOption
+        ) {
             selectedOption =
-                data.opts.find(option => option.id === selectedOptionId) || null;
+                pendingOption;
+        }
+        else if (
+            selectedOptionId
+        ) {
+            selectedOption =
+                data.opts.find(
+                    option =>
+                        option.id ===
+                        selectedOptionId
+                ) || null;
         }
 
         if (
@@ -1121,44 +1888,64 @@
                 `<div class="selected-reply">● ${selectedOption.t}</div>`
             );
 
-            const reaction = getReactionText(selectedOption);
+            const reaction =
+                getReactionText(
+                    selectedOption
+                );
 
             if (reaction) {
                 storyParts.push(
-                    reaction.replace(/\n/g, "<br>")
+                    reaction.replace(
+                        /\n/g,
+                        "<br>"
+                    )
                 );
             }
 
             if (data.afterStory) {
                 storyParts.push(
-                    data.afterStory.replace(/\n/g, "<br>")
+                    data.afterStory.replace(
+                        /\n/g,
+                        "<br>"
+                    )
                 );
             }
 
             if (data.nextHook) {
                 storyParts.push(
-                    data.nextHook.replace(/\n/g, "<br>")
+                    data.nextHook.replace(
+                        /\n/g,
+                        "<br>"
+                    )
                 );
             }
 
             storyText.innerHTML =
-                storyParts.join("<br><br>");
+                storyParts.join(
+                    "<br><br>"
+                );
 
-            storyBlock.style.display = "block";
+            storyBlock.style.display =
+                "block";
         }
 
         if (
             isCurrent &&
-            interactionPhase === "resolution"
+            interactionPhase ===
+                "resolution"
         ) {
             const resolutionParts = [];
 
-            if (pendingResolvedKeys.length > 0) {
-                const understood = pendingResolvedKeys
-                    .map(key => {
-                        return `「${wordBank[key].q}」――「${wordBank[key].canonical}」`;
-                    })
-                    .join("<br>");
+            if (
+                pendingResolvedKeys.length >
+                0
+            ) {
+                const understood =
+                    pendingResolvedKeys
+                        .map(key => {
+                            return `「${wordBank[key].q}」――「${wordBank[key].canonical}」`;
+                        })
+                        .join("<br>");
 
                 resolutionParts.push(
                     `（……意味がつながった。）<br><br>${understood}`
@@ -1172,51 +1959,89 @@
             }
 
             resolutionText.innerHTML =
-                resolutionParts.join("<br>");
+                resolutionParts.join(
+                    "<br>"
+                );
 
-            resolutionBlock.style.display = "block";
+            resolutionBlock.style.display =
+                "block";
         }
 
-        const light = Math.min(85, 10 + (lovePoints / 5));
-        const sat = Math.min(100, 20 + (lovePoints / 4));
-        const hue = 210 - (lovePoints / 10);
+        const light =
+            Math.min(
+                85,
+                10 + (lovePoints / 5)
+            );
 
-        document.documentElement.style.setProperty(
-            '--love-light',
-            `${light}%`
-        );
+        const sat =
+            Math.min(
+                100,
+                20 + (lovePoints / 4)
+            );
 
-        document.documentElement.style.setProperty(
-            '--love-sat',
-            `${sat}%`
-        );
+        const hue =
+            210 - (lovePoints / 10);
 
-        document.documentElement.style.setProperty(
-            '--love-hue',
-            `${hue}`
-        );
+        document.documentElement
+            .style
+            .setProperty(
+                '--love-light',
+                `${light}%`
+            );
+
+        document.documentElement
+            .style
+            .setProperty(
+                '--love-sat',
+                `${sat}%`
+            );
+
+        document.documentElement
+            .style
+            .setProperty(
+                '--love-hue',
+                `${hue}`
+            );
 
         if (!redo) return;
 
-        const area = document.getElementById('action-area');
+        const area =
+            document.getElementById(
+                'action-area'
+            );
 
         area.innerHTML = '';
 
         if (isCurrent) {
-            if (interactionPhase === "conversation") {
-                shuffle([...data.opts]).forEach(o => {
-                    const b = document.createElement('button');
+            if (
+                interactionPhase ===
+                "conversation"
+            ) {
+                shuffle(
+                    [...data.opts]
+                ).forEach(o => {
+                    const b =
+                        document.createElement(
+                            'button'
+                        );
 
-                    b.className = 'opt-btn';
-                    b.innerText = `▶ ${o.t}`;
+                    b.className =
+                        'opt-btn';
+
+                    b.innerText =
+                        `▶ ${o.t}`;
 
                     b.onclick = () => {
-                        selectedAnswers[currentStep] = o.id;
+                        selectedAnswers[
+                            currentStep
+                        ] = o.id;
 
                         rebuildRunState();
 
                         pendingOption = o;
-                        interactionPhase = "reaction";
+
+                        interactionPhase =
+                            "reaction";
 
                         updateUI(true);
                     };
@@ -1224,38 +2049,77 @@
                     area.appendChild(b);
                 });
             }
-            else if (interactionPhase === "reaction") {
-                const next = document.createElement('button');
+            else if (
+                interactionPhase ===
+                "reaction"
+            ) {
+                const next =
+                    document.createElement(
+                        'button'
+                    );
 
-                next.className = 'opt-btn';
-                next.innerText = "▶ 次へ";
-                next.onclick = continueFromReaction;
+                next.className =
+                    'opt-btn';
+
+                next.innerText =
+                    "▶ 次へ";
+
+                next.onclick =
+                    continueFromReaction;
 
                 area.appendChild(next);
             }
-            else if (interactionPhase === "resolution") {
-                const next = document.createElement('button');
+            else if (
+                interactionPhase ===
+                "resolution"
+            ) {
+                const next =
+                    document.createElement(
+                        'button'
+                    );
 
-                next.className = 'opt-btn';
-                next.innerText = "▶ 次へ";
-                next.onclick = advanceScene;
+                next.className =
+                    'opt-btn';
+
+                next.innerText =
+                    "▶ 次へ";
+
+                next.onclick =
+                    advanceScene;
 
                 area.appendChild(next);
             }
-        } else {
+        }
+        else {
             data.opts.forEach(o => {
-                const b = document.createElement('button');
+                const b =
+                    document.createElement(
+                        'button'
+                    );
 
-                b.className = 'opt-btn';
+                b.className =
+                    'opt-btn';
 
-                if (o.id === selectedAnswers[viewingStep]) {
-                    b.classList.add('my-choice');
+                if (
+                    o.id ===
+                    selectedAnswers[
+                        viewingStep
+                    ]
+                ) {
+                    b.classList.add(
+                        'my-choice'
+                    );
                 }
 
                 b.disabled = true;
 
                 b.innerText =
-                    (o.id === selectedAnswers[viewingStep])
+                    (
+                        o.id ===
+                        selectedAnswers[
+                            viewingStep
+                        ]
+                    )
                         ? `● ${o.t}`
                         : `▶ ${o.t}`;
 
@@ -1265,14 +2129,23 @@
     }
 
     function updateColUI() {
-        document.getElementById('col-val').innerText =
-            Math.floor((colSet.size / 7) * 100) + "%";
+        document.getElementById(
+            'col-val'
+        ).innerText =
+            Math.floor(
+                (colSet.size / 7) * 100
+            ) + "%";
 
         colSet.forEach(id => {
-            const el = document.getElementById(`b-${id}`);
+            const el =
+                document.getElementById(
+                    `b-${id}`
+                );
 
             if (el) {
-                el.classList.add('unlocked');
+                el.classList.add(
+                    'unlocked'
+                );
             }
         });
     }
