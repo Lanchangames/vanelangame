@@ -110,7 +110,7 @@
 
         /*
             左側
-            現在の物語 + 選択肢 + 過去LOG
+            会話 / 過去LOG をタブ切り替え
         */
         #main-screen {
             flex: 2;
@@ -158,6 +158,59 @@
             align-items: center;
             font-size: 0.72em;
             border-bottom: 1px solid #ddd;
+        }
+
+        /*
+            左側メインタブ
+        */
+        #main-view-tabs {
+            height: 48px;
+            min-height: 48px;
+            flex: 0 0 48px;
+            display: flex;
+            box-sizing: border-box;
+            background: #eceff1;
+            border-bottom: 1px solid #cfd5d9;
+            padding: 6px 18px 0;
+            gap: 6px;
+        }
+
+        .main-view-tab {
+            flex: 1;
+            border: 1px solid #cfd5d9;
+            border-bottom: none;
+            background: #dfe4e7;
+            color: #6b757c;
+            font-family: inherit;
+            font-size: 0.84rem;
+            font-weight: bold;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: 0.18s;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .main-view-tab:hover {
+            background: #f4f6f7;
+            color: #34495e;
+        }
+
+        .main-view-tab.active {
+            background: #fff;
+            color: var(--main);
+            border-color: #aeb7bd;
+            box-shadow: inset 0 3px 0 var(--main);
+        }
+
+        /*
+            会話タブ
+        */
+        #play-view {
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
         }
 
         /*
@@ -308,16 +361,14 @@
 
         /*
             選択肢領域。
-            左側の物語の直下に固定。
         */
         .controls {
-            flex: 0 0 auto;
-            max-height: 160px;
+            flex: 1 1 auto;
+            min-height: 0;
             box-sizing: border-box;
             padding: 8px 34px 10px;
             background: #fafafa;
             border-top: 1px solid #e1e4e7;
-            border-bottom: 1px solid #dfe3e6;
             overflow-y: auto;
         }
 
@@ -358,13 +409,13 @@
         }
 
         /*
-            左下：過去LOG専用。
-            閉じない・タブなし・常時表示。
+            過去LOGタブ。
+            会話タブとは同時表示しない。
         */
         #log-section {
             flex: 1 1 auto;
-            min-height: 120px;
-            display: flex;
+            min-height: 0;
+            display: none;
             flex-direction: column;
             background: #f7f8f9;
             box-sizing: border-box;
@@ -1002,81 +1053,103 @@
             </span>
         </div>
 
-        <div id="display">
-            <div id="chara-header">
-                <span
-                    id="face-emoji"
-                    style="
-                        font-size: 2em;
-                        margin-right: 15px;
-                    "
-                >
-                    😊
-                </span>
-
-                <span
-                    id="speaker-name"
-                    style="
-                        font-weight: bold;
-                        letter-spacing: 0.1em;
-                        color: var(--main);
-                    "
-                >
-                    LANCELOT
-                </span>
-            </div>
-
-            <div
-                class="bubble"
-                id="message-text"
+        <div id="main-view-tabs">
+            <button
+                type="button"
+                id="play-view-tab"
+                class="main-view-tab active"
+                onclick="switchMainView('play')"
             >
-                ......
-            </div>
+                会話
+            </button>
 
-            <div id="vane-thought-block">
-                <div class="block-label">
-                    💭 VANE
-                </div>
-
-                <div
-                    class="thought-bubble"
-                    id="vane-thought-text"
-                ></div>
-            </div>
-
-            <div
-                id="story-block"
-                style="display:none;"
+            <button
+                type="button"
+                id="log-view-tab"
+                class="main-view-tab"
+                onclick="switchMainView('log')"
             >
-                <div class="block-label">
-                    STORY
-                </div>
-
-                <div
-                    class="story-bubble"
-                    id="story-text"
-                ></div>
-            </div>
-
-            <div
-                id="resolution-block"
-                style="display:none;"
-            >
-                <div class="block-label">
-                    UNDERSTANDING
-                </div>
-
-                <div
-                    class="resolution-bubble"
-                    id="resolution-text"
-                ></div>
-            </div>
+                過去LOG
+            </button>
         </div>
 
-        <div
-            class="controls"
-            id="action-area"
-        ></div>
+        <div id="play-view">
+            <div id="display">
+                <div id="chara-header">
+                    <span
+                        id="face-emoji"
+                        style="
+                            font-size: 2em;
+                            margin-right: 15px;
+                        "
+                    >
+                        😊
+                    </span>
+
+                    <span
+                        id="speaker-name"
+                        style="
+                            font-weight: bold;
+                            letter-spacing: 0.1em;
+                            color: var(--main);
+                        "
+                    >
+                        LANCELOT
+                    </span>
+                </div>
+
+                <div
+                    class="bubble"
+                    id="message-text"
+                >
+                    ......
+                </div>
+
+                <div id="vane-thought-block">
+                    <div class="block-label">
+                        💭 VANE
+                    </div>
+
+                    <div
+                        class="thought-bubble"
+                        id="vane-thought-text"
+                    ></div>
+                </div>
+
+                <div
+                    id="story-block"
+                    style="display:none;"
+                >
+                    <div class="block-label">
+                        STORY
+                    </div>
+
+                    <div
+                        class="story-bubble"
+                        id="story-text"
+                    ></div>
+                </div>
+
+                <div
+                    id="resolution-block"
+                    style="display:none;"
+                >
+                    <div class="block-label">
+                        UNDERSTANDING
+                    </div>
+
+                    <div
+                        class="resolution-bubble"
+                        id="resolution-text"
+                    ></div>
+                </div>
+            </div>
+
+            <div
+                class="controls"
+                id="action-area"
+            ></div>
+        </div>
 
         <div id="log-section">
             <div id="log-header">
@@ -1358,6 +1431,13 @@
 
     let activeDictKey = null;
 
+    /*
+        左側の表示モード。
+        play = 会話
+        log  = 過去LOG
+    */
+    let mainViewMode = "play";
+
     let interpretationCounts = {
         unknown: 0,
         misread: 0,
@@ -1388,6 +1468,79 @@
     });
 
     const maxLove = 450;
+
+    function switchMainView(mode) {
+        if (
+            mode !== "play" &&
+            mode !== "log"
+        ) {
+            return;
+        }
+
+        mainViewMode = mode;
+
+        const playView =
+            document.getElementById(
+                'play-view'
+            );
+
+        const logSection =
+            document.getElementById(
+                'log-section'
+            );
+
+        const playTab =
+            document.getElementById(
+                'play-view-tab'
+            );
+
+        const logTab =
+            document.getElementById(
+                'log-view-tab'
+            );
+
+        if (
+            !playView ||
+            !logSection ||
+            !playTab ||
+            !logTab
+        ) {
+            return;
+        }
+
+        if (mode === "log") {
+            playView.style.display =
+                "none";
+
+            logSection.style.display =
+                "flex";
+
+            playTab.classList.remove(
+                "active"
+            );
+
+            logTab.classList.add(
+                "active"
+            );
+
+            renderPastLog();
+        }
+        else {
+            playView.style.display =
+                "flex";
+
+            logSection.style.display =
+                "none";
+
+            logTab.classList.remove(
+                "active"
+            );
+
+            playTab.classList.add(
+                "active"
+            );
+        }
+    }
 
     function rebuildRunState() {
         lovePoints = 0;
@@ -1718,6 +1871,9 @@
 
         if (!panel) return;
 
+        const previousScrollTop =
+            panel.scrollTop;
+
         const maxIndex =
             Math.min(
                 currentStep,
@@ -1801,6 +1957,9 @@
 
         panel.innerHTML =
             entries.join("");
+
+        panel.scrollTop =
+            previousScrollTop;
     }
 
     /*
@@ -2029,6 +2188,7 @@
         initDict({});
         renderPastLog();
         renderWordList();
+        switchMainView("play");
     };
 
     function startGame(inherit) {
@@ -2075,6 +2235,7 @@
         pendingFinalLine = "";
 
         activeDictKey = null;
+        mainViewMode = "play";
 
         rebuildRunState();
 
@@ -2090,6 +2251,7 @@
         updateUI();
         renderPastLog();
         renderWordList();
+        switchMainView("play");
     }
 
     function initDict(initialWords) {
