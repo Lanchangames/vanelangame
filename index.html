@@ -215,20 +215,21 @@
 
         /*
             現在シーン領域。
-            会話 / STORY / UNDERSTANDING の内容量に関係なく
-            高さを固定する。
+            選択肢領域を除いた残りの高さをすべて使う。
+            会話 / STORY / UNDERSTANDING が長い場合は
+            この領域内だけスクロールする。
         */
         #display {
-            height: 300px;
-            min-height: 300px;
-            max-height: 300px;
-            flex: 0 0 300px;
+            flex: 1 1 auto;
+            min-height: 0;
+            height: auto;
+            max-height: none;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
             gap: 8px;
-            padding: 16px 34px 14px;
+            padding: 24px 34px 18px;
             background: #fff;
             overflow-y: auto;
             box-sizing: border-box;
@@ -361,12 +362,16 @@
 
         /*
             選択肢領域。
+            ここだけ高さを固定し、
+            残りを現在シーン領域へ渡す。
         */
         .controls {
-            flex: 1 1 auto;
-            min-height: 0;
+            height: 180px;
+            min-height: 180px;
+            max-height: 180px;
+            flex: 0 0 180px;
             box-sizing: border-box;
-            padding: 8px 34px 10px;
+            padding: 12px 34px;
             background: #fafafa;
             border-top: 1px solid #e1e4e7;
             overflow-y: auto;
