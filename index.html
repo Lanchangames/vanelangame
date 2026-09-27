@@ -6,27 +6,49 @@
     <title>声を聴かせて、ランスロット！</title>
     <style>
         :root {
-            --main: #2c3e50;
-            --correct: #27ae60;
-            --wrong: #e74c3c;
-            --opt-bg: #fff8ef;
-            --opt-hover: #fff0dc;
-            --selected: #ffdfb8;
-            --love-hue: 210;
-            --love-light: 10%;
-            --love-sat: 20%;
-            --gold: #d4af37;
+            --main: #6f9caf;
+            --main-dark: #466878;
+            --main-soft: #edf5f8;
+
+            --text: #33464f;
+            --muted: #7f919a;
+            --line: #d8e5ea;
+
+            --surface: #ffffff;
+            --surface-soft: #f6fafc;
+            --surface-hover: #eef6f8;
+
+            --correct: #559878;
+            --wrong: #c86c6c;
+
+            --opt-bg: #f8fbfc;
+            --opt-hover: #eef6f8;
+            --selected: #e4f1f5;
+
+            --love-hue: 200;
+            --love-light: 92%;
+            --love-sat: 35%;
+
+            --gold: #b7a268;
         }
 
         body {
-            background: #000;
-            font-family: 'serif', 'Hiragino Mincho ProN', serif;
+            background: #eaf4f7;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                "Hiragino Kaku Gothic ProN",
+                "Yu Gothic",
+                "YuGothic",
+                Meiryo,
+                sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            color: #ecf0f1;
+            color: var(--text);
             overflow: hidden;
         }
 
@@ -36,15 +58,18 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(
-                135deg,
-                #000 0%,
-                hsl(
-                    var(--love-hue),
-                    var(--love-sat),
-                    var(--love-light)
-                ) 100%
-            );
+            background:
+                radial-gradient(
+                    circle at 20% 15%,
+                    rgba(255,255,255,0.95) 0%,
+                    rgba(255,255,255,0) 38%
+                ),
+                linear-gradient(
+                    135deg,
+                    #eaf4f7 0%,
+                    #f7fbfc 48%,
+                    #e5f1f5 100%
+                );
             z-index: -1;
             transition: 2s ease;
         }
@@ -56,19 +81,22 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000;
+            background: rgba(239, 247, 250, 0.98);
             z-index: 200;
             display: flex;
             justify-content: center;
             align-items: center;
             text-align: center;
+            color: var(--text);
         }
 
         .device-box {
-            border: 1px solid #d4af37;
-            padding: 40px;
-            border-radius: 8px;
-            background: rgba(255,255,255,0.05);
+            width: min(520px, 82vw);
+            border: 1px solid var(--line);
+            padding: 42px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.95);
+            box-shadow: 0 18px 55px rgba(72, 104, 120, 0.12);
         }
 
         #intro-overlay,
@@ -79,33 +107,45 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.98);
+            background: rgba(239, 247, 250, 0.98);
             z-index: 100;
             display: none;
             justify-content: center;
             align-items: center;
             text-align: center;
+            color: var(--text);
         }
 
         .content-box {
             max-width: 700px;
             width: 90%;
-            line-height: 2.2;
+            line-height: 2.05;
             max-height: 90vh;
             overflow-y: auto;
-            padding: 20px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        .title-image {
+            display: block;
+            width: min(620px, 92%);
+            height: auto;
+            margin: 0 auto 28px;
         }
 
         #game-container {
             width: 98vw;
             max-width: 1200px;
             height: 92vh;
-            background: rgba(255, 255, 255, 0.98);
+            background: var(--surface);
             display: none;
-            border-radius: 4px;
+            border: 1px solid rgba(183, 204, 213, 0.75);
+            border-radius: 12px;
             overflow: hidden;
-            color: #2c3e50;
-            box-shadow: 0 0 70px rgba(0,0,0,1);
+            color: var(--text);
+            box-shadow:
+                0 24px 70px rgba(58, 90, 104, 0.17),
+                0 2px 10px rgba(58, 90, 104, 0.06);
         }
 
         /*
@@ -116,10 +156,10 @@
             flex: 2;
             display: flex;
             flex-direction: column;
-            border-right: 1px solid #ddd;
+            border-right: 1px solid var(--line);
             min-width: 0;
             height: 100%;
-            background: #fff;
+            background: var(--surface);
         }
 
         /*
@@ -129,20 +169,20 @@
             height: 34px;
             min-height: 34px;
             flex: 0 0 34px;
-            background: #202326;
-            color: #9ea7ad;
+            background: #f2f7f9;
+            color: #91a1a9;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 0.72em;
             letter-spacing: 0.14em;
-            border-bottom: 1px solid #2d3135;
+            border-bottom: 1px solid var(--line);
             box-sizing: border-box;
         }
 
         #progress-current {
-            color: #fff;
-            font-weight: bold;
+            color: var(--main-dark);
+            font-weight: 700;
         }
 
         .status-bar {
@@ -151,54 +191,54 @@
             flex: 0 0 36px;
             box-sizing: border-box;
             padding: 0 18px;
-            background: #292d31;
-            color: #dfe4e7;
+            background: var(--surface);
+            color: #6f818a;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 0.72em;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--line);
         }
 
         /*
             左側メインタブ
         */
         #main-view-tabs {
-            height: 48px;
-            min-height: 48px;
-            flex: 0 0 48px;
+            height: 50px;
+            min-height: 50px;
+            flex: 0 0 50px;
             display: flex;
             box-sizing: border-box;
-            background: #eceff1;
-            border-bottom: 1px solid #cfd5d9;
-            padding: 6px 18px 0;
-            gap: 6px;
+            background: var(--surface-soft);
+            border-bottom: 1px solid var(--line);
+            padding: 7px 20px 0;
+            gap: 8px;
         }
 
         .main-view-tab {
             flex: 1;
-            border: 1px solid #cfd5d9;
+            border: 1px solid transparent;
             border-bottom: none;
-            background: #dfe4e7;
-            color: #6b757c;
+            background: transparent;
+            color: #8999a1;
             font-family: inherit;
             font-size: 0.84rem;
-            font-weight: bold;
-            letter-spacing: 0.1em;
+            font-weight: 700;
+            letter-spacing: 0.08em;
             cursor: pointer;
             transition: 0.18s;
-            border-radius: 4px 4px 0 0;
+            border-radius: 8px 8px 0 0;
         }
 
         .main-view-tab:hover {
-            background: #f4f6f7;
-            color: #34495e;
+            background: #eef5f7;
+            color: var(--main-dark);
         }
 
         .main-view-tab.active {
-            background: #fff;
-            color: var(--main);
-            border-color: #aeb7bd;
+            background: var(--surface);
+            color: var(--main-dark);
+            border-color: var(--line);
             box-shadow: inset 0 3px 0 var(--main);
         }
 
@@ -210,27 +250,27 @@
             min-height: 0;
             display: flex;
             flex-direction: column;
-            background: #fff;
+            background: var(--surface);
         }
 
         /*
-            現在シーン領域。
-            選択肢領域を除いた残りの高さをすべて使う。
-            会話 / STORY / UNDERSTANDING が長い場合は
-            この領域内だけスクロールする。
+            会話側を約58%。
+            選択肢との境界を中央より少し下に置く。
         */
         #display {
-            flex: 1 1 auto;
-            min-height: 0;
             height: auto;
+            min-height: 0;
             max-height: none;
+            flex: 0 0 58%;
+
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
-            gap: 8px;
-            padding: 24px 34px 18px;
-            background: #fff;
+            gap: 10px;
+
+            padding: 22px 34px 18px;
+            background: var(--surface);
             overflow-y: auto;
             box-sizing: border-box;
         }
@@ -245,15 +285,15 @@
         }
 
         .bubble {
-            background: #fff;
-            border-left: 6px solid var(--main);
-            padding: 15px 20px;
+            background: var(--surface);
+            border-left: 4px solid var(--main);
+            padding: 16px 20px;
             width: 90%;
             box-sizing: border-box;
-            font-size: 1.18rem;
+            font-size: 1.14rem;
             line-height: 1.8;
             text-align: left;
-            box-shadow: 0 6px 18px rgba(44, 62, 80, 0.06);
+            color: var(--text);
         }
 
         #vane-thought-block {
@@ -273,55 +313,57 @@
             height: 18px;
             line-height: 18px;
             box-sizing: border-box;
-            font-size: 0.7em;
-            font-weight: bold;
+            font-size: 0.68em;
+            font-weight: 700;
             letter-spacing: 0.1em;
-            color: #98a0a6;
-            margin-bottom: 3px;
+            color: #9aa9b0;
+            margin-bottom: 5px;
         }
 
         .thought-bubble {
-            background: #f7f8f9;
-            border-left: 3px solid #b6bec4;
-            padding: 10px 15px;
+            background: var(--surface-soft);
+            border-left: 3px solid #b8ccd5;
+            padding: 11px 15px;
             box-sizing: border-box;
-            line-height: 1.6;
+            line-height: 1.65;
             text-align: left;
-            color: #69747b;
+            color: #70828b;
             font-size: 0.91em;
-            font-style: italic;
         }
 
+        /*
+            STORYは特別な色を付けない。
+            通常の本文として見せる。
+        */
         .story-bubble {
-            background: #fffaf3;
-            border-left: 4px solid #d8a45d;
-            padding: 16px 19px;
+            background: transparent;
+            border: none;
+            padding: 8px 4px 6px;
             box-sizing: border-box;
-            line-height: 1.8;
+            line-height: 1.85;
             text-align: left;
-            color: #34495e;
+            color: var(--text);
         }
 
         .resolution-bubble {
-            background: #f3fbf5;
-            border-left: 5px solid var(--correct);
+            background: var(--surface-soft);
+            border-left: 4px solid var(--correct);
             padding: 16px 19px;
             box-sizing: border-box;
             line-height: 1.8;
             text-align: left;
-            color: #2c3e50;
-            box-shadow: 0 5px 18px rgba(39, 174, 96, 0.06);
+            color: var(--text);
         }
 
         .selected-reply {
-            font-weight: bold;
+            font-weight: 700;
             margin-bottom: 12px;
-            color: #8e5b22;
+            color: var(--text);
         }
 
         .final-resolve-line {
             font-size: 1.3em;
-            font-weight: bold;
+            font-weight: 700;
             margin-top: 14px;
             color: var(--correct);
         }
@@ -332,115 +374,118 @@
             cursor: pointer;
             transition: 0.2s;
             padding: 1px 5px;
-            border-radius: 3px;
+            border-radius: 4px;
         }
 
         .symbol:hover,
         .resolved:hover,
         .wrong-resolved:hover {
-            background: #e5e9ec;
-            outline: 1px solid #aeb7bd;
+            background: var(--main-soft);
+            outline: 1px solid #b9cdd5;
         }
 
         .resolved {
             color: var(--correct);
-            font-weight: bold;
+            font-weight: 700;
         }
 
         .wrong-resolved {
             color: var(--wrong);
-            font-weight: bold;
+            font-weight: 700;
             text-decoration: underline wavy var(--wrong);
         }
 
         .symbol {
-            color: #4d5961;
-            font-family: monospace;
-            background: #eef1f3;
-            font-weight: bold;
+            color: var(--main-dark);
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                "Liberation Mono",
+                monospace;
+            background: var(--main-soft);
+            font-weight: 700;
         }
 
         /*
-            選択肢領域。
-            ここだけ高さを固定し、
-            残りを現在シーン領域へ渡す。
+            選択肢側は残り42%。
         */
         .controls {
-            height: 180px;
-            min-height: 180px;
-            max-height: 180px;
-            flex: 0 0 180px;
+            flex: 1 1 auto;
+            min-height: 0;
+            height: auto;
+            max-height: none;
+
             box-sizing: border-box;
-            padding: 12px 34px;
-            background: #fafafa;
-            border-top: 1px solid #e1e4e7;
+            padding: 14px 34px 18px;
+            background: var(--surface-soft);
+            border-top: 1px solid var(--line);
             overflow-y: auto;
         }
 
         .opt-btn {
             width: 100%;
-            min-height: 40px;
+            min-height: 42px;
             box-sizing: border-box;
-            padding: 9px 14px;
-            margin: 3px 0;
-            border: 1px solid #e7c69f;
-            border-left: 4px solid #ddb27f;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border: 1px solid var(--line);
+            border-left: 4px solid #a9c5d0;
             background: var(--opt-bg);
             cursor: pointer;
+            font-family: inherit;
             font-size: 0.95rem;
             text-align: left;
-            transition: 0.2s;
-            border-radius: 2px;
-            color: #34495e;
+            transition: 0.18s;
+            border-radius: 6px;
+            color: var(--text);
         }
 
         .opt-btn:hover:not(:disabled) {
-            border-color: #d89c56;
-            border-left-color: #d89c56;
+            border-color: #aac6d1;
+            border-left-color: var(--main);
             background: var(--opt-hover);
-            transform: translateX(3px);
+            transform: translateX(2px);
         }
 
         .opt-btn:disabled {
             cursor: default;
-            opacity: 0.68;
+            opacity: 0.62;
         }
 
         .opt-btn.my-choice {
-            border: 1px solid #e67e22;
-            border-left: 4px solid #e67e22;
+            border: 1px solid #98bdca;
+            border-left: 4px solid var(--main);
             background: var(--selected);
-            font-weight: bold;
+            font-weight: 700;
         }
 
         /*
-            過去LOGタブ。
-            会話タブとは同時表示しない。
+            過去LOGタブ
         */
         #log-section {
             flex: 1 1 auto;
             min-height: 0;
             display: none;
             flex-direction: column;
-            background: #f7f8f9;
+            background: var(--surface);
             box-sizing: border-box;
             overflow: hidden;
         }
 
         #log-header {
-            height: 38px;
-            min-height: 38px;
-            flex: 0 0 38px;
+            height: 42px;
+            min-height: 42px;
+            flex: 0 0 42px;
             display: flex;
             align-items: center;
-            padding: 0 34px;
+            padding: 0 38px;
             box-sizing: border-box;
-            background: #f1f3f4;
-            border-bottom: 1px solid #dfe3e6;
-            color: #69747b;
-            font-size: 0.72em;
-            font-weight: bold;
-            letter-spacing: 0.12em;
+            background: var(--surface);
+            border-bottom: 1px solid var(--line);
+            color: #94a4ac;
+            font-size: 0.68em;
+            font-weight: 700;
+            letter-spacing: 0.1em;
         }
 
         #log-panel {
@@ -448,82 +493,108 @@
             flex: 1;
             min-height: 0;
             overflow-y: auto;
-            padding: 14px 34px 24px;
+            padding: 24px 40px 36px;
             box-sizing: border-box;
-            background: #fbfcfc;
+            background: var(--surface);
         }
 
         .log-empty {
-            color: #9ba2a7;
-            font-size: 0.82em;
+            color: #9eabb1;
+            font-size: 0.84em;
             line-height: 1.8;
             text-align: center;
-            padding: 22px 0;
+            padding: 40px 0;
         }
 
+        /*
+            LOGはタイムライン風。
+            カードを積むのではなく、記録が連続しているようにする。
+        */
         .log-entry {
-            width: 90%;
-            margin: 0 auto 20px;
-            padding-bottom: 18px;
-            border-bottom: 1px solid #e3e6e8;
+            position: relative;
+            width: 92%;
+            margin: 0 auto;
+            padding: 0 0 30px 30px;
+            border-left: 2px solid #dce9ee;
+            box-sizing: border-box;
+        }
+
+        .log-entry::before {
+            content: "";
+            position: absolute;
+            top: 6px;
+            left: -6px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 2px solid #9ebdca;
             box-sizing: border-box;
         }
 
         .log-entry:last-child {
-            margin-bottom: 0;
-            border-bottom: none;
+            padding-bottom: 8px;
         }
 
         .log-scene {
-            margin-bottom: 8px;
-            color: #9aa1a6;
-            font-size: 0.68em;
-            font-weight: bold;
-            letter-spacing: 0.12em;
+            display: inline-flex;
+            align-items: center;
+            min-height: 24px;
+            margin-bottom: 12px;
+            padding: 0 9px;
+            border-radius: 12px;
+            background: var(--main-soft);
+            color: var(--main-dark);
+            font-size: 0.66em;
+            font-weight: 700;
+            letter-spacing: 0.1em;
         }
 
         .log-speaker {
-            margin-bottom: 5px;
-            color: var(--main);
+            margin-bottom: 7px;
+            color: var(--main-dark);
             font-size: 0.72em;
-            font-weight: bold;
+            font-weight: 700;
             letter-spacing: 0.08em;
         }
 
         .log-dialogue {
-            color: #34495e;
-            font-size: 0.9em;
-            line-height: 1.8;
+            color: var(--text);
+            font-size: 0.94em;
+            line-height: 1.85;
+            padding-right: 8px;
         }
 
         .log-thought-label {
-            margin-top: 10px;
-            margin-bottom: 4px;
-            color: #9aa1a6;
-            font-size: 0.68em;
-            font-weight: bold;
+            margin-top: 14px;
+            margin-bottom: 5px;
+            color: #94a4ac;
+            font-size: 0.66em;
+            font-weight: 700;
             letter-spacing: 0.08em;
         }
 
         .log-thought {
-            color: #747d83;
-            font-size: 0.82em;
+            padding: 10px 13px;
+            background: var(--surface-soft);
+            border-radius: 6px;
+            color: #74868f;
+            font-size: 0.84em;
             line-height: 1.7;
-            font-style: italic;
         }
 
         /*
             選択中の暗号をLOG内で強調
         */
         .log-symbol-active {
-            outline: 2px solid #d8a45d;
-            background: #fff1cf;
-            color: #4b4338;
+            outline: 2px solid #8eb7c7;
+            background: #e4f1f5;
+            color: var(--main-dark);
         }
 
         .log-symbol-active:hover {
-            outline: 2px solid #c88d3f;
-            background: #ffe8b3;
+            outline: 2px solid var(--main);
+            background: #dcecf2;
         }
 
         /*
@@ -537,8 +608,8 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            background: #f7f4ec;
-            border-left: 1px solid #d8d3c7;
+            background: var(--surface-soft);
+            border-left: 1px solid var(--line);
             box-sizing: border-box;
         }
 
@@ -551,8 +622,8 @@
             flex: 0 0 70px;
             box-sizing: border-box;
             padding: 10px 24px 8px;
-            border-bottom: 1px solid #ddd;
-            background: #fbf9f3;
+            border-bottom: 1px solid var(--line);
+            background: var(--surface);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -561,15 +632,15 @@
         #dict-header h3 {
             margin: 0;
             font-size: 1.02em;
-            letter-spacing: 0.05em;
-            color: #3f474c;
+            letter-spacing: 0.04em;
+            color: var(--main-dark);
             line-height: 1.2;
         }
 
         #dict-header p {
             margin: 5px 0 0;
             font-size: 0.67em;
-            color: #8d918d;
+            color: #8e9da4;
             line-height: 1.35;
         }
 
@@ -580,8 +651,8 @@
             flex: 0 0 245px;
             min-height: 245px;
             box-sizing: border-box;
-            border-bottom: 1px solid #d8d3c7;
-            background: #f7f4ec;
+            border-bottom: 1px solid var(--line);
+            background: var(--surface-soft);
             display: flex;
             flex-direction: column;
         }
@@ -594,9 +665,9 @@
             align-items: center;
             padding: 0 24px;
             box-sizing: border-box;
-            color: #9a9589;
+            color: #91a0a7;
             font-size: 0.68em;
-            font-weight: bold;
+            font-weight: 700;
             letter-spacing: 0.1em;
         }
 
@@ -615,15 +686,19 @@
             width: 100%;
             margin-top: 26px;
             text-align: center;
-            color: #9d9d97;
+            color: #98a6ac;
             line-height: 1.9;
             font-size: 0.86em;
         }
 
         .dict-placeholder-symbol {
-            font-family: monospace;
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                "Liberation Mono",
+                monospace;
             font-size: 1.8em;
-            color: #b9b8b1;
+            color: #b1c3ca;
             margin-bottom: 16px;
         }
 
@@ -632,34 +707,38 @@
             min-height: 160px;
             box-sizing: border-box;
             padding: 20px 22px;
-            background: rgba(255,255,255,0.7);
-            border: 1px solid #ddd8cc;
-            border-radius: 2px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 8px;
             transition: background 0.5s;
-            box-shadow: 0 5px 18px rgba(70, 60, 40, 0.04);
+            box-shadow: 0 4px 14px rgba(70, 104, 120, 0.05);
         }
 
         .dict-entry.correct {
-            border-left: 5px solid var(--correct);
-            background: #f1faf3;
+            border-left: 4px solid var(--correct);
+            background: #f7fbf9;
         }
 
         .dict-entry.guessing {
-            border-left: 5px solid #7d9bb0;
-            background: #f5f8fa;
+            border-left: 4px solid var(--main);
+            background: var(--surface);
         }
 
         .dict-entry.highlight-flash {
-            background: #fff9c4;
+            background: #eef6f8;
         }
 
         .dict-entry label {
             font-size: 1.55em;
-            color: #535b60;
+            color: var(--main-dark);
             display: block;
             margin-bottom: 12px;
-            font-family: monospace;
-            font-weight: bold;
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                "Liberation Mono",
+                monospace;
+            font-weight: 700;
             text-align: center;
             letter-spacing: 0.12em;
         }
@@ -668,53 +747,52 @@
             width: 100%;
             box-sizing: border-box;
             padding: 11px 12px;
-            border: 1px solid #d5d2ca;
-            background: rgba(255,255,255,0.9);
+            border: 1px solid #cddce2;
+            background: var(--surface);
             font-size: 1rem;
             outline: none;
-            border-radius: 2px;
+            border-radius: 6px;
             font-family: inherit;
-            color: #34495e;
+            color: var(--text);
         }
 
         .dict-entry input:focus {
-            border-color: #82939e;
-            box-shadow: 0 0 0 2px rgba(130,147,158,0.1);
+            border-color: var(--main);
+            box-shadow: 0 0 0 3px rgba(111, 156, 175, 0.12);
         }
 
         .dict-entry input.wrong-text {
             color: var(--wrong);
-            font-weight: bold;
+            font-weight: 700;
             border-color: var(--wrong);
         }
 
         .dict-status {
             min-height: 18px;
             font-size: 0.75em;
-            color: #9b9c96;
+            color: #95a3a9;
             margin-bottom: 12px;
             text-align: center;
         }
 
         .dict-entry.guessing .dict-status {
-            color: #597b91;
+            color: var(--main-dark);
         }
 
         .dict-entry.correct .dict-status {
             color: var(--correct);
-            font-weight: bold;
+            font-weight: 700;
         }
 
         /*
             右下：言葉一覧専用。
-            左側には置かない。
         */
         #word-list-section {
             flex: 1 1 auto;
             min-height: 0;
             display: flex;
             flex-direction: column;
-            background: #fbf9f3;
+            background: var(--surface);
             overflow: hidden;
         }
 
@@ -726,11 +804,11 @@
             align-items: center;
             padding: 0 24px;
             box-sizing: border-box;
-            background: #f1eee6;
-            border-bottom: 1px solid #ddd8cc;
-            color: #777267;
+            background: var(--surface-soft);
+            border-bottom: 1px solid var(--line);
+            color: #788b94;
             font-size: 0.72em;
-            font-weight: bold;
+            font-weight: 700;
             letter-spacing: 0.1em;
         }
 
@@ -740,6 +818,7 @@
             overflow-y: auto;
             padding: 8px 14px 18px;
             box-sizing: border-box;
+            background: var(--surface);
         }
 
         #word-list {
@@ -747,7 +826,7 @@
         }
 
         .word-list-empty {
-            color: #9ba2a7;
+            color: #9ba8ae;
             font-size: 0.8em;
             line-height: 1.8;
             text-align: center;
@@ -764,9 +843,9 @@
             gap: 8px;
             padding: 8px 9px;
             border: 1px solid transparent;
-            border-bottom-color: #e3dfd5;
+            border-bottom-color: #e2ebee;
             background: transparent;
-            color: #34495e;
+            color: var(--text);
             font-family: inherit;
             text-align: left;
             cursor: pointer;
@@ -774,18 +853,23 @@
         }
 
         .word-row:hover {
-            background: #f2efe7;
+            background: var(--surface-hover);
         }
 
         .word-row.active {
-            background: #fff4dd;
-            border-color: #e3bd82;
+            background: var(--main-soft);
+            border-color: #bfd4dc;
+            border-radius: 5px;
         }
 
         .word-symbol {
-            font-family: monospace;
-            font-weight: bold;
-            color: #4d5961;
+            font-family:
+                "SFMono-Regular",
+                Consolas,
+                "Liberation Mono",
+                monospace;
+            font-weight: 700;
+            color: var(--main-dark);
             letter-spacing: 0.04em;
         }
 
@@ -794,32 +878,32 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            color: #657078;
+            color: #687b84;
             font-size: 0.86em;
         }
 
         .word-guess.understood {
             color: var(--correct);
-            font-weight: bold;
+            font-weight: 700;
         }
 
         .word-guess.empty {
-            color: #b1b6b9;
+            color: #b0bbc0;
         }
 
         .word-status {
             white-space: nowrap;
             font-size: 0.66em;
-            color: #9aa1a6;
+            color: #96a3a9;
         }
 
         .word-status.guessing {
-            color: #597b91;
+            color: var(--main-dark);
         }
 
         .word-status.understood {
             color: var(--correct);
-            font-weight: bold;
+            font-weight: 700;
         }
 
         .badge-container {
@@ -834,18 +918,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: #3b3f43;
+            background: #e8f0f3;
             font-size: 9px;
             filter: grayscale(1);
-            opacity: 0.27;
+            opacity: 0.35;
             transition: 0.5s;
             cursor: help;
         }
 
         .badge.unlocked {
             filter: grayscale(0);
-            opacity: 0.9;
-            box-shadow: none;
+            opacity: 1;
+            background: #f3f8fa;
         }
 
         .badge.gold {
@@ -854,21 +938,27 @@
 
         .hint-text {
             font-size: 0.9em;
-            color: #7f8c8d;
+            color: #7f9098;
             margin-top: 15px;
-            border-top: 1px dashed #ccc;
+            border-top: 1px dashed #cbd9df;
             padding-top: 10px;
-            font-style: italic;
         }
 
         .btn-style {
-            padding: 15px 50px;
+            padding: 14px 44px;
             cursor: pointer;
-            border: none;
-            font-size: 1.1em;
-            border-radius: 5px;
+            border: 1px solid transparent;
+            font-family: inherit;
+            font-size: 1em;
+            font-weight: 700;
+            border-radius: 8px;
             margin: 10px;
-            transition: 0.3s;
+            transition: 0.2s;
+        }
+
+        .btn-style:hover {
+            transform: translateY(-1px);
+            filter: brightness(0.98);
         }
     </style>
 </head>
@@ -878,7 +968,10 @@
 
 <div id="device-check-overlay">
     <div class="device-box">
-        <h2 id="check-title" style="color: var(--gold);">
+        <h2
+            id="check-title"
+            style="color: var(--main-dark);"
+        >
             CHECKING ENVIRONMENT...
         </h2>
 
@@ -890,7 +983,11 @@
             <button
                 id="entry-btn"
                 class="btn-style"
-                style="background: var(--gold); color: #000; display: none;"
+                style="
+                    background: var(--main);
+                    color: #fff;
+                    display: none;
+                "
             >
                 物語を始める
             </button>
@@ -898,7 +995,11 @@
             <button
                 id="recollection-entry-btn"
                 class="btn-style"
-                style="background: #2c3e50; color: #fff; display: none;"
+                style="
+                    background: #829eaa;
+                    color: #fff;
+                    display: none;
+                "
             >
                 追憶を辿る
             </button>
@@ -916,9 +1017,12 @@
 
 <div id="intro-overlay">
     <div class="content-box">
-        <h1 style="color: #d4af37; font-size: 2.5em;">
-            声を聴かせて、ランスロット！
-        </h1>
+
+        <img
+            src="title.png"
+            alt="声を聴かせて、ランスロット！"
+            class="title-image"
+        >
 
         <p>
             ある任務にて魔物の前に飛び出したランスロット。<br>
@@ -939,7 +1043,7 @@
         <button
             id="to-tutorial"
             class="btn-style"
-            style="background: #d4af37; color: #000;"
+            style="background: var(--main); color: #fff;"
         >
             次へ
         </button>
@@ -948,14 +1052,15 @@
 
 <div id="tutorial-overlay">
     <div class="content-box">
-        <h2 style="color: #3498db;">
+        <h2 style="color: var(--main-dark);">
             プレイ方法
         </h2>
 
         <div
             style="
                 text-align: left;
-                background: rgba(255,255,255,0.05);
+                background: #f7fbfc;
+                border: 1px solid var(--line);
                 padding: 25px;
                 border-radius: 10px;
                 font-size: 0.9em;
@@ -988,7 +1093,7 @@
         <button
             id="start-init-btn"
             class="btn-style"
-            style="background: #3498db; color: #fff;"
+            style="background: var(--main); color: #fff;"
         >
             物語を開始する
         </button>
@@ -997,7 +1102,7 @@
 
 <div id="load-overlay">
     <div class="content-box">
-        <h2 style="color: #27ae60;">
+        <h2 style="color: var(--main-dark);">
             記憶の継承
         </h2>
 
@@ -1008,7 +1113,7 @@
         <button
             id="load-yes"
             class="btn-style"
-            style="background: #27ae60; color: #fff;"
+            style="background: var(--main); color: #fff;"
         >
             継承する
         </button>
@@ -1016,7 +1121,7 @@
         <button
             id="load-no"
             class="btn-style"
-            style="background: #7f8c8d; color: #fff;"
+            style="background: #94a7af; color: #fff;"
         >
             最初から解く
         </button>
@@ -1094,9 +1199,9 @@
                     <span
                         id="speaker-name"
                         style="
-                            font-weight: bold;
+                            font-weight: 700;
                             letter-spacing: 0.1em;
-                            color: var(--main);
+                            color: var(--main-dark);
                         "
                     >
                         LANCELOT
@@ -1158,7 +1263,7 @@
 
         <div id="log-section">
             <div id="log-header">
-                過去LOG
+                これまでの会話
             </div>
 
             <div id="log-panel"></div>
