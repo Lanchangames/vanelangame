@@ -115,6 +115,7 @@
             border-right: 1px solid #ddd;
             min-width: 0;
             height: 100%;
+            background: #fff;
         }
 
         /*
@@ -157,8 +158,7 @@
         }
 
         /*
-            第9-C段階
-            左側の余白を減らし、会話を上から自然に詰める
+            左側の会話領域は上から詰める
         */
         #display {
             flex: 0 1 auto;
@@ -168,7 +168,7 @@
             justify-content: flex-start;
             align-items: center;
             gap: 8px;
-            padding: 18px 34px 12px;
+            padding: 16px 34px 10px;
             background: #fff;
             overflow-y: auto;
             box-sizing: border-box;
@@ -180,17 +180,17 @@
             display: flex;
             align-items: center;
             box-sizing: border-box;
-            min-height: 32px;
+            min-height: 30px;
         }
 
         .bubble {
             background: #fff;
             border-left: 6px solid var(--main);
-            padding: 17px 22px;
+            padding: 15px 20px;
             width: 90%;
             box-sizing: border-box;
-            font-size: 1.2rem;
-            line-height: 1.85;
+            font-size: 1.18rem;
+            line-height: 1.8;
             text-align: left;
             box-shadow: 0 6px 18px rgba(44, 62, 80, 0.06);
         }
@@ -222,9 +222,9 @@
         .thought-bubble {
             background: #f7f8f9;
             border-left: 3px solid #b6bec4;
-            padding: 11px 16px;
+            padding: 10px 15px;
             box-sizing: border-box;
-            line-height: 1.65;
+            line-height: 1.6;
             text-align: left;
             color: #69747b;
             font-size: 0.91em;
@@ -234,7 +234,7 @@
         .story-bubble {
             background: #fffaf3;
             border-left: 4px solid #d8a45d;
-            padding: 17px 20px;
+            padding: 16px 19px;
             box-sizing: border-box;
             line-height: 1.8;
             text-align: left;
@@ -244,7 +244,7 @@
         .resolution-bubble {
             background: #f3fbf5;
             border-left: 5px solid var(--correct);
-            padding: 17px 20px;
+            padding: 16px 19px;
             box-sizing: border-box;
             line-height: 1.8;
             text-align: left;
@@ -300,14 +300,12 @@
         }
 
         /*
-            第9-C段階
-            選択肢領域の固定190pxを廃止。
-            会話の直下に必要な分だけ表示する。
+            選択肢も必要な高さだけ使用する
         */
         .controls {
             flex: 0 0 auto;
             box-sizing: border-box;
-            padding: 10px 34px 12px;
+            padding: 8px 34px 10px;
             background: #fafafa;
             border-top: 1px solid #e1e4e7;
             overflow-y: auto;
@@ -315,15 +313,15 @@
 
         .opt-btn {
             width: 100%;
-            min-height: 42px;
+            min-height: 40px;
             box-sizing: border-box;
-            padding: 10px 14px;
-            margin: 4px 0;
+            padding: 9px 14px;
+            margin: 3px 0;
             border: 1px solid #e7c69f;
             border-left: 4px solid #ddb27f;
             background: var(--opt-bg);
             cursor: pointer;
-            font-size: 0.96rem;
+            font-size: 0.95rem;
             text-align: left;
             transition: 0.2s;
             border-radius: 2px;
@@ -350,11 +348,11 @@
         }
 
         /*
-            第9-C段階
-            過去LOG
+            第9-D段階
+            過去LOG / 言葉一覧 共通パネル
         */
         #log-section {
-            flex: 1 1 auto;
+            flex: 0 0 auto;
             min-height: 42px;
             display: flex;
             flex-direction: column;
@@ -364,56 +362,84 @@
             overflow: hidden;
         }
 
-        #log-toggle {
+        #log-section.open {
+            flex: 1 1 auto;
+            min-height: 150px;
+        }
+
+        #reference-tabs {
             height: 42px;
             min-height: 42px;
             flex: 0 0 42px;
-            width: 100%;
-            box-sizing: border-box;
-            padding: 0 34px;
-            border: none;
+            display: flex;
             background: #f1f3f4;
-            color: #667078;
-            font-family: inherit;
-            font-size: 0.78em;
-            font-weight: bold;
-            letter-spacing: 0.12em;
-            text-align: left;
-            cursor: pointer;
             border-bottom: 1px solid transparent;
-            transition: 0.2s;
+            box-sizing: border-box;
         }
 
-        #log-toggle:hover {
+        #log-section.open #reference-tabs {
+            border-bottom-color: #dfe3e6;
+        }
+
+        .reference-tab {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: #7c858b;
+            font-family: inherit;
+            font-size: 0.76em;
+            font-weight: bold;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+        }
+
+        .reference-tab + .reference-tab {
+            border-left: 1px solid #dde1e3;
+        }
+
+        .reference-tab:hover {
             background: #e9edef;
             color: #34495e;
         }
 
-        #log-section.open #log-toggle {
-            border-bottom-color: #dfe3e6;
+        .reference-tab.active {
+            background: #fff;
+            color: #34495e;
         }
 
-        #log-toggle-mark {
-            display: inline-block;
-            width: 18px;
-            color: #9aa2a7;
+        .reference-tab.active::after {
+            content: "";
+            position: absolute;
+            left: 25%;
+            right: 25%;
+            bottom: 0;
+            height: 2px;
+            background: #d8a45d;
         }
 
-        #log-panel {
+        #log-panel,
+        #word-list-panel {
             display: none;
             flex: 1;
             min-height: 0;
             overflow-y: auto;
-            padding: 18px 34px 28px;
+            padding: 16px 34px 24px;
             box-sizing: border-box;
             background: #fbfcfc;
         }
 
-        #log-section.open #log-panel {
+        #log-section.open.mode-log #log-panel {
             display: block;
         }
 
-        .log-empty {
+        #log-section.open.mode-words #word-list-panel {
+            display: block;
+        }
+
+        .log-empty,
+        .word-list-empty {
             color: #9ba2a7;
             font-size: 0.82em;
             line-height: 1.8;
@@ -473,8 +499,7 @@
         }
 
         /*
-            右ノートで選択中の暗号だけ
-            LOG内で少し強く見せる
+            選択中の暗号をLOG内で強調
         */
         .log-symbol-active {
             outline: 2px solid #d8a45d;
@@ -485,6 +510,83 @@
         .log-symbol-active:hover {
             outline: 2px solid #c88d3f;
             background: #ffe8b3;
+        }
+
+        /*
+            第9-D段階
+            言葉一覧
+        */
+        #word-list {
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        .word-row {
+            width: 100%;
+            min-height: 48px;
+            box-sizing: border-box;
+            display: grid;
+            grid-template-columns: minmax(86px, 0.8fr) minmax(110px, 1.4fr) auto;
+            align-items: center;
+            gap: 12px;
+            padding: 9px 12px;
+            border: 1px solid transparent;
+            border-bottom-color: #e3e6e8;
+            background: transparent;
+            color: #34495e;
+            font-family: inherit;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .word-row:hover {
+            background: #f2f5f6;
+        }
+
+        .word-row.active {
+            background: #fff4dd;
+            border-color: #e3bd82;
+        }
+
+        .word-symbol {
+            font-family: monospace;
+            font-weight: bold;
+            color: #4d5961;
+            letter-spacing: 0.06em;
+        }
+
+        .word-guess {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #657078;
+            font-size: 0.9em;
+        }
+
+        .word-guess.understood {
+            color: var(--correct);
+            font-weight: bold;
+        }
+
+        .word-guess.empty {
+            color: #b1b6b9;
+        }
+
+        .word-status {
+            white-space: nowrap;
+            font-size: 0.7em;
+            color: #9aa1a6;
+        }
+
+        .word-status.guessing {
+            color: #597b91;
+        }
+
+        .word-status.understood {
+            color: var(--correct);
+            font-weight: bold;
         }
 
         #dictionary {
@@ -499,9 +601,7 @@
         }
 
         /*
-            左側の
-            progress 34px + status 36px
-            と完全に同じ70pxにする
+            左側の70pxと揃える
         */
         #dict-header {
             height: 70px;
@@ -948,17 +1048,35 @@
             id="action-area"
         ></div>
 
-        <div id="log-section">
-            <button
-                type="button"
-                id="log-toggle"
-                onclick="toggleLog()"
-            >
-                <span id="log-toggle-mark">＋</span>
-                過去LOG
-            </button>
+        <div
+            id="log-section"
+            class="open mode-words"
+        >
+            <div id="reference-tabs">
+                <button
+                    type="button"
+                    id="log-toggle"
+                    class="reference-tab"
+                    onclick="toggleReference('log')"
+                >
+                    過去LOG
+                </button>
+
+                <button
+                    type="button"
+                    id="word-list-toggle"
+                    class="reference-tab active"
+                    onclick="toggleReference('words')"
+                >
+                    言葉一覧
+                </button>
+            </div>
 
             <div id="log-panel"></div>
+
+            <div id="word-list-panel">
+                <div id="word-list"></div>
+            </div>
         </div>
     </div>
 
@@ -1218,10 +1336,11 @@
     let activeDictKey = null;
 
     /*
-        第9-C段階
-        過去LOGの開閉状態
+        第9-D段階
+        下部参照パネル
     */
-    let logOpen = false;
+    let referenceOpen = true;
+    let referenceMode = "words";
 
     let interpretationCounts = {
         unknown: 0,
@@ -1447,14 +1566,10 @@
         if (!wordBank[key]) return;
 
         activeDictKey = key;
-        renderActiveDictEntry();
 
-        /*
-            第9-C段階
-            ノートで選択中の語が変わったら
-            LOG内の強調も更新する
-        */
+        renderActiveDictEntry();
         renderPastLog();
+        renderWordList();
 
         const input =
             document.getElementById(`input-${key}`);
@@ -1525,16 +1640,6 @@
         renderDictEntryState(key);
     }
 
-    /*
-        第9-C段階
-        LOG内の会話表示。
-
-        通常本文と同じく現在のヴェインが理解している語は
-        通常語として表示する。
-
-        activeDictKey と一致する暗号だけ
-        log-symbol-active を付与する。
-    */
     function renderLogDialogueText(text) {
         let rendered =
             text || "";
@@ -1587,16 +1692,7 @@
     }
 
     /*
-        第9-C段階
-        現在までに到達したシーンだけをLOGへ表示する。
-
-        LOGには現段階では
-        ・ランスロットの台詞
-        ・ヴェインの心の声
-        だけを載せる。
-
-        選択肢、リアクション、afterStory、nextHookは
-        まだ追加しない。
+        現在までに到達したシーンの会話ログ
     */
     function renderPastLog() {
         const panel =
@@ -1631,10 +1727,6 @@
             index <= maxIndex;
             index++
         ) {
-            /*
-                実際に到達したシーンのみ表示。
-                通常進行だけでなく追憶開始にも対応する。
-            */
             if (
                 !seenSceneIds.has(index) &&
                 index !== currentStep
@@ -1695,46 +1787,220 @@
             entries.join("");
     }
 
-    function updateLogToggleUI() {
+    /*
+        第9-D段階
+        一度でもこの周回で登場した言葉を、
+        初めて遭遇した順で取得する。
+
+        継承済みの語は、現在のヴェインが最初から理解しているため
+        一覧にも表示する。
+    */
+    function getVisibleWordKeys() {
+        const keys = [];
+
+        scenario.forEach((scene, sceneIndex) => {
+            if (!seenSceneIds.has(sceneIndex)) {
+                return;
+            }
+
+            Object.keys(wordBank).forEach(key => {
+                if (
+                    sceneContainsWord(scene.q, key) &&
+                    !keys.includes(key)
+                ) {
+                    keys.push(key);
+                }
+            });
+        });
+
+        Object.keys(wordBank).forEach(key => {
+            if (
+                vaneKnownWords.has(key) &&
+                !keys.includes(key)
+            ) {
+                keys.push(key);
+            }
+        });
+
+        return keys;
+    }
+
+    /*
+        第9-D段階
+        言葉一覧
+    */
+    function renderWordList() {
+        const list =
+            document.getElementById(
+                'word-list'
+            );
+
+        if (!list) return;
+
+        const keys =
+            getVisibleWordKeys();
+
+        if (keys.length === 0) {
+            list.innerHTML = `
+                <div class="word-list-empty">
+                    まだ聞き取れない言葉は記録されていません。
+                </div>
+            `;
+            return;
+        }
+
+        list.innerHTML =
+            keys.map(key => {
+                const understood =
+                    vaneKnownWords.has(key);
+
+                const guess =
+                    understood
+                        ? wordBank[key].canonical
+                        : (userDict[key] || "").trim();
+
+                let statusText =
+                    "未推測";
+
+                let statusClass =
+                    "";
+
+                if (understood) {
+                    statusText =
+                        "理解した";
+
+                    statusClass =
+                        " understood";
+                }
+                else if (guess) {
+                    statusText =
+                        "推測中";
+
+                    statusClass =
+                        " guessing";
+                }
+
+                const guessText =
+                    guess || "―";
+
+                const guessClass =
+                    understood
+                        ? " understood"
+                        : (
+                            guess
+                                ? ""
+                                : " empty"
+                        );
+
+                const activeClass =
+                    key === activeDictKey
+                        ? " active"
+                        : "";
+
+                return `
+                    <button
+                        type="button"
+                        class="word-row${activeClass}"
+                        onclick="jumpToDict('${key}')"
+                    >
+                        <span class="word-symbol">
+                            ${wordBank[key].q}
+                        </span>
+
+                        <span class="word-guess${guessClass}">
+                            ${guessText}
+                        </span>
+
+                        <span class="word-status${statusClass}">
+                            ${statusText}
+                        </span>
+                    </button>
+                `;
+            }).join("");
+    }
+
+    function updateReferenceUI() {
         const section =
             document.getElementById(
                 'log-section'
             );
 
-        const mark =
+        const logButton =
             document.getElementById(
-                'log-toggle-mark'
+                'log-toggle'
             );
 
-        if (!section || !mark) {
+        const wordsButton =
+            document.getElementById(
+                'word-list-toggle'
+            );
+
+        if (
+            !section ||
+            !logButton ||
+            !wordsButton
+        ) {
             return;
         }
 
-        if (logOpen) {
-            section.classList.add(
-                'open'
-            );
+        section.classList.remove(
+            'open',
+            'mode-log',
+            'mode-words'
+        );
 
-            mark.innerText =
-                "－";
+        logButton.classList.remove(
+            'active'
+        );
+
+        wordsButton.classList.remove(
+            'active'
+        );
+
+        if (!referenceOpen) {
+            return;
+        }
+
+        section.classList.add(
+            'open',
+            referenceMode === "log"
+                ? 'mode-log'
+                : 'mode-words'
+        );
+
+        if (
+            referenceMode === "log"
+        ) {
+            logButton.classList.add(
+                'active'
+            );
         }
         else {
-            section.classList.remove(
-                'open'
+            wordsButton.classList.add(
+                'active'
             );
-
-            mark.innerText =
-                "＋";
         }
     }
 
-    function toggleLog() {
-        logOpen =
-            !logOpen;
+    function toggleReference(mode) {
+        if (
+            referenceOpen &&
+            referenceMode === mode
+        ) {
+            referenceOpen = false;
 
-        updateLogToggleUI();
+            updateReferenceUI();
+            return;
+        }
 
-        if (logOpen) {
+        referenceMode = mode;
+        referenceOpen = true;
+
+        updateReferenceUI();
+
+        if (
+            referenceMode === "log"
+        ) {
             renderPastLog();
 
             const panel =
@@ -1746,6 +2012,9 @@
                 panel.scrollTop =
                     panel.scrollHeight;
             }
+        }
+        else {
+            renderWordList();
         }
     }
 
@@ -1843,8 +2112,9 @@
         }
 
         initDict({});
-        updateLogToggleUI();
+        updateReferenceUI();
         renderPastLog();
+        renderWordList();
     };
 
     function startGame(inherit) {
@@ -1893,10 +2163,12 @@
         activeDictKey = null;
 
         /*
-            新規開始時はLOGを閉じる。
+            D段階では言葉一覧を最初から開いておく
         */
-        logOpen = false;
-        updateLogToggleUI();
+        referenceOpen = true;
+        referenceMode = "words";
+
+        updateReferenceUI();
 
         rebuildRunState();
 
@@ -1911,6 +2183,7 @@
         renderTabs();
         updateUI();
         renderPastLog();
+        renderWordList();
     }
 
     function initDict(initialWords) {
@@ -1939,6 +2212,7 @@
 
         renderDictPlaceholder();
         updateIntelUI();
+        renderWordList();
     }
 
     function renderDictEntryState(key) {
@@ -2032,6 +2306,11 @@
             val.trim();
 
         renderDictEntryState(key);
+
+        /*
+            入力内容を言葉一覧へ即反映
+        */
+        renderWordList();
     }
 
     function registerSceneWords(index) {
@@ -2065,11 +2344,8 @@
             }
         }
 
-        /*
-            第9-C段階
-            到達シーンが増えたらLOGも更新。
-        */
         renderPastLog();
+        renderWordList();
     }
 
     function resolveWord(key) {
@@ -2112,11 +2388,8 @@
         renderDictEntryState(key);
         updateIntelUI();
 
-        /*
-            解読状態が変わった場合、
-            LOG内の表示も現在の理解状態へ更新。
-        */
         renderPastLog();
+        renderWordList();
 
         return true;
     }
@@ -2322,6 +2595,7 @@
             renderTabs();
             updateUI(true);
             renderPastLog();
+            renderWordList();
 
             const display =
                 document.getElementById(
@@ -2442,22 +2716,6 @@
             (data.vaneThought || "")
                 .replace(/\n/g, "<br>");
 
-        /*
-            表示領域は常に一種類だけ表示する。
-
-            conversation:
-                LANCELOT + VANE
-
-            reaction:
-                STORY
-
-            resolution:
-                UNDERSTANDING
-
-            過去シーン:
-                選択済みなら STORY
-                未選択なら会話
-        */
         charaHeader.style.display =
             "none";
 
@@ -2609,12 +2867,15 @@
                 "block";
         }
 
-        /*
-            LOGを開いたままシーンが変わった場合も
-            内容を同期する。
-        */
-        if (logOpen) {
-            renderPastLog();
+        if (referenceOpen) {
+            if (
+                referenceMode === "log"
+            ) {
+                renderPastLog();
+            }
+            else {
+                renderWordList();
+            }
         }
 
         const light =
