@@ -1,1544 +1,962 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>声を聴かせて、ランスロット！</title>
-
-    <style>
-        :root {
-            --main: #7897a5;
-            --main-dark: #506c78;
-            --main-soft: #edf3f5;
-            --main-pale: #f5f8f9;
-
-            --text: #394b53;
-            --text-soft: #687b84;
-            --muted: #8b9aa1;
-            --muted-light: #aab5ba;
-
-            --line: #d9e2e6;
-            --line-strong: #c5d2d8;
-
-            --surface: #ffffff;
-            --surface-soft: #f7f9fa;
-            --surface-hover: #f0f5f6;
-
-            --correct: #587887;
-            --wrong: #ad7070;
-
-            --opt-bg: #ffffff;
-            --opt-hover: #f1f5f6;
-            --selected: #eaf1f4;
-
-            --love-hue: 200;
-            --love-light: 92%;
-            --love-sat: 20%;
-
-            --gold: #7897a5;
-        }
-
-        body {
-            background: #edf3f5;
-
-            font-family:
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                "Hiragino Kaku Gothic ProN",
-                "Yu Gothic",
-                "YuGothic",
-                Meiryo,
-                sans-serif;
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            min-height: 100vh;
-            margin: 0;
-
-            color: var(--text);
-            overflow: hidden;
-        }
-
-        #bg-layer {
-            position: fixed;
-            top: 0;
-            left: 0;
-
-            width: 100%;
-            height: 100%;
-
-            background:
-                radial-gradient(
-                    circle at 20% 15%,
-                    rgba(255,255,255,0.95) 0%,
-                    rgba(255,255,255,0) 38%
-                ),
-                linear-gradient(
-                    135deg,
-                    #edf3f5 0%,
-                    #f7f9fa 48%,
-                    #e9f0f2 100%
-                );
-
-            z-index: -1;
-            transition: 2s ease;
-        }
-
-        #device-check-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-
-            width: 100%;
-            height: 100%;
-
-            background: rgba(244, 248, 249, 0.98);
-
-            z-index: 200;
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            text-align: center;
-            color: var(--text);
-        }
-
-        .device-box {
-            width: min(520px, 82vw);
-
-            border: 1px solid var(--line);
-
-            padding: 42px;
-
-            border-radius: 16px;
-
-            background: rgba(255,255,255,0.96);
-
-            box-shadow:
-                0 18px 55px rgba(68, 91, 101, 0.10);
-        }
-
-        #intro-overlay,
-        #tutorial-overlay,
-        #load-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-
-            width: 100%;
-            height: 100%;
-
-            background: rgba(244, 248, 249, 0.98);
-
-            z-index: 100;
-
-            display: none;
-            justify-content: center;
-            align-items: center;
-
-            text-align: center;
-            color: var(--text);
-        }
-
-        .content-box {
-            max-width: 700px;
-            width: 90%;
-
-            line-height: 2.05;
-
-            max-height: 90vh;
-            overflow-y: auto;
-
-            padding: 30px;
-
-            box-sizing: border-box;
-        }
-
-        .title-image {
-            display: block;
-
-            width: min(620px, 92%);
-            height: auto;
-
-            margin: 0 auto 28px;
-        }
-
-        #game-container {
-            width: 98vw;
-            max-width: 1200px;
-            height: 92vh;
-
-            background: var(--surface);
-
-            display: none;
-
-            border: 1px solid var(--line-strong);
-            border-radius: 12px;
-
-            overflow: hidden;
-
-            color: var(--text);
-
-            box-shadow:
-                0 24px 70px rgba(68, 91, 101, 0.14),
-                0 2px 10px rgba(68, 91, 101, 0.05);
-        }
-
-        #main-screen {
-            flex: 2;
-
-            display: flex;
-            flex-direction: column;
-
-            border-right: 1px solid var(--line);
-
-            min-width: 0;
-            height: 100%;
-
-            background: var(--surface);
-        }
-
-        #progress-bar {
-            height: 34px;
-            min-height: 34px;
-            flex: 0 0 34px;
-
-            background: var(--surface-soft);
-            color: var(--muted);
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            font-size: 0.72em;
-            letter-spacing: 0.14em;
-
-            border-bottom: 1px solid var(--line);
-
-            box-sizing: border-box;
-        }
-
-        #progress-current {
-            color: var(--main-dark);
-            font-weight: 700;
-        }
-
-        /*
-            解析率・収集率・バッジは常時表示しない。
-            物語中に見るべき情報を減らす。
-        */
-        .status-bar {
-            height: 36px;
-            min-height: 36px;
-            flex: 0 0 36px;
-
-            box-sizing: border-box;
-
-            padding: 0 18px;
-
-            background: var(--surface);
-            color: var(--text-soft);
-
-            display: flex;
-            align-items: center;
-
-            font-size: 0.72em;
-            letter-spacing: 0.08em;
-
-            border-bottom: 1px solid var(--line);
-        }
-
-        #legacy-state {
-            display: none;
-        }
-
-        #main-view-tabs {
-            height: 50px;
-            min-height: 50px;
-            flex: 0 0 50px;
-
-            display: flex;
-
-            box-sizing: border-box;
-
-            background: var(--surface-soft);
-
-            border-bottom: 1px solid var(--line);
-
-            padding: 7px 20px 0;
-
-            gap: 8px;
-        }
-
-        .main-view-tab {
-            flex: 1;
-
-            border: 1px solid transparent;
-            border-bottom: none;
-
-            background: transparent;
-            color: var(--muted);
-
-            font-family: inherit;
-            font-size: 0.84rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-
-            cursor: pointer;
-
-            transition: 0.18s;
-
-            border-radius: 8px 8px 0 0;
-        }
-
-        .main-view-tab:hover {
-            background: var(--main-soft);
-            color: var(--main-dark);
-        }
-
-        .main-view-tab.active {
-            background: var(--surface);
-            color: var(--main-dark);
-
-            border-color: var(--line);
-
-            box-shadow:
-                inset 0 3px 0 var(--main);
-        }
-
-        #play-view {
-            flex: 1 1 auto;
-            min-height: 0;
-
-            display: flex;
-            flex-direction: column;
-
-            background: var(--surface);
-        }
-
-        /*
-            上側：約58%
-            下側：約42%
-        */
-        #display {
-            height: auto;
-            min-height: 0;
-            max-height: none;
-
-            flex: 0 0 58%;
-
-            display: flex;
-            flex-direction: column;
-
-            justify-content: flex-start;
-            align-items: center;
-
-            gap: 10px;
-
-            padding: 22px 34px 18px;
-
-            background: var(--surface);
-
-            overflow-y: auto;
-
-            box-sizing: border-box;
-        }
-
-        #chara-header {
-            width: 90%;
-
-            flex: 0 0 auto;
-
-            display: flex;
-            align-items: center;
-
-            box-sizing: border-box;
-
-            min-height: 30px;
-        }
-
-        #speaker-name {
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            color: var(--main-dark);
-        }
-
-        .bubble {
-            background: var(--surface);
-
-            border-left: 4px solid var(--main);
-
-            padding: 16px 20px;
-
-            width: 90%;
-
-            box-sizing: border-box;
-
-            font-size: 1.14rem;
-            line-height: 1.8;
-
-            text-align: left;
-
-            color: var(--text);
-        }
-
-        #vane-thought-block {
-            width: 90%;
-            box-sizing: border-box;
-            flex: 0 0 auto;
-        }
-
-        #story-block,
-        #resolution-block {
-            width: 90%;
-            box-sizing: border-box;
-            flex: 0 0 auto;
-        }
-
-        .block-label {
-            height: 18px;
-            line-height: 18px;
-
-            box-sizing: border-box;
-
-            font-size: 0.68em;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-
-            color: var(--muted);
-
-            margin-bottom: 5px;
-        }
-
-        .thought-bubble {
-            background: var(--surface-soft);
-
-            border-left: 3px solid var(--line-strong);
-
-            padding: 11px 15px;
-
-            box-sizing: border-box;
-
-            line-height: 1.65;
-
-            text-align: left;
-
-            color: var(--text-soft);
-
-            font-size: 0.91em;
-        }
-
-        .story-bubble {
-            background: transparent;
-
-            border: none;
-
-            padding: 8px 4px 6px;
-
-            box-sizing: border-box;
-
-            line-height: 1.85;
-
-            text-align: left;
-
-            color: var(--text);
-        }
-
-        /*
-            理解演出も「結果画面」ではなく
-            ヴェインが意味へ辿り着く場面として表示。
-        */
-        .resolution-bubble {
-            background: transparent;
-            border: none;
-
-            padding: 8px 4px 10px;
-
-            box-sizing: border-box;
-
-            line-height: 1.8;
-
-            text-align: left;
-
-            color: var(--text);
-        }
-
-        .understanding-item {
-            padding: 4px 0 10px;
-        }
-
-        .understanding-lead {
-            font-size: 1.02em;
-            margin-bottom: 12px;
-        }
-
-        .understanding-copy {
-            color: var(--text-soft);
-            line-height: 1.9;
-        }
-
-        .understanding-symbol {
-            margin-top: 18px;
-
-            color: var(--main-dark);
-
-            font-family:
-                "SFMono-Regular",
-                Consolas,
-                "Liberation Mono",
-                monospace;
-
-            font-size: 1.28em;
-            font-weight: 700;
-            letter-spacing: 0.12em;
-        }
-
-        .understanding-bridge {
-            margin-top: 13px;
-            color: var(--text-soft);
-        }
-
-        .understanding-word {
-            margin-top: 8px;
-
-            font-size: 1.45em;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-
-            color: var(--main-dark);
-        }
-
-        .understanding-divider {
-            width: 100%;
-            height: 1px;
-
-            margin: 22px 0;
-
-            background: var(--line);
-        }
-
-        .selected-reply {
-            font-weight: 700;
-
-            margin-bottom: 12px;
-
-            color: var(--text);
-        }
-
-        .final-resolve-line {
-            font-size: 1.3em;
-            font-weight: 700;
-
-            margin-top: 20px;
-
-            color: var(--main-dark);
-        }
-
-        .symbol,
-        .resolved,
-        .wrong-resolved {
-            cursor: pointer;
-
-            transition: 0.2s;
-
-            padding: 1px 5px;
-
-            border-radius: 4px;
-        }
-
-        .symbol:hover,
-        .resolved:hover,
-        .wrong-resolved:hover {
-            background: var(--main-soft);
-
-            outline: 1px solid var(--line-strong);
-        }
-
-        .resolved {
-            color: var(--main-dark);
-            font-weight: 700;
-        }
-
-        .wrong-resolved {
-            color: var(--wrong);
-
-            font-weight: 700;
-
-            text-decoration:
-                underline wavy var(--wrong);
-        }
-
-        .symbol {
-            color: var(--main-dark);
-
-            font-family:
-                "SFMono-Regular",
-                Consolas,
-                "Liberation Mono",
-                monospace;
-
-            background: var(--main-soft);
-
-            font-weight: 700;
-        }
-
-        .controls {
-            flex: 1 1 auto;
-
-            min-height: 0;
-
-            height: auto;
-            max-height: none;
-
-            box-sizing: border-box;
-
-            padding: 14px 34px 18px;
-
-            background: var(--surface-soft);
-
-            border-top: 1px solid var(--line);
-
-            overflow-y: auto;
-        }
-
-        .opt-btn {
-            width: 100%;
-
-            min-height: 42px;
-
-            box-sizing: border-box;
-
-            padding: 10px 15px;
-
-            margin: 5px 0;
-
-            border: 1px solid var(--line);
-
-            border-left:
-                4px solid var(--line-strong);
-
-            background: var(--opt-bg);
-
-            cursor: pointer;
-
-            font-family: inherit;
-            font-size: 0.95rem;
-
-            text-align: left;
-
-            transition: 0.18s;
-
-            border-radius: 6px;
-
-            color: var(--text);
-        }
-
-        .opt-btn:hover:not(:disabled) {
-            border-color: var(--line-strong);
-
-            border-left-color: var(--main);
-
-            background: var(--opt-hover);
-
-            transform: translateX(2px);
-        }
-
-        .opt-btn:disabled {
-            cursor: default;
-            opacity: 0.62;
-        }
-
-        .opt-btn.my-choice {
-            border: 1px solid var(--line-strong);
-
-            border-left:
-                4px solid var(--main);
-
-            background: var(--selected);
-
-            font-weight: 700;
-        }
-
-        #log-section {
-            flex: 1 1 auto;
-
-            min-height: 0;
-
-            display: none;
-            flex-direction: column;
-
-            background: var(--surface);
-
-            box-sizing: border-box;
-
-            overflow: hidden;
-        }
-
-        #log-header {
-            height: 42px;
-            min-height: 42px;
-            flex: 0 0 42px;
-
-            display: flex;
-            align-items: center;
-
-            padding: 0 38px;
-
-            box-sizing: border-box;
-
-            background: var(--surface);
-
-            border-bottom: 1px solid var(--line);
-
-            color: var(--muted);
-
-            font-size: 0.68em;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-        }
-
-        #log-panel {
-            display: block;
-
-            flex: 1;
-
-            min-height: 0;
-
-            overflow-y: auto;
-
-            padding: 24px 40px 36px;
-
-            box-sizing: border-box;
-
-            background: var(--surface);
-        }
-
-        .log-empty {
-            color: var(--muted);
-
-            font-size: 0.84em;
-            line-height: 1.8;
-
-            text-align: center;
-
-            padding: 40px 0;
-        }
-
-        .log-entry {
-            position: relative;
-
-            width: 92%;
-
-            margin: 0 auto;
-
-            padding: 0 0 30px 30px;
-
-            border-left:
-                2px solid var(--line);
-
-            box-sizing: border-box;
-
-            transition: background 0.3s;
-        }
-
-        .log-entry::before {
-            content: "";
-
-            position: absolute;
-
-            top: 6px;
-            left: -6px;
-
-            width: 10px;
-            height: 10px;
-
-            border-radius: 50%;
-
-            background: var(--surface);
-
-            border:
-                2px solid var(--main);
-
-            box-sizing: border-box;
-        }
-
-        .log-entry:last-child {
-            padding-bottom: 8px;
-        }
-
-        .log-entry.log-focus {
-            background: var(--main-pale);
-            border-radius: 6px;
-        }
-
-        .log-scene {
-            display: inline-flex;
-            align-items: center;
-
-            min-height: 24px;
-
-            margin-bottom: 12px;
-
-            padding: 0 9px;
-
-            border-radius: 12px;
-
-            background: var(--main-soft);
-
-            color: var(--main-dark);
-
-            font-size: 0.66em;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-        }
-
-        .log-speaker {
-            margin-bottom: 7px;
-
-            color: var(--main-dark);
-
-            font-size: 0.72em;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-        }
-
-        .log-dialogue {
-            color: var(--text);
-
-            font-size: 0.94em;
-            line-height: 1.85;
-
-            padding-right: 8px;
-        }
-
-        .log-thought-label {
-            margin-top: 14px;
-            margin-bottom: 5px;
-
-            color: var(--muted);
-
-            font-size: 0.66em;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-        }
-
-        .log-thought {
-            padding: 10px 13px;
-
-            background: var(--surface-soft);
-
-            border-radius: 6px;
-
-            color: var(--text-soft);
-
-            font-size: 0.84em;
-            line-height: 1.7;
-        }
-
-        .log-symbol-active {
-            outline:
-                2px solid var(--main);
-
-            background: var(--main-soft);
-
-            color: var(--main-dark);
-        }
-
-        .log-symbol-active:hover {
-            outline:
-                2px solid var(--main-dark);
-
-            background: var(--selected);
-        }
-
-        /*
-            右側：ヴェインのノート
-        */
-        #dictionary {
-            flex: 0 0 330px;
-
-            min-width: 300px;
-            height: 100%;
-
-            display: flex;
-            flex-direction: column;
-
-            background: var(--surface-soft);
-
-            border-left:
-                1px solid var(--line);
-
-            box-sizing: border-box;
-        }
-
-        #dict-header {
-            height: 70px;
-            min-height: 70px;
-            flex: 0 0 70px;
-
-            box-sizing: border-box;
-
-            padding: 10px 24px 8px;
-
-            border-bottom:
-                1px solid var(--line);
-
-            background: var(--surface);
-
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        #dict-header h3 {
-            margin: 0;
-
-            font-size: 1.02em;
-            letter-spacing: 0.04em;
-
-            color: var(--main-dark);
-
-            line-height: 1.2;
-        }
-
-        #dict-header p {
-            margin: 5px 0 0;
-
-            font-size: 0.67em;
-
-            color: var(--muted);
-
-            line-height: 1.35;
-        }
-
-        /*
-            遭遇記録を表示するため少し高さを増やす。
-        */
-        #dict-editor-section {
-            flex: 0 0 300px;
-
-            min-height: 300px;
-
-            box-sizing: border-box;
-
-            border-bottom:
-                1px solid var(--line);
-
-            background: var(--surface-soft);
-
-            display: flex;
-            flex-direction: column;
-        }
-
-        #dict-editor-label {
-            height: 34px;
-            min-height: 34px;
-            flex: 0 0 34px;
-
-            display: flex;
-            align-items: center;
-
-            padding: 0 24px;
-
-            box-sizing: border-box;
-
-            color: var(--muted);
-
-            font-size: 0.68em;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-        }
-
-        #dict-list {
-            flex: 1;
-
-            min-height: 0;
-
-            padding: 8px 20px 18px;
-
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-
-            overflow-y: auto;
-
-            box-sizing: border-box;
-        }
-
-        .dict-placeholder {
-            width: 100%;
-
-            margin-top: 26px;
-
-            text-align: center;
-
-            color: var(--muted);
-
-            line-height: 1.9;
-
-            font-size: 0.86em;
-        }
-
-        .dict-placeholder-symbol {
-            font-family:
-                "SFMono-Regular",
-                Consolas,
-                "Liberation Mono",
-                monospace;
-
-            font-size: 1.8em;
-
-            color: var(--muted-light);
-
-            margin-bottom: 16px;
-        }
-
-        .dict-entry {
-            width: 100%;
-
-            box-sizing: border-box;
-
-            padding: 15px 17px 17px;
-
-            background: var(--surface);
-
-            border:
-                1px solid var(--line);
-
-            border-radius: 8px;
-
-            transition:
-                background 0.5s;
-
-            box-shadow:
-                0 4px 14px rgba(68, 91, 101, 0.04);
-        }
-
-        .dict-entry.correct {
-            border-left:
-                4px solid var(--main-dark);
-
-            background: var(--main-pale);
-        }
-
-        .dict-entry.guessing {
-            border-left:
-                4px solid var(--main);
-
-            background: var(--surface);
-        }
-
-        .dict-entry.highlight-flash {
-            background: var(--main-soft);
-        }
-
-        .dict-entry label.dict-symbol-label {
-            font-size: 1.5em;
-
-            color: var(--main-dark);
-
-            display: block;
-
-            margin-bottom: 12px;
-
-            font-family:
-                "SFMono-Regular",
-                Consolas,
-                "Liberation Mono",
-                monospace;
-
-            font-weight: 700;
-
-            text-align: center;
-
-            letter-spacing: 0.12em;
-        }
-
-        .dict-field-label {
-            margin: 0 0 6px;
-
-            color: var(--muted);
-
-            font-size: 0.65em;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-        }
-
-        .dict-entry input {
-            width: 100%;
-
-            box-sizing: border-box;
-
-            padding: 10px 11px;
-
-            border:
-                1px solid var(--line-strong);
-
-            background: var(--surface);
-
-            font-size: 0.96rem;
-
-            outline: none;
-
-            border-radius: 6px;
-
-            font-family: inherit;
-
-            color: var(--text);
-        }
-
-        .dict-entry input:focus {
-            border-color: var(--main);
-
-            box-shadow:
-                0 0 0 3px rgba(120, 151, 165, 0.10);
-        }
-
-        .dict-entry input.wrong-text {
-            color: var(--wrong);
-
-            font-weight: 700;
-
-            border-color: var(--wrong);
-        }
-
-        /*
-            「答え」ではなく現在の仮説状態。
-        */
-        .dict-status {
-            min-height: 18px;
-
-            font-size: 0.72em;
-
-            color: var(--muted);
-
-            margin-top: 8px;
-
-            text-align: left;
-        }
-
-        .dict-entry.guessing .dict-status {
-            color: var(--main-dark);
-        }
-
-        .dict-entry.correct .dict-status {
-            color: var(--main-dark);
-            font-weight: 700;
-        }
-
-        .dict-records {
-            margin-top: 14px;
-
-            padding-top: 12px;
-
-            border-top:
-                1px solid var(--line);
-        }
-
-        .dict-records-title {
-            margin-bottom: 7px;
-
-            color: var(--muted);
-
-            font-size: 0.65em;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-        }
-
-        .dict-record-list {
-            display: flex;
-            flex-wrap: wrap;
-
-            gap: 6px;
-        }
-
-        .dict-record-btn {
-            border:
-                1px solid var(--line);
-
-            background:
-                var(--surface-soft);
-
-            color:
-                var(--text-soft);
-
-            padding:
-                5px 8px;
-
-            border-radius:
-                4px;
-
-            font-family:
-                inherit;
-
-            font-size:
-                0.68em;
-
-            cursor:
-                pointer;
-
-            transition:
-                0.15s;
-        }
-
-        .dict-record-btn:hover {
-            background:
-                var(--main-soft);
-
-            border-color:
-                var(--line-strong);
-
-            color:
-                var(--main-dark);
-        }
-
-        .dict-record-empty {
-            color:
-                var(--muted-light);
-
-            font-size:
-                0.7em;
-        }
-
-        #word-list-section {
-            flex: 1 1 auto;
-
-            min-height: 0;
-
-            display: flex;
-            flex-direction: column;
-
-            background: var(--surface);
-
-            overflow: hidden;
-        }
-
-        #word-list-header {
-            height: 38px;
-            min-height: 38px;
-            flex: 0 0 38px;
-
-            display: flex;
-            align-items: center;
-
-            padding: 0 24px;
-
-            box-sizing: border-box;
-
-            background: var(--surface-soft);
-
-            border-bottom:
-                1px solid var(--line);
-
-            color: var(--text-soft);
-
-            font-size: 0.72em;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-        }
-
-        #word-list-panel {
-            flex: 1;
-
-            min-height: 0;
-
-            overflow-y: auto;
-
-            padding: 8px 14px 18px;
-
-            box-sizing: border-box;
-
-            background: var(--surface);
-        }
-
-        #word-list {
-            width: 100%;
-        }
-
-        .word-list-empty {
-            color: var(--muted);
-
-            font-size: 0.8em;
-            line-height: 1.8;
-
-            text-align: center;
-
-            padding: 22px 10px;
-        }
-
-        .word-row {
-            width: 100%;
-
-            min-height: 46px;
-
-            box-sizing: border-box;
-
-            display: grid;
-
-            grid-template-columns:
-                minmax(72px, 0.8fr)
-                minmax(90px, 1.25fr)
-                auto;
-
-            align-items: center;
-
-            gap: 8px;
-
-            padding: 8px 9px;
-
-            border:
-                1px solid transparent;
-
-            border-bottom-color:
-                var(--line);
-
-            background: transparent;
-
-            color: var(--text);
-
-            font-family: inherit;
-
-            text-align: left;
-
-            cursor: pointer;
-
-            transition: 0.15s;
-        }
-
-        .word-row:hover {
-            background: var(--surface-hover);
-        }
-
-        .word-row.active {
-            background: var(--main-soft);
-
-            border-color: var(--line-strong);
-
-            border-radius: 5px;
-        }
-
-        .word-symbol {
-            font-family:
-                "SFMono-Regular",
-                Consolas,
-                "Liberation Mono",
-                monospace;
-
-            font-weight: 700;
-
-            color: var(--main-dark);
-
-            letter-spacing: 0.04em;
-        }
-
-        .word-guess {
-            min-width: 0;
-
-            overflow: hidden;
-
-            text-overflow: ellipsis;
-
-            white-space: nowrap;
-
-            color: var(--text-soft);
-
-            font-size: 0.86em;
-        }
-
-        .word-guess.understood {
-            color: var(--main-dark);
-            font-weight: 700;
-        }
-
-        .word-guess.empty {
-            color: var(--muted-light);
-        }
-
-        .word-status {
-            white-space: nowrap;
-
-            font-size: 0.66em;
-
-            color: var(--muted);
-        }
-
-        .word-status.guessing {
-            color: var(--main-dark);
-        }
-
-        .word-status.understood {
-            color: var(--main-dark);
-            font-weight: 700;
-        }
-
-        /*
-            旧コレクション処理との互換用。
-            画面には表示しない。
-        */
-        .badge-container,
-        .badge {
-            display: none;
-        }
-
-        .hint-text {
-            font-size: 0.9em;
-
-            color: var(--text-soft);
-
-            margin-top: 15px;
-
-            border-top:
-                1px dashed var(--line-strong);
-
-            padding-top: 10px;
-        }
-
-        .btn-style {
-            padding: 14px 44px;
-
-            cursor: pointer;
-
-            border:
-                1px solid transparent;
-
-            font-family: inherit;
-
-            font-size: 1em;
-            font-weight: 700;
-
-            border-radius: 8px;
-
-            margin: 10px;
-
-            transition: 0.2s;
-        }
-
-        .btn-style:hover {
-            transform:
-                translateY(-1px);
-
-            filter:
-                brightness(0.98);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>声を聴かせて、ランスロット！</title>
+
+<style>
+:root {
+    --main:#7897a5;
+    --main-dark:#506c78;
+    --main-soft:#edf3f5;
+    --main-pale:#f5f8f9;
+    --text:#394b53;
+    --text-soft:#687b84;
+    --muted:#8b9aa1;
+    --muted-light:#aab5ba;
+    --line:#d9e2e6;
+    --line-strong:#c5d2d8;
+    --surface:#ffffff;
+    --surface-soft:#f7f9fa;
+    --surface-hover:#f0f5f6;
+    --correct:#587887;
+    --wrong:#ad7070;
+    --opt-bg:#ffffff;
+    --opt-hover:#f1f5f6;
+    --selected:#eaf1f4;
+    --love-hue:200;
+    --love-light:92%;
+    --love-sat:20%;
+    --gold:#7897a5;
+}
+
+body {
+    background:#edf3f5;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic","YuGothic",Meiryo,sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    margin:0;
+    color:var(--text);
+    overflow:hidden;
+}
+
+#bg-layer {
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:
+        radial-gradient(circle at 20% 15%,rgba(255,255,255,.95) 0%,rgba(255,255,255,0) 38%),
+        linear-gradient(135deg,#edf3f5 0%,#f7f9fa 48%,#e9f0f2 100%);
+    z-index:-1;
+    transition:2s ease;
+}
+
+#device-check-overlay {
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(244,248,249,.98);
+    z-index:200;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    color:var(--text);
+}
+
+.device-box {
+    width:min(520px,82vw);
+    border:1px solid var(--line);
+    padding:42px;
+    border-radius:16px;
+    background:rgba(255,255,255,.96);
+    box-shadow:0 18px 55px rgba(68,91,101,.10);
+}
+
+#intro-overlay,#tutorial-overlay,#load-overlay {
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(244,248,249,.98);
+    z-index:100;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    color:var(--text);
+}
+
+.content-box {
+    max-width:700px;
+    width:90%;
+    line-height:2.05;
+    max-height:90vh;
+    overflow-y:auto;
+    padding:30px;
+    box-sizing:border-box;
+}
+
+.title-image {
+    display:block;
+    width:min(620px,92%);
+    height:auto;
+    margin:0 auto 28px;
+}
+
+#game-container {
+    width:98vw;
+    max-width:1200px;
+    height:92vh;
+    background:var(--surface);
+    display:none;
+    border:1px solid var(--line-strong);
+    border-radius:12px;
+    overflow:hidden;
+    color:var(--text);
+    box-shadow:0 24px 70px rgba(68,91,101,.14),0 2px 10px rgba(68,91,101,.05);
+}
+
+#main-screen {
+    flex:2;
+    display:flex;
+    flex-direction:column;
+    border-right:1px solid var(--line);
+    min-width:0;
+    height:100%;
+    background:var(--surface);
+}
+
+#progress-bar {
+    height:34px;
+    min-height:34px;
+    flex:0 0 34px;
+    background:var(--surface-soft);
+    color:var(--muted);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:.72em;
+    letter-spacing:.14em;
+    border-bottom:1px solid var(--line);
+    box-sizing:border-box;
+}
+
+#progress-current {
+    color:var(--main-dark);
+    font-weight:700;
+}
+
+.status-bar {
+    height:36px;
+    min-height:36px;
+    flex:0 0 36px;
+    box-sizing:border-box;
+    padding:0 18px;
+    background:var(--surface);
+    color:var(--text-soft);
+    display:flex;
+    align-items:center;
+    font-size:.72em;
+    letter-spacing:.08em;
+    border-bottom:1px solid var(--line);
+}
+
+#legacy-state { display:none; }
+
+#main-view-tabs {
+    height:50px;
+    min-height:50px;
+    flex:0 0 50px;
+    display:flex;
+    box-sizing:border-box;
+    background:var(--surface-soft);
+    border-bottom:1px solid var(--line);
+    padding:7px 20px 0;
+    gap:8px;
+}
+
+.main-view-tab {
+    flex:1;
+    border:1px solid transparent;
+    border-bottom:none;
+    background:transparent;
+    color:var(--muted);
+    font-family:inherit;
+    font-size:.84rem;
+    font-weight:700;
+    letter-spacing:.08em;
+    cursor:pointer;
+    transition:.18s;
+    border-radius:8px 8px 0 0;
+}
+
+.main-view-tab:hover {
+    background:var(--main-soft);
+    color:var(--main-dark);
+}
+
+.main-view-tab.active {
+    background:var(--surface);
+    color:var(--main-dark);
+    border-color:var(--line);
+    box-shadow:inset 0 3px 0 var(--main);
+}
+
+#play-view {
+    flex:1 1 auto;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    background:var(--surface);
+}
+
+#display {
+    height:auto;
+    min-height:0;
+    max-height:none;
+    flex:0 0 58%;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+    align-items:center;
+    gap:10px;
+    padding:22px 34px 18px;
+    background:var(--surface);
+    overflow-y:auto;
+    box-sizing:border-box;
+}
+
+#chara-header {
+    width:90%;
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    box-sizing:border-box;
+    min-height:30px;
+}
+
+#speaker-name {
+    font-weight:700;
+    letter-spacing:.1em;
+    color:var(--main-dark);
+}
+
+.bubble {
+    background:var(--surface);
+    border-left:4px solid var(--main);
+    padding:16px 20px;
+    width:90%;
+    box-sizing:border-box;
+    font-size:1.14rem;
+    line-height:1.8;
+    text-align:left;
+    color:var(--text);
+}
+
+#vane-thought-block,#story-block,#resolution-block {
+    width:90%;
+    box-sizing:border-box;
+    flex:0 0 auto;
+}
+
+.block-label {
+    height:18px;
+    line-height:18px;
+    box-sizing:border-box;
+    font-size:.68em;
+    font-weight:700;
+    letter-spacing:.1em;
+    color:var(--muted);
+    margin-bottom:5px;
+}
+
+.thought-bubble {
+    background:var(--surface-soft);
+    border-left:3px solid var(--line-strong);
+    padding:11px 15px;
+    box-sizing:border-box;
+    line-height:1.65;
+    text-align:left;
+    color:var(--text-soft);
+    font-size:.91em;
+}
+
+.story-bubble {
+    background:transparent;
+    border:none;
+    padding:8px 4px 6px;
+    box-sizing:border-box;
+    line-height:1.85;
+    text-align:left;
+    color:var(--text);
+}
+
+.resolution-bubble {
+    background:transparent;
+    border:none;
+    padding:8px 4px 10px;
+    box-sizing:border-box;
+    line-height:1.8;
+    text-align:left;
+    color:var(--text);
+}
+
+.understanding-item { padding:4px 0 10px; }
+.understanding-lead { font-size:1.02em; margin-bottom:12px; }
+.understanding-copy { color:var(--text-soft); line-height:1.9; }
+
+.understanding-symbol {
+    margin-top:18px;
+    color:var(--main-dark);
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    font-size:1.28em;
+    font-weight:700;
+    letter-spacing:.12em;
+}
+
+.understanding-bridge {
+    margin-top:13px;
+    color:var(--text-soft);
+}
+
+.understanding-word {
+    margin-top:8px;
+    font-size:1.45em;
+    font-weight:700;
+    letter-spacing:.05em;
+    color:var(--main-dark);
+}
+
+.understanding-divider {
+    width:100%;
+    height:1px;
+    margin:22px 0;
+    background:var(--line);
+}
+
+.selected-reply {
+    font-weight:700;
+    margin-bottom:12px;
+    color:var(--text);
+}
+
+.final-resolve-line {
+    font-size:1.3em;
+    font-weight:700;
+    margin-top:20px;
+    color:var(--main-dark);
+}
+
+.symbol,.resolved,.wrong-resolved {
+    cursor:pointer;
+    transition:.2s;
+    padding:1px 5px;
+    border-radius:4px;
+}
+
+.symbol:hover,.resolved:hover,.wrong-resolved:hover {
+    background:var(--main-soft);
+    outline:1px solid var(--line-strong);
+}
+
+.resolved {
+    color:var(--main-dark);
+    font-weight:700;
+}
+
+.wrong-resolved {
+    color:var(--wrong);
+    font-weight:700;
+    text-decoration:underline wavy var(--wrong);
+}
+
+.symbol {
+    color:var(--main-dark);
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    background:var(--main-soft);
+    font-weight:700;
+}
+
+.controls {
+    flex:1 1 auto;
+    min-height:0;
+    height:auto;
+    max-height:none;
+    box-sizing:border-box;
+    padding:14px 34px 18px;
+    background:var(--surface-soft);
+    border-top:1px solid var(--line);
+    overflow-y:auto;
+}
+
+.opt-btn {
+    width:100%;
+    min-height:42px;
+    box-sizing:border-box;
+    padding:10px 15px;
+    margin:5px 0;
+    border:1px solid var(--line);
+    border-left:4px solid var(--line-strong);
+    background:var(--opt-bg);
+    cursor:pointer;
+    font-family:inherit;
+    font-size:.95rem;
+    text-align:left;
+    transition:.18s;
+    border-radius:6px;
+    color:var(--text);
+}
+
+.opt-btn:hover:not(:disabled) {
+    border-color:var(--line-strong);
+    border-left-color:var(--main);
+    background:var(--opt-hover);
+    transform:translateX(2px);
+}
+
+.opt-btn:disabled {
+    cursor:default;
+    opacity:.62;
+}
+
+.opt-btn.my-choice {
+    border:1px solid var(--line-strong);
+    border-left:4px solid var(--main);
+    background:var(--selected);
+    font-weight:700;
+}
+
+#log-section {
+    flex:1 1 auto;
+    min-height:0;
+    display:none;
+    flex-direction:column;
+    background:var(--surface);
+    box-sizing:border-box;
+    overflow:hidden;
+}
+
+#log-header {
+    height:42px;
+    min-height:42px;
+    flex:0 0 42px;
+    display:flex;
+    align-items:center;
+    padding:0 38px;
+    box-sizing:border-box;
+    background:var(--surface);
+    border-bottom:1px solid var(--line);
+    color:var(--muted);
+    font-size:.68em;
+    font-weight:700;
+    letter-spacing:.1em;
+}
+
+#log-panel {
+    display:block;
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+    padding:24px 40px 36px;
+    box-sizing:border-box;
+    background:var(--surface);
+}
+
+.log-empty {
+    color:var(--muted);
+    font-size:.84em;
+    line-height:1.8;
+    text-align:center;
+    padding:40px 0;
+}
+
+.log-entry {
+    position:relative;
+    width:92%;
+    margin:0 auto;
+    padding:0 0 30px 30px;
+    border-left:2px solid var(--line);
+    box-sizing:border-box;
+    transition:background .3s;
+}
+
+.log-entry::before {
+    content:"";
+    position:absolute;
+    top:6px;
+    left:-6px;
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:var(--surface);
+    border:2px solid var(--main);
+    box-sizing:border-box;
+}
+
+.log-entry:last-child { padding-bottom:8px; }
+
+.log-entry.log-focus {
+    background:var(--main-pale);
+    border-radius:6px;
+}
+
+.log-scene {
+    display:inline-flex;
+    align-items:center;
+    min-height:24px;
+    margin-bottom:12px;
+    padding:0 9px;
+    border-radius:12px;
+    background:var(--main-soft);
+    color:var(--main-dark);
+    font-size:.66em;
+    font-weight:700;
+    letter-spacing:.1em;
+}
+
+.log-speaker {
+    margin-bottom:7px;
+    color:var(--main-dark);
+    font-size:.72em;
+    font-weight:700;
+    letter-spacing:.08em;
+}
+
+.log-dialogue {
+    color:var(--text);
+    font-size:.94em;
+    line-height:1.85;
+    padding-right:8px;
+}
+
+.log-thought-label {
+    margin-top:14px;
+    margin-bottom:5px;
+    color:var(--muted);
+    font-size:.66em;
+    font-weight:700;
+    letter-spacing:.08em;
+}
+
+.log-thought {
+    padding:10px 13px;
+    background:var(--surface-soft);
+    border-radius:6px;
+    color:var(--text-soft);
+    font-size:.84em;
+    line-height:1.7;
+}
+
+.log-symbol-active {
+    outline:2px solid var(--main);
+    background:var(--main-soft);
+    color:var(--main-dark);
+}
+
+.log-symbol-active:hover {
+    outline:2px solid var(--main-dark);
+    background:var(--selected);
+}
+
+#dictionary {
+    flex:0 0 330px;
+    min-width:300px;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    background:var(--surface-soft);
+    border-left:1px solid var(--line);
+    box-sizing:border-box;
+}
+
+#dict-header {
+    height:70px;
+    min-height:70px;
+    flex:0 0 70px;
+    box-sizing:border-box;
+    padding:10px 24px 8px;
+    border-bottom:1px solid var(--line);
+    background:var(--surface);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+#dict-header h3 {
+    margin:0;
+    font-size:1.02em;
+    letter-spacing:.04em;
+    color:var(--main-dark);
+    line-height:1.2;
+}
+
+#dict-header p {
+    margin:5px 0 0;
+    font-size:.67em;
+    color:var(--muted);
+    line-height:1.35;
+}
+
+#dict-editor-section {
+    flex:0 0 300px;
+    min-height:300px;
+    box-sizing:border-box;
+    border-bottom:1px solid var(--line);
+    background:var(--surface-soft);
+    display:flex;
+    flex-direction:column;
+}
+
+#dict-editor-label {
+    height:34px;
+    min-height:34px;
+    flex:0 0 34px;
+    display:flex;
+    align-items:center;
+    padding:0 24px;
+    box-sizing:border-box;
+    color:var(--muted);
+    font-size:.68em;
+    font-weight:700;
+    letter-spacing:.1em;
+}
+
+#dict-list {
+    flex:1;
+    min-height:0;
+    padding:8px 20px 18px;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    overflow-y:auto;
+    box-sizing:border-box;
+}
+
+.dict-placeholder {
+    width:100%;
+    margin-top:26px;
+    text-align:center;
+    color:var(--muted);
+    line-height:1.9;
+    font-size:.86em;
+}
+
+.dict-placeholder-symbol {
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    font-size:1.8em;
+    color:var(--muted-light);
+    margin-bottom:16px;
+}
+
+.dict-entry {
+    width:100%;
+    box-sizing:border-box;
+    padding:15px 17px 17px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:8px;
+    transition:background .5s;
+    box-shadow:0 4px 14px rgba(68,91,101,.04);
+}
+
+.dict-entry.correct {
+    border-left:4px solid var(--main-dark);
+    background:var(--main-pale);
+}
+
+.dict-entry.guessing {
+    border-left:4px solid var(--main);
+    background:var(--surface);
+}
+
+.dict-entry.highlight-flash { background:var(--main-soft); }
+
+.dict-entry label.dict-symbol-label {
+    font-size:1.5em;
+    color:var(--main-dark);
+    display:block;
+    margin-bottom:12px;
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    font-weight:700;
+    text-align:center;
+    letter-spacing:.12em;
+}
+
+.dict-field-label {
+    margin:0 0 6px;
+    color:var(--muted);
+    font-size:.65em;
+    font-weight:700;
+    letter-spacing:.1em;
+}
+
+.dict-entry input {
+    width:100%;
+    box-sizing:border-box;
+    padding:10px 11px;
+    border:1px solid var(--line-strong);
+    background:var(--surface);
+    font-size:.96rem;
+    outline:none;
+    border-radius:6px;
+    font-family:inherit;
+    color:var(--text);
+}
+
+.dict-entry input:focus {
+    border-color:var(--main);
+    box-shadow:0 0 0 3px rgba(120,151,165,.10);
+}
+
+.dict-entry input.wrong-text {
+    color:var(--wrong);
+    font-weight:700;
+    border-color:var(--wrong);
+}
+
+.dict-status {
+    min-height:18px;
+    font-size:.72em;
+    color:var(--muted);
+    margin-top:8px;
+    text-align:left;
+}
+
+.dict-entry.guessing .dict-status { color:var(--main-dark); }
+
+.dict-entry.correct .dict-status {
+    color:var(--main-dark);
+    font-weight:700;
+}
+
+.dict-records {
+    margin-top:14px;
+    padding-top:12px;
+    border-top:1px solid var(--line);
+}
+
+.dict-records-title {
+    margin-bottom:7px;
+    color:var(--muted);
+    font-size:.65em;
+    font-weight:700;
+    letter-spacing:.1em;
+}
+
+.dict-record-list {
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+}
+
+.dict-record-btn {
+    border:1px solid var(--line);
+    background:var(--surface-soft);
+    color:var(--text-soft);
+    padding:5px 8px;
+    border-radius:4px;
+    font-family:inherit;
+    font-size:.68em;
+    cursor:pointer;
+    transition:.15s;
+}
+
+.dict-record-btn:hover {
+    background:var(--main-soft);
+    border-color:var(--line-strong);
+    color:var(--main-dark);
+}
+
+.dict-record-empty {
+    color:var(--muted-light);
+    font-size:.7em;
+}
+
+#word-list-section {
+    flex:1 1 auto;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    background:var(--surface);
+    overflow:hidden;
+}
+
+#word-list-header {
+    height:38px;
+    min-height:38px;
+    flex:0 0 38px;
+    display:flex;
+    align-items:center;
+    padding:0 24px;
+    box-sizing:border-box;
+    background:var(--surface-soft);
+    border-bottom:1px solid var(--line);
+    color:var(--text-soft);
+    font-size:.72em;
+    font-weight:700;
+    letter-spacing:.1em;
+}
+
+#word-list-panel {
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+    padding:8px 14px 18px;
+    box-sizing:border-box;
+    background:var(--surface);
+}
+
+#word-list { width:100%; }
+
+.word-list-empty {
+    color:var(--muted);
+    font-size:.8em;
+    line-height:1.8;
+    text-align:center;
+    padding:22px 10px;
+}
+
+.word-row {
+    width:100%;
+    min-height:46px;
+    box-sizing:border-box;
+    display:grid;
+    grid-template-columns:minmax(72px,.8fr) minmax(90px,1.25fr) auto;
+    align-items:center;
+    gap:8px;
+    padding:8px 9px;
+    border:1px solid transparent;
+    border-bottom-color:var(--line);
+    background:transparent;
+    color:var(--text);
+    font-family:inherit;
+    text-align:left;
+    cursor:pointer;
+    transition:.15s;
+}
+
+.word-row:hover { background:var(--surface-hover); }
+
+.word-row.active {
+    background:var(--main-soft);
+    border-color:var(--line-strong);
+    border-radius:5px;
+}
+
+.word-symbol {
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    font-weight:700;
+    color:var(--main-dark);
+    letter-spacing:.04em;
+}
+
+.word-guess {
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:var(--text-soft);
+    font-size:.86em;
+}
+
+.word-guess.understood {
+    color:var(--main-dark);
+    font-weight:700;
+}
+
+.word-guess.empty { color:var(--muted-light); }
+
+.word-status {
+    white-space:nowrap;
+    font-size:.66em;
+    color:var(--muted);
+}
+
+.word-status.guessing { color:var(--main-dark); }
+
+.word-status.understood {
+    color:var(--main-dark);
+    font-weight:700;
+}
+
+.badge-container,.badge { display:none; }
+
+.hint-text {
+    font-size:.9em;
+    color:var(--text-soft);
+    margin-top:15px;
+    border-top:1px dashed var(--line-strong);
+    padding-top:10px;
+}
+
+.btn-style {
+    padding:14px 44px;
+    cursor:pointer;
+    border:1px solid transparent;
+    font-family:inherit;
+    font-size:1em;
+    font-weight:700;
+    border-radius:8px;
+    margin:10px;
+    transition:.2s;
+}
+
+.btn-style:hover {
+    transform:translateY(-1px);
+    filter:brightness(.98);
+}
+</style>
 </head>
 
 <body>
-
 <div id="bg-layer"></div>
 
 <div id="device-check-overlay">
     <div class="device-box">
-        <h2
-            id="check-title"
-            style="color: var(--main-dark);"
-        >
-            CHECKING ENVIRONMENT...
-        </h2>
-
-        <p id="check-msg">
-            本ゲームはPCブラウザ環境でのプレイを前提として設計されています。
-        </p>
-
+        <h2 id="check-title" style="color:var(--main-dark);">CHECKING ENVIRONMENT...</h2>
+        <p id="check-msg">本ゲームはPCブラウザ環境でのプレイを前提として設計されています。</p>
         <div id="check-action">
-            <button
-                id="entry-btn"
-                class="btn-style"
-                style="
-                    background: var(--main);
-                    color: #fff;
-                    display: none;
-                "
-            >
-                物語を始める
-            </button>
-
-            <button
-                id="recollection-entry-btn"
-                class="btn-style"
-                style="
-                    background: var(--main-dark);
-                    color: #fff;
-                    display: none;
-                "
-            >
-                追憶を辿る
-            </button>
-
-            <p
-                id="error-msg"
-                style="
-                    color: var(--wrong);
-                    display: none;
-                "
-            >
-                <b>MOBILE DEVICE DETECTED</b><br>
-                スマートフォン等のモバイル環境ではプレイできません。
-            </p>
+            <button id="entry-btn" class="btn-style" style="background:var(--main);color:#fff;display:none;">物語を始める</button>
+            <button id="recollection-entry-btn" class="btn-style" style="background:var(--main-dark);color:#fff;display:none;">追憶を辿る</button>
+            <p id="error-msg" style="color:var(--wrong);display:none;"><b>MOBILE DEVICE DETECTED</b><br>スマートフォン等のモバイル環境ではプレイできません。</p>
         </div>
     </div>
 </div>
 
 <div id="intro-overlay">
     <div class="content-box">
-
-        <img
-            src="title.png"
-            alt="声を聴かせて、ランスロット！"
-            class="title-image"
-        >
-
+        <img src="title.png" alt="声を聴かせて、ランスロット！" class="title-image">
         <p>
             ある任務にて魔物の前に飛び出したランスロット。<br>
             目の前の人を助けるのに夢中で、背後から魔物が放った呪いに気づけなかった。<br>
-            大好きな幼馴染を守るために身を投げ出したヴェインは、呪いを全身に浴びてしまう。<br>
-            <br>
+            大好きな幼馴染を守るために身を投げ出したヴェインは、呪いを全身に浴びてしまう。<br><br>
             それは、人と人との絆を断つ呪い。<br>
             普通の言葉は聞こえるのに、ランスロットがヴェインへ向ける感情や願い、二人の関係にとって大切な言葉ほど、意味不明な音に変わってしまう。<br><br>
             ____俺は絶対にあきらめない！このままランちゃんの声がわからないなんていやだ。<br>
             ヴェインはランスロットの言葉に耳を傾け、<br>
             聞き取れない言葉をひとつひとつ記録していくことにした。<br>
-            いつかまた、お前の言葉を理解できるように。
-            <br>
+            いつかまた、お前の言葉を理解できるように。<br>
             あの日以来暗い表情のままの幼馴染の笑顔を取り戻して、<br>
             大好きだよ、と伝えるために。
         </p>
-
-        <button
-            id="to-tutorial"
-            class="btn-style"
-            style="
-                background: var(--main);
-                color: #fff;
-            "
-        >
-            次へ
-        </button>
-
+        <button id="to-tutorial" class="btn-style" style="background:var(--main);color:#fff;">次へ</button>
     </div>
 </div>
 
 <div id="tutorial-overlay">
     <div class="content-box">
+        <h2 style="color:var(--main-dark);">プレイ方法</h2>
 
-        <h2 style="color: var(--main-dark);">
-            プレイ方法
-        </h2>
-
-        <div
-            style="
-                text-align: left;
-                background: var(--surface-soft);
-                border: 1px solid var(--line);
-                padding: 25px;
-                border-radius: 10px;
-                font-size: 0.9em;
-            "
-        >
+        <div style="text-align:left;background:var(--surface-soft);border:1px solid var(--line);padding:25px;border-radius:10px;font-size:.9em;">
             <p>
                 <b>【推測】</b><br>
                 プレイヤーはヴェインとしてこのゲームを進めます。<br>
@@ -1547,9 +965,7 @@
                 入力した時点では、その仮説が正しいかどうかは判定されません。<br><br>
                 同じ記号は、同じ意味の核を持つ言葉を表します。文章によって「頼って」「頼れば」のように形が変わる場合がありますが、ノートには「頼る」のような<b>基本の形・言い切りの形</b>で推測してください。<br><br>
                 ノートには、その言葉に遭遇したSCENEも記録されます。過去の使用例を読み返し、必要なら何度でも仮説を書き直してください。
-            </p>
-
-            <br>
+            </p><br>
 
             <p>
                 <b>【返答】</b><br>
@@ -1557,18 +973,14 @@
                 正しい返答を当てることが目的ではありません。<br>
                 ランスロットの反応そのものが、新しい手掛かりになることがあります。<br>
                 一度選んだ返答は、その周回では変更できません。
-            </p>
-
-            <br>
+            </p><br>
 
             <p>
                 <b>【理解】</b><br>
                 正しい仮説を書いただけでは、その言葉を理解したことにはなりません。<br>
                 会話を重ね、十分な手掛かりが揃ったとき、ヴェイン自身がその意味へ辿り着きます。<br>
                 一度理解した言葉は、それ以降の会話と過去LOGで日本語として読めるようになります。
-            </p>
-
-            <br>
+            </p><br>
 
             <p>
                 <b>【継承】</b><br>
@@ -1576,80 +988,29 @@
             </p>
         </div>
 
-        <button
-            id="start-init-btn"
-            class="btn-style"
-            style="
-                background: var(--main);
-                color: #fff;
-            "
-        >
-            物語を開始する
-        </button>
-
+        <button id="start-init-btn" class="btn-style" style="background:var(--main);color:#fff;">物語を開始する</button>
     </div>
 </div>
 
 <div id="load-overlay">
     <div class="content-box">
-
-        <h2 style="color: var(--main-dark);">
-            記憶の継承
-        </h2>
-
-        <p>
-            過去に理解した単語を、最初からノートに引き継ぎますか？
-        </p>
-
-        <button
-            id="load-yes"
-            class="btn-style"
-            style="
-                background: var(--main);
-                color: #fff;
-            "
-        >
-            継承する
-        </button>
-
-        <button
-            id="load-no"
-            class="btn-style"
-            style="
-                background: var(--main-dark);
-                color: #fff;
-            "
-        >
-            最初から解く
-        </button>
-
+        <h2 style="color:var(--main-dark);">記憶の継承</h2>
+        <p>過去に理解した単語を、最初からノートに引き継ぎますか？</p>
+        <button id="load-yes" class="btn-style" style="background:var(--main);color:#fff;">継承する</button>
+        <button id="load-no" class="btn-style" style="background:var(--main-dark);color:#fff;">最初から解く</button>
     </div>
 </div>
 
 <div id="game-container">
-
     <div id="main-screen">
-
-        <div id="progress-bar">
-            SCENE&nbsp;
-            <span id="progress-current">01</span>
-            &nbsp;/&nbsp;
-            <span id="progress-total">20</span>
-        </div>
+        <div id="progress-bar">SCENE&nbsp;<span id="progress-current">01</span>&nbsp;/&nbsp;<span id="progress-total">20</span></div>
 
         <div class="status-bar">
-            <span>
-                KNIGHT: VANE
-            </span>
-
+            <span>KNIGHT: VANE</span>
             <div id="legacy-state">
                 <span id="intel-val">0%</span>
                 <span id="col-val">0%</span>
-
-                <div
-                    class="badge-container"
-                    id="badge-area"
-                >
+                <div class="badge-container" id="badge-area">
                     <div class="badge" id="b-1" title="暁光の誓い"></div>
                     <div class="badge" id="b-6" title="魂の共鳴"></div>
                     <div class="badge" id="b-2" title="不滅の双璧"></div>
@@ -1662,2790 +1023,928 @@
         </div>
 
         <div id="main-view-tabs">
-
-            <button
-                type="button"
-                id="play-view-tab"
-                class="main-view-tab active"
-                onclick="switchMainView('play')"
-            >
-                会話
-            </button>
-
-            <button
-                type="button"
-                id="log-view-tab"
-                class="main-view-tab"
-                onclick="switchMainView('log')"
-            >
-                過去LOG
-            </button>
-
+            <button type="button" id="play-view-tab" class="main-view-tab active" onclick="switchMainView('play')">会話</button>
+            <button type="button" id="log-view-tab" class="main-view-tab" onclick="switchMainView('log')">過去LOG</button>
         </div>
 
         <div id="play-view">
-
             <div id="display">
-
-                <div id="chara-header">
-                    <span id="speaker-name">
-                        LANCELOT
-                    </span>
-                </div>
-
-                <div
-                    class="bubble"
-                    id="message-text"
-                >
-                    ......
-                </div>
+                <div id="chara-header"><span id="speaker-name">LANCELOT</span></div>
+                <div class="bubble" id="message-text">......</div>
 
                 <div id="vane-thought-block">
-
-                    <div class="block-label">
-                        VANE
-                    </div>
-
-                    <div
-                        class="thought-bubble"
-                        id="vane-thought-text"
-                    ></div>
-
+                    <div class="block-label">VANE</div>
+                    <div class="thought-bubble" id="vane-thought-text"></div>
                 </div>
 
-                <div
-                    id="story-block"
-                    style="display:none;"
-                >
-
-                    <div class="block-label">
-                        STORY
-                    </div>
-
-                    <div
-                        class="story-bubble"
-                        id="story-text"
-                    ></div>
-
+                <div id="story-block" style="display:none;">
+                    <div class="block-label">STORY</div>
+                    <div class="story-bubble" id="story-text"></div>
                 </div>
 
-                <div
-                    id="resolution-block"
-                    style="display:none;"
-                >
-
-                    <div class="block-label">
-                        UNDERSTANDING
-                    </div>
-
-                    <div
-                        class="resolution-bubble"
-                        id="resolution-text"
-                    ></div>
-
+                <div id="resolution-block" style="display:none;">
+                    <div class="block-label">UNDERSTANDING</div>
+                    <div class="resolution-bubble" id="resolution-text"></div>
                 </div>
-
             </div>
 
-            <div
-                class="controls"
-                id="action-area"
-            ></div>
-
+            <div class="controls" id="action-area"></div>
         </div>
 
         <div id="log-section">
-
-            <div id="log-header">
-                これまでの会話
-            </div>
-
+            <div id="log-header">これまでの会話</div>
             <div id="log-panel"></div>
-
         </div>
-
     </div>
 
     <div id="dictionary">
-
         <div id="dict-header">
-
-            <h3>
-                ヴェインのノート
-            </h3>
-
-            <p>
-                聞き取れない言葉を選び、<br>
-                思いついた意味を書き留める。
-            </p>
-
+            <h3>ヴェインのノート</h3>
+            <p>聞き取れない言葉を選び、<br>思いついた意味を書き留める。</p>
         </div>
 
         <div id="dict-editor-section">
-
-            <div id="dict-editor-label">
-                選択中の言葉
-            </div>
-
+            <div id="dict-editor-label">選択中の言葉</div>
             <div id="dict-list"></div>
-
         </div>
 
         <div id="word-list-section">
-
-            <div id="word-list-header">
-                言葉一覧
-            </div>
-
-            <div id="word-list-panel">
-                <div id="word-list"></div>
-            </div>
-
+            <div id="word-list-header">言葉一覧</div>
+            <div id="word-list-panel"><div id="word-list"></div></div>
         </div>
-
     </div>
-
 </div>
 
 <script src="game.js"></script>
 
 <script>
-    /*
-        第2段階確定版 wordBank
-    */
-    const wordBank = {
-        "W1": {
-            q: "θωε",
-            canonical: "心配",
-            variants: ["しんぱい", "心配する"],
-            synonyms: ["気がかり", "気掛かり", "懸念"],
-            nearMisses: ["怖い", "不安", "気になる", "案じる"],
-            meaning: "ヴェインの状態・安全・心情などを気にかけること",
-            boundary: "「怖い」はランスロット自身の恐怖。「心配」はヴェインへ向く感情。",
-            appearances: [1, 5, 13],
-            difficulty: "easy",
-            finalRole: "物語の入口。後に「大切」「失う」「怖い」へ繋がる気遣い。",
-            minClues: 2
-        },
+const wordBank = {
+    W1:{q:"θωε",canonical:"心配",variants:["しんぱい","心配する"],synonyms:["気がかり","気掛かり","懸念"],nearMisses:["怖い","不安","気になる","案じる"],meaning:"ヴェインの状態・安全・心情などを気にかけること",boundary:"「怖い」はランスロット自身の恐怖。「心配」はヴェインへ向く感情。",appearances:[1,5,13],difficulty:"easy",finalRole:"物語の入口。後に「大切」「失う」「怖い」へ繋がる気遣い。",minClues:2},
+    W2:{q:"ΣΦμ",canonical:"一緒",variants:["いっしょ"],synonyms:["共に","ともに"],nearMisses:["そば","傍","隣","ずっと","同行"],meaning:"二人で行動する、二人として何かを共有すること",boundary:"「ずっと」は時間的継続。「一緒」は誰と・どのような状態であるか。",appearances:[4,8,17],difficulty:"easy-medium",finalRole:"二人がこの先も共にあることを示す未来語。",minClues:2},
+    W3:{q:"αβγδε",canonical:"ありがとう",variants:["ありがと","有難う","有り難う"],synonyms:["感謝","感謝する","お礼"],nearMisses:["嬉しい","助かった","ごめん","すまない"],meaning:"ヴェイン本人がしてくれたことへの感謝",boundary:"謝罪や一般的な礼儀ではなく、ヴェインとの関係に意味を持つ感謝。",appearances:[3,9,18],difficulty:"easy",finalRole:"最後まで理解しようとしてくれたヴェインへの感謝。",minClues:2},
+    W4:{q:"λησ",canonical:"親友",variants:["しんゆう"],synonyms:["ベストフレンド"],nearMisses:["友達","友人","相棒","仲間","幼馴染"],meaning:"現在の二人の関係を定義する言葉",boundary:"「親友」は関係名。「愛している」は感情。",appearances:[7,12,17],difficulty:"easy-medium",finalRole:"「親友だからだけではない」と関係を一段深めるための基準点。",minClues:2},
+    W5:{q:"ψζβ",canonical:"大切",variants:["たいせつ"],synonyms:["大事","だいじ"],nearMisses:["特別","重要","好き","大好き","愛している","かけがえのない"],meaning:"ヴェインという存在そのものに高い価値を置いていること",boundary:"「大切」は恋愛に限定されない存在価値。「愛している」は最終的な愛情。",appearances:[6,10,16],difficulty:"medium",finalRole:"心配・守る・失う・怖いを結ぶ理由。",minClues:2},
+    W6:{q:"ΘΞΦ",canonical:"守る",variants:["まもる","護る"],synonyms:["保護する","守護する"],nearMisses:["助ける","救う","庇う","かばう","支える"],meaning:"ヴェイン個人を守ろうとする行動・意志・誓い",boundary:"一般的な職務としての「城を守る」「国を守る」は暗号化しない。",appearances:[6,12,19],difficulty:"medium",finalRole:"一方的に守ろうとする関係から、互いに支え合う関係への変化。",minClues:2},
+    W7:{q:"κμνρ",canonical:"忘れる",variants:["わすれる"],synonyms:["忘却","忘却する"],nearMisses:["捨てる","手放す","失う","離れる","消す"],meaning:"記憶・言葉・関係などを意図的に手放そうとすること",boundary:"「忘れる」は本人の意思を伴う。「失う」は望まない喪失。",appearances:[11,15,16],difficulty:"medium",finalRole:"ランスロットが関係を断とうとした誤った選択と、その撤回。",minClues:2},
+    W8:{q:"Ωβδ",canonical:"失う",variants:["うしなう","喪う"],synonyms:["失くす","なくす","喪失","喪失する"],nearMisses:["離れる","別れる","忘れる","死ぬ","手放す"],meaning:"大切な相手や関係を、本人の望みに反して喪失すること",boundary:"「忘れる」は意図的。「失う」は望まない喪失。",appearances:[10,14,17],difficulty:"medium-hard",finalRole:"ランスロットが距離を取った根本原因である喪失への恐れ。",minClues:3},
+    W9:{q:"ξΔφ",canonical:"怖い",variants:["こわい","恐い"],synonyms:["恐れる","恐怖","恐ろしい"],nearMisses:["心配","不安","怯える","おびえる","つらい"],meaning:"ランスロット自身が恐怖を感じること",boundary:"「心配」はヴェインを気にかけること。「怖い」はランスロット自身の内側の感情。",appearances:[12,15,17],difficulty:"medium-hard",finalRole:"ランスロットが自分の弱さを認めるための核心語。",minClues:3},
+    W10:{q:"∞∅θ",canonical:"ずっと",variants:["ズット","ずーっと"],synonyms:["いつまでも","末永く","末ながく"],nearMisses:["いつも","永遠","これからも","長く","一緒"],meaning:"二人の関係や感情が時間的に継続すること",boundary:"「一緒」は二人である状態。「ずっと」はその状態がいつまで続くか。",appearances:[13,16,19],difficulty:"medium",finalRole:"過去から未来へ関係が続いていくことを示す。",minClues:2},
+    W11:{q:"πρστυφ",canonical:"愛している",variants:["あいしている","愛してる","あいしてる"],synonyms:["愛する","愛"],nearMisses:["好き","大好き","恋している","恋する","大切","愛情"],meaning:"「親友」「大切」だけでは説明できない最終的な愛情",boundary:"「大切」と完全同義にしない。本作の最終解読語。",appearances:[15,18,20],difficulty:"hardest",finalRole:"最後の告白で意味が確定する最重要語。",minClues:3},
+    W12:{q:"ϕχψζ",canonical:"信じる",variants:["しんじる"],synonyms:["信頼","信頼する"],nearMisses:["頼る","信用","信用する","任せる","期待する"],meaning:"ヴェインの判断・言葉・存在を信頼し、確信すること",boundary:"「信じる」は認識・信頼。「頼る」は実際に自分の負担を相手へ預けること。",appearances:[5,11,18],difficulty:"medium",finalRole:"言葉が完全に分からなくても成立する二人の信頼。",minClues:2},
+    W13:{q:"℧ΞΛ",canonical:"頼る",variants:["たよる"],synonyms:["頼りにする","頼みにする"],nearMisses:["信じる","任せる","甘える","助けを求める","依存する","すがる"],meaning:"自分の弱さや負担をヴェインへ預け、支えを求めること",boundary:"相手を信じていても、実際には頼らない状態は成立する。",appearances:[9,14,18],difficulty:"medium",finalRole:"一人で抱え込まず、互いに支え合う関係への変化。",minClues:2},
+    W14:{q:"ΓΔ",canonical:"約束",variants:["やくそく","約束する"],synonyms:[],nearMisses:["誓う","誓い","誓約","保証","決める","契約"],meaning:"二人の間で未来についての意志を言葉として確定すること",boundary:"「一緒」は望む状態。「ずっと」は時間。「約束」はその未来を二人で確認する行為。",appearances:[8,13,19],difficulty:"medium",finalRole:"「ずっと」「一緒」など複数の既知語を未来へ結びつける。",minClues:2},
+    W15:{q:"ΨΩ",canonical:"伝える",variants:["つたえる"],synonyms:["届ける"],nearMisses:["言う","話す","知らせる","伝達する","分かってほしい","聞いて"],meaning:"自分の本心・感情・願いを言葉としてヴェインへ届けること",boundary:"「愛している」などは伝える内容。「伝える」は届けようとする行為。",appearances:[2,11,20],difficulty:"medium",finalRole:"「言葉が届かない」というゲームそのもののテーマを回収する。",minClues:2}
+};
 
-        "W2": {
-            q: "ΣΦμ",
-            canonical: "一緒",
-            variants: ["いっしょ"],
-            synonyms: ["共に", "ともに"],
-            nearMisses: ["そば", "傍", "隣", "ずっと", "同行"],
-            meaning: "二人で行動する、二人として何かを共有すること",
-            boundary: "「ずっと」は時間的継続。「一緒」は誰と・どのような状態であるか。",
-            appearances: [4, 8, 17],
-            difficulty: "easy-medium",
-            finalRole: "二人がこの先も共にあることを示す未来語。",
-            minClues: 2
-        },
+let currentStep=0,viewingStep=0,lovePoints=0,userDict={},colSet=new Set();
+let selectedAnswers=[];
+let masteredWords=new Set(),vaneKnownWords=new Set(),vaneUnderstoodAt={};
+let wordSeenCounts={},seenSceneIds=new Set();
+let interactionPhase="conversation",pendingOption=null,pendingResolvedKeys=[],pendingFinalLine="";
+let activeDictKey=null,mainViewMode="play";
+let interpretationCounts={unknown:0,misread:0,understood:0};
+let axisCounts={listen:0,act:0,bond:0,self:0,daily:0};
+let routeCounts={twin:0,glass:0,resonance:0};
 
-        "W3": {
-            q: "αβγδε",
-            canonical: "ありがとう",
-            variants: ["ありがと", "有難う", "有り難う"],
-            synonyms: ["感謝", "感謝する", "お礼"],
-            nearMisses: ["嬉しい", "助かった", "ごめん", "すまない"],
-            meaning: "ヴェイン本人がしてくれたことへの感謝",
-            boundary: "謝罪や一般的な礼儀ではなく、ヴェインとの関係に意味を持つ感謝。",
-            appearances: [3, 9, 18],
-            difficulty: "easy",
-            finalRole: "最後まで理解しようとしてくれたヴェインへの感謝。",
-            minClues: 2
-        },
+scenario.forEach(scene=>{
+    scene.opts.forEach((option,optionIndex)=>{
+        if(!option.id) option.id=`s${String(scene.id).padStart(2,"0")}_o${optionIndex+1}`;
+    });
+});
 
-        "W4": {
-            q: "λησ",
-            canonical: "親友",
-            variants: ["しんゆう"],
-            synonyms: ["ベストフレンド"],
-            nearMisses: ["友達", "友人", "相棒", "仲間", "幼馴染"],
-            meaning: "現在の二人の関係を定義する言葉",
-            boundary: "「親友」は関係名。「愛している」は感情。",
-            appearances: [7, 12, 17],
-            difficulty: "easy-medium",
-            finalRole: "「親友だからだけではない」と関係を一段深めるための基準点。",
-            minClues: 2
-        },
+const maxLove=450;
 
-        "W5": {
-            q: "ψζβ",
-            canonical: "大切",
-            variants: ["たいせつ"],
-            synonyms: ["大事", "だいじ"],
-            nearMisses: ["特別", "重要", "好き", "大好き", "愛している", "かけがえのない"],
-            meaning: "ヴェインという存在そのものに高い価値を置いていること",
-            boundary: "「大切」は恋愛に限定されない存在価値。「愛している」は最終的な愛情。",
-            appearances: [6, 10, 16],
-            difficulty: "medium",
-            finalRole: "心配・守る・失う・怖いを結ぶ理由。",
-            minClues: 2
-        },
+function switchMainView(mode){
+    if(mode!=="play"&&mode!=="log") return;
 
-        "W6": {
-            q: "ΘΞΦ",
-            canonical: "守る",
-            variants: ["まもる", "護る"],
-            synonyms: ["保護する", "守護する"],
-            nearMisses: ["助ける", "救う", "庇う", "かばう", "支える"],
-            meaning: "ヴェイン個人を守ろうとする行動・意志・誓い",
-            boundary: "一般的な職務としての「城を守る」「国を守る」は暗号化しない。",
-            appearances: [6, 12, 19],
-            difficulty: "medium",
-            finalRole: "一方的に守ろうとする関係から、互いに支え合う関係への変化。",
-            minClues: 2
-        },
+    mainViewMode=mode;
 
-        "W7": {
-            q: "κμνρ",
-            canonical: "忘れる",
-            variants: ["わすれる"],
-            synonyms: ["忘却", "忘却する"],
-            nearMisses: ["捨てる", "手放す", "失う", "離れる", "消す"],
-            meaning: "記憶・言葉・関係などを意図的に手放そうとすること",
-            boundary: "「忘れる」は本人の意思を伴う。「失う」は望まない喪失。",
-            appearances: [11, 15, 16],
-            difficulty: "medium",
-            finalRole: "ランスロットが関係を断とうとした誤った選択と、その撤回。",
-            minClues: 2
-        },
+    const playView=document.getElementById("play-view");
+    const logSection=document.getElementById("log-section");
+    const playTab=document.getElementById("play-view-tab");
+    const logTab=document.getElementById("log-view-tab");
 
-        "W8": {
-            q: "Ωβδ",
-            canonical: "失う",
-            variants: ["うしなう", "喪う"],
-            synonyms: ["失くす", "なくす", "喪失", "喪失する"],
-            nearMisses: ["離れる", "別れる", "忘れる", "死ぬ", "手放す"],
-            meaning: "大切な相手や関係を、本人の望みに反して喪失すること",
-            boundary: "「忘れる」は意図的。「失う」は望まない喪失。",
-            appearances: [10, 14, 17],
-            difficulty: "medium-hard",
-            finalRole: "ランスロットが距離を取った根本原因である喪失への恐れ。",
-            minClues: 3
-        },
+    if(!playView||!logSection||!playTab||!logTab) return;
 
-        "W9": {
-            q: "ξΔφ",
-            canonical: "怖い",
-            variants: ["こわい", "恐い"],
-            synonyms: ["恐れる", "恐怖", "恐ろしい"],
-            nearMisses: ["心配", "不安", "怯える", "おびえる", "つらい"],
-            meaning: "ランスロット自身が恐怖を感じること",
-            boundary: "「心配」はヴェインを気にかけること。「怖い」はランスロット自身の内側の感情。",
-            appearances: [12, 15, 17],
-            difficulty: "medium-hard",
-            finalRole: "ランスロットが自分の弱さを認めるための核心語。",
-            minClues: 3
-        },
+    if(mode==="log"){
+        playView.style.display="none";
+        logSection.style.display="flex";
+        playTab.classList.remove("active");
+        logTab.classList.add("active");
+        renderPastLog();
+    }else{
+        playView.style.display="flex";
+        logSection.style.display="none";
+        logTab.classList.remove("active");
+        playTab.classList.add("active");
+    }
+}
 
-        "W10": {
-            q: "∞∅θ",
-            canonical: "ずっと",
-            variants: ["ズット", "ずーっと"],
-            synonyms: ["いつまでも", "末永く", "末ながく"],
-            nearMisses: ["いつも", "永遠", "これからも", "長く", "一緒"],
-            meaning: "二人の関係や感情が時間的に継続すること",
-            boundary: "「一緒」は二人である状態。「ずっと」はその状態がいつまで続くか。",
-            appearances: [13, 16, 19],
-            difficulty: "medium",
-            finalRole: "過去から未来へ関係が続いていくことを示す。",
-            minClues: 2
-        },
+function rebuildRunState(){
+    lovePoints=0;
+    interpretationCounts={unknown:0,misread:0,understood:0};
+    axisCounts={listen:0,act:0,bond:0,self:0,daily:0};
+    routeCounts={twin:0,glass:0,resonance:0};
 
-        "W11": {
-            q: "πρστυφ",
-            canonical: "愛している",
-            variants: ["あいしている", "愛してる", "あいしてる"],
-            synonyms: ["愛する", "愛"],
-            nearMisses: ["好き", "大好き", "恋している", "恋する", "大切", "愛情"],
-            meaning: "「親友」「大切」だけでは説明できない最終的な愛情",
-            boundary: "「大切」と完全同義にしない。本作の最終解読語。",
-            appearances: [15, 18, 20],
-            difficulty: "hardest",
-            finalRole: "最後の告白で意味が確定する最重要語。",
-            minClues: 3
-        },
+    selectedAnswers.forEach((optionId,sceneIndex)=>{
+        if(!optionId) return;
 
-        "W12": {
-            q: "ϕχψζ",
-            canonical: "信じる",
-            variants: ["しんじる"],
-            synonyms: ["信頼", "信頼する"],
-            nearMisses: ["頼る", "信用", "信用する", "任せる", "期待する"],
-            meaning: "ヴェインの判断・言葉・存在を信頼し、確信すること",
-            boundary: "「信じる」は認識・信頼。「頼る」は実際に自分の負担を相手へ預けること。",
-            appearances: [5, 11, 18],
-            difficulty: "medium",
-            finalRole: "言葉が完全に分からなくても成立する二人の信頼。",
-            minClues: 2
-        },
+        const data=scenario[sceneIndex];
+        if(!data) return;
 
-        "W13": {
-            q: "℧ΞΛ",
-            canonical: "頼る",
-            variants: ["たよる"],
-            synonyms: ["頼りにする", "頼みにする"],
-            nearMisses: ["信じる", "任せる", "甘える", "助けを求める", "依存する", "すがる"],
-            meaning: "自分の弱さや負担をヴェインへ預け、支えを求めること",
-            boundary: "相手を信じていても、実際には頼らない状態は成立する。",
-            appearances: [9, 14, 18],
-            difficulty: "medium",
-            finalRole: "一人で抱え込まず、互いに支え合う関係への変化。",
-            minClues: 2
-        },
+        const option=data.opts.find(o=>o.id===optionId);
+        if(!option) return;
 
-        "W14": {
-            q: "ΓΔ",
-            canonical: "約束",
-            variants: ["やくそく", "約束する"],
-            synonyms: [],
-            nearMisses: ["誓う", "誓い", "誓約", "保証", "決める", "契約"],
-            meaning: "二人の間で未来についての意志を言葉として確定すること",
-            boundary: "「一緒」は望む状態。「ずっと」は時間。「約束」はその未来を二人で確認する行為。",
-            appearances: [8, 13, 19],
-            difficulty: "medium",
-            finalRole: "「ずっと」「一緒」など複数の既知語を未来へ結びつける。",
-            minClues: 2
-        },
+        lovePoints+=Number(option.v)||0;
+        if(!option.endingImpact) return;
 
-        "W15": {
-            q: "ΨΩ",
-            canonical: "伝える",
-            variants: ["つたえる"],
-            synonyms: ["届ける"],
-            nearMisses: ["言う", "話す", "知らせる", "伝達する", "分かってほしい", "聞いて"],
-            meaning: "自分の本心・感情・願いを言葉としてヴェインへ届けること",
-            boundary: "「愛している」などは伝える内容。「伝える」は届けようとする行為。",
-            appearances: [2, 11, 20],
-            difficulty: "medium",
-            finalRole: "「言葉が届かない」というゲームそのもののテーマを回収する。",
-            minClues: 2
+        if(option.interpretation&&Object.prototype.hasOwnProperty.call(interpretationCounts,option.interpretation)){
+            interpretationCounts[option.interpretation]++;
         }
-    };
+        if(option.axis&&Object.prototype.hasOwnProperty.call(axisCounts,option.axis)){
+            axisCounts[option.axis]++;
+        }
+        if(option.route&&Object.prototype.hasOwnProperty.call(routeCounts,option.route)){
+            routeCounts[option.route]++;
+        }
+    });
+}
 
-    let currentStep = 0,
-        viewingStep = 0,
-        lovePoints = 0,
-        userDict = {},
-        colSet = new Set();
+function normalizeGuess(value){
+    return String(value||"").normalize("NFKC").replace(/\s+/g,"").trim();
+}
 
-    let selectedAnswers = [];
+function isAcceptedGuess(key,value){
+    if(!wordBank[key]) return false;
 
-    let masteredWords = new Set();
-    let vaneKnownWords = new Set();
-    let vaneUnderstoodAt = {};
+    const normalized=normalizeGuess(value);
+    const acceptedInputs=[
+        wordBank[key].canonical,
+        ...(wordBank[key].variants||[]),
+        ...(wordBank[key].synonyms||[])
+    ];
 
-    let wordSeenCounts = {};
-    let seenSceneIds = new Set();
+    return acceptedInputs.some(candidate=>normalizeGuess(candidate)===normalized);
+}
 
-    let interactionPhase = "conversation";
-    let pendingOption = null;
-    let pendingResolvedKeys = [];
-    let pendingFinalLine = "";
+function getSavedWords(){
+    try{
+        return JSON.parse(localStorage.getItem("vane_solved_words")||"{}");
+    }catch(e){
+        return {};
+    }
+}
 
-    let activeDictKey = null;
+function getMasteredWordSet(){
+    const saved=getSavedWords();
+    const result=new Set();
 
-    let mainViewMode = "play";
+    Object.keys(wordBank).forEach(key=>{
+        if(saved[key]&&isAcceptedGuess(key,saved[key])) result.add(key);
+    });
 
-    let interpretationCounts = {
-        unknown: 0,
-        misread: 0,
-        understood: 0
-    };
+    return result;
+}
 
-    let axisCounts = {
-        listen: 0,
-        act: 0,
-        bond: 0,
-        self: 0,
-        daily: 0
-    };
+function persistMasteredWord(key){
+    if(!wordBank[key]) return;
 
-    let routeCounts = {
-        twin: 0,
-        glass: 0,
-        resonance: 0
-    };
+    const solved=getSavedWords();
+    solved[key]=wordBank[key].canonical;
+    localStorage.setItem("vane_solved_words",JSON.stringify(solved));
+}
 
-    scenario.forEach(scene => {
-        scene.opts.forEach((option, optionIndex) => {
-            if (!option.id) {
-                option.id =
-                    `s${String(scene.id).padStart(2, "0")}_o${optionIndex + 1}`;
-            }
+function hasCompatibleSavedWords(){
+    return getMasteredWordSet().size>0;
+}
+
+function sceneContainsWord(text,key){
+    return new RegExp("\\[\\["+key+"(?:\\||\\]\\])").test(text);
+}
+
+const wordTotalClueScenes={};
+for(let key in wordBank){
+    wordTotalClueScenes[key]=scenario.filter(data=>sceneContainsWord(data.q,key)).length;
+}
+
+function checkEnvironment(){
+    const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||window.innerWidth<800;
+    const title=document.getElementById("check-title");
+    const entryBtn=document.getElementById("entry-btn");
+    const errorMsg=document.getElementById("error-msg");
+
+    if(isMobile){
+        title.innerText="ACCESS DENIED";
+        errorMsg.style.display="block";
+    }else{
+        title.innerText="ATTENTION";
+        entryBtn.style.display="inline-block";
+    }
+}
+
+function shuffle(arr){
+    let n=arr.length;
+    while(n){
+        let i=Math.floor(Math.random()*n--);
+        [arr[n],arr[i]]=[arr[i],arr[n]];
+    }
+    return arr;
+}
+
+function getEncounteredScenesForWord(key){
+    const result=[];
+
+    scenario.forEach((scene,sceneIndex)=>{
+        if(!seenSceneIds.has(sceneIndex)) return;
+        if(sceneContainsWord(scene.q,key)) result.push(sceneIndex);
+    });
+
+    return result;
+}
+
+function jumpToLogScene(sceneIndex,key){
+    if(key&&wordBank[key]) activeDictKey=key;
+
+    switchMainView("log");
+    renderPastLog();
+
+    requestAnimationFrame(()=>{
+        const target=document.getElementById(`log-scene-${sceneIndex}`);
+        if(!target) return;
+
+        target.scrollIntoView({behavior:"smooth",block:"center"});
+        target.classList.remove("log-focus");
+        void target.offsetWidth;
+        target.classList.add("log-focus");
+
+        setTimeout(()=>target.classList.remove("log-focus"),1200);
+    });
+}
+
+function jumpToDict(key){
+    if(!wordBank[key]) return;
+
+    activeDictKey=key;
+    renderActiveDictEntry();
+    renderPastLog();
+    renderWordList();
+
+    const input=document.getElementById(`input-${key}`);
+    if(input&&!input.disabled) input.focus();
+}
+
+function renderDictPlaceholder(){
+    const list=document.getElementById("dict-list");
+    if(!list) return;
+
+    list.innerHTML=`
+        <div class="dict-placeholder">
+            <div class="dict-placeholder-symbol">―――</div>
+            会話の中の聞き取れない言葉を<br>選んでください。
+        </div>
+    `;
+}
+
+function renderActiveDictEntry(){
+    const list=document.getElementById("dict-list");
+    if(!list) return;
+
+    if(!activeDictKey||!wordBank[activeDictKey]){
+        renderDictPlaceholder();
+        return;
+    }
+
+    const key=activeDictKey;
+    const encounteredScenes=getEncounteredScenesForWord(key);
+
+    const recordButtons=encounteredScenes.length>0
+        ? encounteredScenes.map(sceneIndex=>`
+            <button type="button" class="dict-record-btn" onclick="jumpToLogScene(${sceneIndex}, '${key}')">
+                SCENE ${String(sceneIndex+1).padStart(2,"0")}
+            </button>
+        `).join("")
+        : `<span class="dict-record-empty">この周回ではまだ記録がありません。</span>`;
+
+    list.innerHTML="";
+
+    const div=document.createElement("div");
+    div.className="dict-entry";
+    div.id=`entry-${key}`;
+    div.innerHTML=`
+        <label class="dict-symbol-label">${wordBank[key].q}</label>
+        <div class="dict-field-label">仮説</div>
+        <input type="text" id="input-${key}" placeholder="思いついた意味を書き留める" value="" oninput="updateGuess('${key}', this.value)">
+        <div class="dict-status" id="status-${key}"></div>
+        <div class="dict-records">
+            <div class="dict-records-title">遭遇記録</div>
+            <div class="dict-record-list">${recordButtons}</div>
+        </div>
+    `;
+
+    list.appendChild(div);
+    renderDictEntryState(key);
+}
+
+function renderLogDialogueText(text){
+    let rendered=text||"";
+
+    for(let key in wordBank){
+        const reg=new RegExp("\\[\\["+key+"(?:\\|([^\\]]+))?\\]\\]","g");
+
+        rendered=rendered.replace(reg,(match,surfaceForm)=>{
+            const resolved=vaneKnownWords.has(key);
+            const spanClass=resolved?"resolved":"symbol";
+            const activeClass=key===activeDictKey?" log-symbol-active":"";
+            const displayVal=resolved?(surfaceForm||wordBank[key].canonical):wordBank[key].q;
+
+            return `<span class="${spanClass}${activeClass}" onclick="jumpToDict('${key}')">${displayVal}</span>`;
+        });
+    }
+
+    return rendered.replace(/\n/g,"<br>");
+}
+
+function renderPastLog(){
+    const panel=document.getElementById("log-panel");
+    if(!panel) return;
+
+    const previousScrollTop=panel.scrollTop;
+    const maxIndex=Math.min(currentStep,scenario.length-1);
+
+    if(maxIndex<0||scenario.length===0){
+        panel.innerHTML=`<div class="log-empty">まだ記録はありません。</div>`;
+        return;
+    }
+
+    const entries=[];
+
+    for(let index=0;index<=maxIndex;index++){
+        if(!seenSceneIds.has(index)&&index!==currentStep) continue;
+
+        const data=scenario[index];
+        if(!data) continue;
+
+        const thought=(data.vaneThought||"").replace(/\n/g,"<br>");
+
+        entries.push(`
+            <div class="log-entry" id="log-scene-${index}">
+                <div class="log-scene">SCENE ${String(index+1).padStart(2,"0")}</div>
+                <div class="log-speaker">LANCELOT</div>
+                <div class="log-dialogue">${renderLogDialogueText(data.q)}</div>
+                ${thought?`
+                    <div class="log-thought-label">VANE</div>
+                    <div class="log-thought">${thought}</div>
+                `:""}
+            </div>
+        `);
+    }
+
+    if(entries.length===0){
+        panel.innerHTML=`<div class="log-empty">まだ記録はありません。</div>`;
+        return;
+    }
+
+    panel.innerHTML=entries.join("");
+    panel.scrollTop=previousScrollTop;
+}
+
+function getVisibleWordKeys(){
+    const keys=[];
+
+    scenario.forEach((scene,sceneIndex)=>{
+        if(!seenSceneIds.has(sceneIndex)) return;
+
+        Object.keys(wordBank).forEach(key=>{
+            if(sceneContainsWord(scene.q,key)&&!keys.includes(key)) keys.push(key);
         });
     });
 
-    const maxLove = 450;
+    Object.keys(wordBank).forEach(key=>{
+        if(vaneKnownWords.has(key)&&!keys.includes(key)) keys.push(key);
+    });
 
-    function switchMainView(mode) {
-        if (
-            mode !== "play" &&
-            mode !== "log"
-        ) {
-            return;
-        }
+    return keys;
+}
 
-        mainViewMode = mode;
+function renderWordList(){
+    const list=document.getElementById("word-list");
+    if(!list) return;
 
-        const playView =
-            document.getElementById(
-                'play-view'
-            );
+    const keys=getVisibleWordKeys();
 
-        const logSection =
-            document.getElementById(
-                'log-section'
-            );
-
-        const playTab =
-            document.getElementById(
-                'play-view-tab'
-            );
-
-        const logTab =
-            document.getElementById(
-                'log-view-tab'
-            );
-
-        if (
-            !playView ||
-            !logSection ||
-            !playTab ||
-            !logTab
-        ) {
-            return;
-        }
-
-        if (mode === "log") {
-            playView.style.display =
-                "none";
-
-            logSection.style.display =
-                "flex";
-
-            playTab.classList.remove(
-                "active"
-            );
-
-            logTab.classList.add(
-                "active"
-            );
-
-            renderPastLog();
-        }
-        else {
-            playView.style.display =
-                "flex";
-
-            logSection.style.display =
-                "none";
-
-            logTab.classList.remove(
-                "active"
-            );
-
-            playTab.classList.add(
-                "active"
-            );
-        }
+    if(keys.length===0){
+        list.innerHTML=`<div class="word-list-empty">まだ聞き取れない言葉は記録されていません。</div>`;
+        return;
     }
 
-    function rebuildRunState() {
-        lovePoints = 0;
+    list.innerHTML=keys.map(key=>{
+        const understood=vaneKnownWords.has(key);
+        const guess=understood?wordBank[key].canonical:(userDict[key]||"").trim();
 
-        interpretationCounts = {
-            unknown: 0,
-            misread: 0,
-            understood: 0
-        };
+        let statusText="未推測";
+        let statusClass="";
 
-        axisCounts = {
-            listen: 0,
-            act: 0,
-            bond: 0,
-            self: 0,
-            daily: 0
-        };
-
-        routeCounts = {
-            twin: 0,
-            glass: 0,
-            resonance: 0
-        };
-
-        selectedAnswers.forEach(
-            (optionId, sceneIndex) => {
-                if (!optionId) return;
-
-                const data =
-                    scenario[sceneIndex];
-
-                if (!data) return;
-
-                const option =
-                    data.opts.find(
-                        o =>
-                            o.id === optionId
-                    );
-
-                if (!option) return;
-
-                lovePoints +=
-                    Number(option.v) || 0;
-
-                if (
-                    !option.endingImpact
-                ) {
-                    return;
-                }
-
-                if (
-                    option.interpretation &&
-                    Object.prototype.hasOwnProperty.call(
-                        interpretationCounts,
-                        option.interpretation
-                    )
-                ) {
-                    interpretationCounts[
-                        option.interpretation
-                    ]++;
-                }
-
-                if (
-                    option.axis &&
-                    Object.prototype.hasOwnProperty.call(
-                        axisCounts,
-                        option.axis
-                    )
-                ) {
-                    axisCounts[
-                        option.axis
-                    ]++;
-                }
-
-                if (
-                    option.route &&
-                    Object.prototype.hasOwnProperty.call(
-                        routeCounts,
-                        option.route
-                    )
-                ) {
-                    routeCounts[
-                        option.route
-                    ]++;
-                }
-            }
-        );
-    }
-
-    function normalizeGuess(value) {
-        return String(value || "")
-            .normalize("NFKC")
-            .replace(/\s+/g, "")
-            .trim();
-    }
-
-    function isAcceptedGuess(
-        key,
-        value
-    ) {
-        if (!wordBank[key]) {
-            return false;
+        if(understood){
+            statusText="理解した";
+            statusClass=" understood";
+        }else if(guess){
+            statusText="推測中";
+            statusClass=" guessing";
         }
 
-        const normalized =
-            normalizeGuess(value);
-
-        const acceptedInputs = [
-            wordBank[key].canonical,
-            ...(wordBank[key].variants || []),
-            ...(wordBank[key].synonyms || [])
-        ];
-
-        return acceptedInputs.some(
-            candidate => {
-                return (
-                    normalizeGuess(candidate) ===
-                    normalized
-                );
-            }
-        );
-    }
-
-    function getSavedWords() {
-        try {
-            return JSON.parse(
-                localStorage.getItem(
-                    'vane_solved_words'
-                ) || "{}"
-            );
-        }
-        catch (e) {
-            return {};
-        }
-    }
-
-    function getMasteredWordSet() {
-        const saved =
-            getSavedWords();
-
-        const result =
-            new Set();
-
-        Object.keys(
-            wordBank
-        ).forEach(key => {
-            if (
-                saved[key] &&
-                isAcceptedGuess(
-                    key,
-                    saved[key]
-                )
-            ) {
-                result.add(key);
-            }
-        });
-
-        return result;
-    }
-
-    function persistMasteredWord(
-        key
-    ) {
-        if (!wordBank[key]) {
-            return;
-        }
-
-        const solved =
-            getSavedWords();
-
-        solved[key] =
-            wordBank[key].canonical;
-
-        localStorage.setItem(
-            'vane_solved_words',
-            JSON.stringify(solved)
-        );
-    }
-
-    function hasCompatibleSavedWords() {
-        return (
-            getMasteredWordSet().size >
-            0
-        );
-    }
-
-    function sceneContainsWord(
-        text,
-        key
-    ) {
-        const reg =
-            new RegExp(
-                "\\[\\[" +
-                key +
-                "(?:\\||\\]\\])"
-            );
-
-        return reg.test(text);
-    }
-
-    const wordTotalClueScenes =
-        {};
-
-    for (
-        let key in wordBank
-    ) {
-        wordTotalClueScenes[key] =
-            scenario.filter(
-                data => {
-                    return sceneContainsWord(
-                        data.q,
-                        key
-                    );
-                }
-            ).length;
-    }
-
-    function checkEnvironment() {
-        const isMobile =
-            /iPhone|iPad|iPod|Android/i.test(
-                navigator.userAgent
-            ) ||
-            (
-                window.innerWidth <
-                800
-            );
-
-        const title =
-            document.getElementById(
-                'check-title'
-            );
-
-        const entryBtn =
-            document.getElementById(
-                'entry-btn'
-            );
-
-        const errorMsg =
-            document.getElementById(
-                'error-msg'
-            );
-
-        if (isMobile) {
-            title.innerText =
-                "ACCESS DENIED";
-
-            errorMsg.style.display =
-                "block";
-        }
-        else {
-            title.innerText =
-                "ATTENTION";
-
-            entryBtn.style.display =
-                "inline-block";
-        }
-    }
-
-    function shuffle(arr) {
-        let n = arr.length;
-
-        while (n) {
-            let i =
-                Math.floor(
-                    Math.random() * n--
-                );
-
-            [
-                arr[n],
-                arr[i]
-            ] = [
-                arr[i],
-                arr[n]
-            ];
-        }
-
-        return arr;
-    }
-
-    function getEncounteredScenesForWord(
-        key
-    ) {
-        const result = [];
-
-        scenario.forEach(
-            (
-                scene,
-                sceneIndex
-            ) => {
-                if (
-                    !seenSceneIds.has(
-                        sceneIndex
-                    )
-                ) {
-                    return;
-                }
-
-                if (
-                    sceneContainsWord(
-                        scene.q,
-                        key
-                    )
-                ) {
-                    result.push(
-                        sceneIndex
-                    );
-                }
-            }
-        );
-
-        return result;
-    }
-
-    function jumpToLogScene(
-        sceneIndex,
-        key
-    ) {
-        if (
-            key &&
-            wordBank[key]
-        ) {
-            activeDictKey =
-                key;
-        }
-
-        switchMainView(
-            "log"
-        );
-
-        renderPastLog();
-
-        requestAnimationFrame(
-            () => {
-                const target =
-                    document.getElementById(
-                        `log-scene-${sceneIndex}`
-                    );
-
-                if (!target) {
-                    return;
-                }
-
-                target.scrollIntoView({
-                    behavior:
-                        "smooth",
-                    block:
-                        "center"
-                });
-
-                target.classList.remove(
-                    "log-focus"
-                );
-
-                void target.offsetWidth;
-
-                target.classList.add(
-                    "log-focus"
-                );
-
-                setTimeout(
-                    () => {
-                        target.classList.remove(
-                            "log-focus"
-                        );
-                    },
-                    1200
-                );
-            }
-        );
-    }
-
-    function jumpToDict(key) {
-        if (!wordBank[key]) {
-            return;
-        }
-
-        activeDictKey = key;
-
-        renderActiveDictEntry();
-        renderPastLog();
-        renderWordList();
-
-        const input =
-            document.getElementById(
-                `input-${key}`
-            );
-
-        if (
-            input &&
-            !input.disabled
-        ) {
-            input.focus();
-        }
-    }
-
-    function renderDictPlaceholder() {
-        const list =
-            document.getElementById(
-                'dict-list'
-            );
-
-        if (!list) {
-            return;
-        }
-
-        list.innerHTML = `
-            <div class="dict-placeholder">
-                <div class="dict-placeholder-symbol">
-                    ―――
-                </div>
-
-                会話の中の聞き取れない言葉を<br>
-                選んでください。
-            </div>
-        `;
-    }
-
-    function renderActiveDictEntry() {
-        const list =
-            document.getElementById(
-                'dict-list'
-            );
-
-        if (!list) {
-            return;
-        }
-
-        if (
-            !activeDictKey ||
-            !wordBank[activeDictKey]
-        ) {
-            renderDictPlaceholder();
-            return;
-        }
-
-        const key =
-            activeDictKey;
-
-        const encounteredScenes =
-            getEncounteredScenesForWord(
-                key
-            );
-
-        const recordButtons =
-            encounteredScenes.length > 0
-                ? encounteredScenes
-                    .map(
-                        sceneIndex => {
-                            return `
-                                <button
-                                    type="button"
-                                    class="dict-record-btn"
-                                    onclick="jumpToLogScene(${sceneIndex}, '${key}')"
-                                >
-                                    SCENE ${String(sceneIndex + 1).padStart(2, "0")}
-                                </button>
-                            `;
-                        }
-                    )
-                    .join("")
-                : `
-                    <span class="dict-record-empty">
-                        この周回ではまだ記録がありません。
-                    </span>
-                `;
-
-        list.innerHTML = "";
-
-        const div =
-            document.createElement(
-                'div'
-            );
-
-        div.className =
-            'dict-entry';
-
-        div.id =
-            `entry-${key}`;
-
-        div.innerHTML = `
-            <label class="dict-symbol-label">
-                ${wordBank[key].q}
-            </label>
-
-            <div class="dict-field-label">
-                仮説
-            </div>
-
-            <input
-                type="text"
-                id="input-${key}"
-                placeholder="思いついた意味を書き留める"
-                value=""
-                oninput="updateGuess('${key}', this.value)"
-            >
-
-            <div
-                class="dict-status"
-                id="status-${key}"
-            ></div>
-
-            <div class="dict-records">
-
-                <div class="dict-records-title">
-                    遭遇記録
-                </div>
-
-                <div class="dict-record-list">
-                    ${recordButtons}
-                </div>
-
-            </div>
-        `;
-
-        list.appendChild(div);
-
-        renderDictEntryState(
-            key
-        );
-    }
-
-    function renderLogDialogueText(
-        text
-    ) {
-        let rendered =
-            text || "";
-
-        for (
-            let key in wordBank
-        ) {
-            const reg =
-                new RegExp(
-                    "\\[\\[" +
-                    key +
-                    "(?:\\|([^\\]]+))?\\]\\]",
-                    "g"
-                );
-
-            rendered =
-                rendered.replace(
-                    reg,
-                    (
-                        match,
-                        surfaceForm
-                    ) => {
-                        const resolved =
-                            vaneKnownWords.has(
-                                key
-                            );
-
-                        const spanClass =
-                            resolved
-                                ? "resolved"
-                                : "symbol";
-
-                        const activeClass =
-                            key === activeDictKey
-                                ? " log-symbol-active"
-                                : "";
-
-                        const displayVal =
-                            resolved
-                                ? (
-                                    surfaceForm ||
-                                    wordBank[key].canonical
-                                )
-                                : wordBank[key].q;
-
-                        return (
-                            `<span class="${spanClass}${activeClass}" onclick="jumpToDict('${key}')">${displayVal}</span>`
-                        );
-                    }
-                );
-        }
-
-        return rendered.replace(
-            /\n/g,
-            "<br>"
-        );
-    }
-
-    function renderPastLog() {
-        const panel =
-            document.getElementById(
-                'log-panel'
-            );
-
-        if (!panel) {
-            return;
-        }
-
-        const previousScrollTop =
-            panel.scrollTop;
-
-        const maxIndex =
-            Math.min(
-                currentStep,
-                scenario.length - 1
-            );
-
-        if (
-            maxIndex < 0 ||
-            scenario.length === 0
-        ) {
-            panel.innerHTML = `
-                <div class="log-empty">
-                    まだ記録はありません。
-                </div>
-            `;
-
-            return;
-        }
-
-        const entries =
-            [];
-
-        for (
-            let index = 0;
-            index <= maxIndex;
-            index++
-        ) {
-            if (
-                !seenSceneIds.has(
-                    index
-                ) &&
-                index !==
-                currentStep
-            ) {
-                continue;
-            }
-
-            const data =
-                scenario[index];
-
-            if (!data) {
-                continue;
-            }
-
-            const thought =
-                (
-                    data.vaneThought ||
-                    ""
-                ).replace(
-                    /\n/g,
-                    "<br>"
-                );
-
-            entries.push(`
-                <div
-                    class="log-entry"
-                    id="log-scene-${index}"
-                >
-
-                    <div class="log-scene">
-                        SCENE ${String(index + 1).padStart(2, "0")}
-                    </div>
-
-                    <div class="log-speaker">
-                        LANCELOT
-                    </div>
-
-                    <div class="log-dialogue">
-                        ${renderLogDialogueText(data.q)}
-                    </div>
-
-                    ${
-                        thought
-                            ? `
-                                <div class="log-thought-label">
-                                    VANE
-                                </div>
-
-                                <div class="log-thought">
-                                    ${thought}
-                                </div>
-                            `
-                            : ""
-                    }
-
-                </div>
-            `);
-        }
-
-        if (
-            entries.length ===
-            0
-        ) {
-            panel.innerHTML = `
-                <div class="log-empty">
-                    まだ記録はありません。
-                </div>
-            `;
-
-            return;
-        }
-
-        panel.innerHTML =
-            entries.join("");
-
-        panel.scrollTop =
-            previousScrollTop;
-    }
-
-    function getVisibleWordKeys() {
-        const keys =
-            [];
-
-        scenario.forEach(
-            (
-                scene,
-                sceneIndex
-            ) => {
-                if (
-                    !seenSceneIds.has(
-                        sceneIndex
-                    )
-                ) {
-                    return;
-                }
-
-                Object.keys(
-                    wordBank
-                ).forEach(
-                    key => {
-                        if (
-                            sceneContainsWord(
-                                scene.q,
-                                key
-                            ) &&
-                            !keys.includes(
-                                key
-                            )
-                        ) {
-                            keys.push(
-                                key
-                            );
-                        }
-                    }
-                );
-            }
-        );
-
-        Object.keys(
-            wordBank
-        ).forEach(
-            key => {
-                if (
-                    vaneKnownWords.has(
-                        key
-                    ) &&
-                    !keys.includes(
-                        key
-                    )
-                ) {
-                    keys.push(
-                        key
-                    );
-                }
-            }
-        );
-
-        return keys;
-    }
-
-    function renderWordList() {
-        const list =
-            document.getElementById(
-                'word-list'
-            );
-
-        if (!list) {
-            return;
-        }
-
-        const keys =
-            getVisibleWordKeys();
-
-        if (
-            keys.length === 0
-        ) {
-            list.innerHTML = `
-                <div class="word-list-empty">
-                    まだ聞き取れない言葉は記録されていません。
-                </div>
-            `;
-
-            return;
-        }
-
-        list.innerHTML =
-            keys.map(
-                key => {
-                    const understood =
-                        vaneKnownWords.has(
-                            key
-                        );
-
-                    const guess =
-                        understood
-                            ? wordBank[key].canonical
-                            : (
-                                userDict[key] ||
-                                ""
-                            ).trim();
-
-                    let statusText =
-                        "未推測";
-
-                    let statusClass =
-                        "";
-
-                    if (understood) {
-                        statusText =
-                            "理解した";
-
-                        statusClass =
-                            " understood";
-                    }
-                    else if (guess) {
-                        statusText =
-                            "推測中";
-
-                        statusClass =
-                            " guessing";
-                    }
-
-                    const guessText =
-                        guess || "―";
-
-                    const guessClass =
-                        understood
-                            ? " understood"
-                            : (
-                                guess
-                                    ? ""
-                                    : " empty"
-                            );
-
-                    const activeClass =
-                        key === activeDictKey
-                            ? " active"
-                            : "";
-
-                    return `
-                        <button
-                            type="button"
-                            class="word-row${activeClass}"
-                            onclick="jumpToDict('${key}')"
-                        >
-
-                            <span class="word-symbol">
-                                ${wordBank[key].q}
-                            </span>
-
-                            <span class="word-guess${guessClass}">
-                                ${guessText}
-                            </span>
-
-                            <span class="word-status${statusClass}">
-                                ${statusText}
-                            </span>
-
-                        </button>
-                    `;
-                }
-            ).join("");
-    }
-
-    window.onload =
-        () => {
-            masteredWords =
-                getMasteredWordSet();
-
-            checkEnvironment();
-
-            const entryBtn =
-                document.getElementById(
-                    'entry-btn'
-                );
-
-            const recollectionEntryBtn =
-                document.getElementById(
-                    'recollection-entry-btn'
-                );
-
-            const isMobile =
-                /iPhone|iPad|iPod|Android/i.test(
-                    navigator.userAgent
-                ) ||
-                (
-                    window.innerWidth <
-                    800
-                );
-
-            if (
-                !isMobile &&
-                typeof recollectionProgress !==
-                    "undefined" &&
-                recollectionProgress.gameCleared
-            ) {
-                entryBtn.innerText =
-                    "はじめから";
-
-                recollectionEntryBtn.style.display =
-                    "inline-block";
-            }
-
-            entryBtn.onclick =
-                () => {
-                    document.getElementById(
-                        'device-check-overlay'
-                    ).style.display =
-                        'none';
-
-                    document.getElementById(
-                        'intro-overlay'
-                    ).style.display =
-                        'flex';
-                };
-
-            recollectionEntryBtn.onclick =
-                () => {
-                    document.getElementById(
-                        'device-check-overlay'
-                    ).style.display =
-                        'none';
-
-                    openRecollection();
-                };
-
-            document.getElementById(
-                'to-tutorial'
-            ).onclick =
-                () => {
-                    document.getElementById(
-                        'intro-overlay'
-                    ).style.display =
-                        'none';
-
-                    document.getElementById(
-                        'tutorial-overlay'
-                    ).style.display =
-                        'flex';
-                };
-
-            document.getElementById(
-                'start-init-btn'
-            ).onclick =
-                () => {
-                    if (
-                        hasCompatibleSavedWords()
-                    ) {
-                        document.getElementById(
-                            'tutorial-overlay'
-                        ).style.display =
-                            'none';
-
-                        document.getElementById(
-                            'load-overlay'
-                        ).style.display =
-                            'flex';
-                    }
-                    else {
-                        startGame(
-                            false
-                        );
-                    }
-                };
-
-            document.getElementById(
-                'load-yes'
-            ).onclick =
-                () =>
-                    startGame(
-                        true
-                    );
-
-            document.getElementById(
-                'load-no'
-            ).onclick =
-                () =>
-                    startGame(
-                        false
-                    );
-
-            const savedCol =
-                localStorage.getItem(
-                    'vane_collection_v3'
-                );
-
-            if (savedCol) {
-                colSet =
-                    new Set(
-                        JSON.parse(
-                            savedCol
-                        )
-                    );
-
-                updateColUI();
-            }
-
-            initDict({});
-            renderPastLog();
-            renderWordList();
-            switchMainView(
-                "play"
-            );
-        };
-
-    function startGame(
-        inherit
-    ) {
-        document.getElementById(
-            'tutorial-overlay'
-        ).style.display =
-            'none';
-
-        document.getElementById(
-            'load-overlay'
-        ).style.display =
-            'none';
-
-        document.getElementById(
-            'game-container'
-        ).style.display =
-            'flex';
-
-        if (
-            typeof runMode !==
-            "undefined"
-        ) {
-            runMode =
-                "story";
-        }
-
-        if (
-            typeof recollectionBaseEndingId !==
-            "undefined"
-        ) {
-            recollectionBaseEndingId =
-                null;
-        }
-
-        selectedAnswers =
-            new Array(
-                scenario.length
-            ).fill(
-                null
-            );
-
-        masteredWords =
-            getMasteredWordSet();
-
-        vaneKnownWords =
-            new Set();
-
-        vaneUnderstoodAt =
-            {};
-
-        wordSeenCounts =
-            {};
-
-        seenSceneIds =
-            new Set();
-
-        interactionPhase =
-            "conversation";
-
-        pendingOption =
-            null;
-
-        pendingResolvedKeys =
-            [];
-
-        pendingFinalLine =
-            "";
-
-        activeDictKey =
-            null;
-
-        mainViewMode =
-            "play";
-
-        rebuildRunState();
-
-        const savedWords =
-            getSavedWords();
-
-        initDict(
-            inherit
-                ? savedWords
-                : {}
-        );
-
-        registerSceneWords(
-            currentStep
-        );
-
-        renderTabs();
-        updateUI();
-        renderPastLog();
-        renderWordList();
-
-        switchMainView(
-            "play"
-        );
-    }
-
-    function initDict(
-        initialWords
-    ) {
-        userDict =
-            {};
-
-        activeDictKey =
-            null;
-
-        for (
-            let key in wordBank
-        ) {
-            const isInherited =
-                initialWords[key] &&
-                isAcceptedGuess(
-                    key,
-                    initialWords[key]
-                );
-
-            userDict[key] =
-                isInherited
-                    ? wordBank[key].canonical
-                    : "";
-
-            if (
-                isInherited
-            ) {
-                masteredWords.add(
-                    key
-                );
-
-                vaneKnownWords.add(
-                    key
-                );
-
-                vaneUnderstoodAt[
-                    key
-                ] = -1;
-            }
-        }
-
-        renderDictPlaceholder();
-        updateIntelUI();
-        renderWordList();
-    }
-
-    function renderDictEntryState(
-        key
-    ) {
-        if (
-            key !==
-            activeDictKey
-        ) {
-            return;
-        }
-
-        const entry =
-            document.getElementById(
-                `entry-${key}`
-            );
-
-        const input =
-            document.getElementById(
-                `input-${key}`
-            );
-
-        const status =
-            document.getElementById(
-                `status-${key}`
-            );
-
-        if (
-            !entry ||
-            !input ||
-            !status
-        ) {
-            return;
-        }
-
-        entry.classList.remove(
-            'correct',
-            'guessing'
-        );
-
-        input.classList.remove(
-            'wrong-text'
-        );
-
-        if (
-            vaneKnownWords.has(
-                key
-            )
-        ) {
-            entry.classList.add(
-                'correct'
-            );
-
-            status.innerText =
-                "状態　理解した";
-
-            input.disabled =
-                true;
-
-            input.value =
-                wordBank[key].canonical;
-        }
-        else if (
-            (
-                userDict[key] ||
-                ""
-            )
-                .trim()
-                .length >
-            0
-        ) {
-            entry.classList.add(
-                'guessing'
-            );
-
-            status.innerText =
-                masteredWords.has(
-                    key
-                )
-                    ? "状態　推測中"
-                    : "状態　推測中";
-
-            input.disabled =
-                false;
-
-            input.value =
-                userDict[key] ||
-                "";
-        }
-        else {
-            status.innerText =
-                "状態　未推測";
-
-            input.disabled =
-                false;
-
-            input.value =
-                "";
-        }
-    }
-
-    function updateGuess(
-        key,
-        val
-    ) {
-        if (
-            vaneKnownWords.has(
-                key
-            )
-        ) {
-            return;
-        }
-
-        userDict[key] =
-            val.trim();
-
-        /*
-            入力した瞬間には
-            正誤を一切表示しない。
-        */
-        renderDictEntryState(
-            key
-        );
-
-        renderWordList();
-    }
-
-    function registerSceneWords(
-        index
-    ) {
-        if (
-            index < 0 ||
-            index >=
-            scenario.length
-        ) {
-            return;
-        }
-
-        if (
-            seenSceneIds.has(
-                index
-            )
-        ) {
-            return;
-        }
-
-        seenSceneIds.add(
-            index
-        );
-
-        const text =
-            scenario[index].q;
-
-        for (
-            let key in wordBank
-        ) {
-            if (
-                sceneContainsWord(
-                    text,
-                    key
-                )
-            ) {
-                wordSeenCounts[
-                    key
-                ] =
-                    (
-                        wordSeenCounts[
-                            key
-                        ] ||
-                        0
-                    ) + 1;
-            }
-        }
-
-        renderPastLog();
-        renderWordList();
-
-        if (
-            activeDictKey
-        ) {
-            renderActiveDictEntry();
-        }
-    }
-
-    function resolveWord(
-        key
-    ) {
-        if (
-            vaneKnownWords.has(
-                key
-            )
-        ) {
-            return false;
-        }
-
-        const guess =
-            (
-                userDict[key] ||
-                ""
-            ).trim();
-
-        if (
-            !isAcceptedGuess(
-                key,
-                guess
-            )
-        ) {
-            return false;
-        }
-
-        vaneKnownWords.add(
-            key
-        );
-
-        vaneUnderstoodAt[
-            key
-        ] =
-            currentStep;
-
-        const canonical =
-            wordBank[key].canonical;
-
-        userDict[key] =
-            canonical;
-
-        if (
-            !masteredWords.has(
-                key
-            )
-        ) {
-            masteredWords.add(
-                key
-            );
-
-            persistMasteredWord(
-                key
-            );
-        }
-
-        renderDictEntryState(
-            key
-        );
-
-        updateIntelUI();
-
-        renderPastLog();
-        renderWordList();
-
-        return true;
-    }
-
-    function evaluateUnderstanding(
-        data
-    ) {
-        let candidates;
-
-        if (
-            Array.isArray(
-                data.resolveChecks
-            )
-        ) {
-            candidates =
-                [
-                    ...data.resolveChecks
-                ];
-        }
-        else {
-            candidates =
-                Object.keys(
-                    wordBank
-                ).filter(
-                    key => {
-                        const totalClues =
-                            wordTotalClueScenes[
-                                key
-                            ] || 1;
-
-                        const requiredClues =
-                            Math.min(
-                                wordBank[
-                                    key
-                                ].minClues ||
-                                2,
-                                totalClues
-                            );
-
-                        return (
-                            wordSeenCounts[
-                                key
-                            ] ||
-                            0
-                        ) >=
-                        requiredClues;
-                    }
-                );
-        }
-
-        if (
-            data.finalResolve &&
-            data.finalResolve.special &&
-            data.finalResolve.key
-        ) {
-            candidates =
-                candidates.filter(
-                    key => {
-                        return (
-                            key !==
-                            data.finalResolve.key
-                        );
-                    }
-                );
-        }
-
-        const resolvedNow =
-            [];
-
-        candidates.forEach(
-            key => {
-                if (
-                    resolveWord(
-                        key
-                    )
-                ) {
-                    resolvedNow.push(
-                        key
-                    );
-                }
-            }
-        );
-
-        return resolvedNow;
-    }
-
-    function updateIntelUI() {
-        const intel =
-            Math.floor(
-                (
-                    vaneKnownWords.size /
-                    Object.keys(
-                        wordBank
-                    ).length
-                ) * 100
-            );
-
-        const el =
-            document.getElementById(
-                'intel-val'
-            );
-
-        if (el) {
-            el.innerText =
-                intel +
-                "%";
-        }
-    }
-
-    function getReactionText(
-        option
-    ) {
-        if (
-            option &&
-            option.reaction
-        ) {
-            return (
-                option.reaction
-            );
-        }
-
-        return "（ランちゃんは、俺の返事を静かに聞いている。）";
-    }
-
-    function renderDialogueText(
-        text
-    ) {
-        let rendered =
-            text || "";
-
-        for (
-            let key in wordBank
-        ) {
-            const reg =
-                new RegExp(
-                    "\\[\\[" +
-                    key +
-                    "(?:\\|([^\\]]+))?\\]\\]",
-                    "g"
-                );
-
-            rendered =
-                rendered.replace(
-                    reg,
-                    (
-                        match,
-                        surfaceForm
-                    ) => {
-                        const resolved =
-                            vaneKnownWords.has(
-                                key
-                            );
-
-                        const spanClass =
-                            resolved
-                                ? "resolved"
-                                : "symbol";
-
-                        const displayVal =
-                            resolved
-                                ? (
-                                    surfaceForm ||
-                                    wordBank[key].canonical
-                                )
-                                : wordBank[key].q;
-
-                        return (
-                            `<span class="${spanClass}" onclick="jumpToDict('${key}')">${displayVal}</span>`
-                        );
-                    }
-                );
-        }
-
-        return rendered.replace(
-            /\n/g,
-            "<br>"
-        );
-    }
-
-    /*
-        「意味がつながった」を
-        クイズ結果ではなく物語上の気づきとして見せる。
-    */
-    function buildUnderstandingNarrative(
-        key
-    ) {
-        if (
-            !wordBank[key]
-        ) {
-            return "";
-        }
-
-        const word =
-            wordBank[key];
+        const guessText=guess||"―";
+        const guessClass=understood?" understood":(guess?"":" empty");
+        const activeClass=key===activeDictKey?" active":"";
 
         return `
-            <div class="understanding-item">
-
-                <div class="understanding-lead">
-                    ……あ。
-                </div>
-
-                <div class="understanding-copy">
-                    何度も聞いた、あの音。<br>
-                    これまでの会話が、一つにつながる。
-                </div>
-
-                <div class="understanding-symbol">
-                    ${word.q}
-                </div>
-
-                <div class="understanding-bridge">
-                    あれは――
-                </div>
-
-                <div class="understanding-word">
-                    ${word.canonical}
-                </div>
-
-                <div class="understanding-copy">
-                    そういう意味だったんだ。
-                </div>
-
-            </div>
+            <button type="button" class="word-row${activeClass}" onclick="jumpToDict('${key}')">
+                <span class="word-symbol">${wordBank[key].q}</span>
+                <span class="word-guess${guessClass}">${guessText}</span>
+                <span class="word-status${statusClass}">${statusText}</span>
+            </button>
         `;
+    }).join("");
+}
+
+window.onload=()=>{
+    masteredWords=getMasteredWordSet();
+    checkEnvironment();
+
+    const entryBtn=document.getElementById("entry-btn");
+    const recollectionEntryBtn=document.getElementById("recollection-entry-btn");
+    const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||window.innerWidth<800;
+
+    if(!isMobile&&typeof recollectionProgress!=="undefined"&&recollectionProgress.gameCleared){
+        entryBtn.innerText="はじめから";
+        recollectionEntryBtn.style.display="inline-block";
     }
 
-    function continueFromReaction() {
-        const data =
-            scenario[
-                currentStep
-            ];
+    entryBtn.onclick=()=>{
+        document.getElementById("device-check-overlay").style.display="none";
+        document.getElementById("intro-overlay").style.display="flex";
+    };
 
-        pendingResolvedKeys =
-            evaluateUnderstanding(
-                data
-            );
+    recollectionEntryBtn.onclick=()=>{
+        document.getElementById("device-check-overlay").style.display="none";
+        openRecollection();
+    };
 
-        pendingFinalLine =
-            "";
+    document.getElementById("to-tutorial").onclick=()=>{
+        document.getElementById("intro-overlay").style.display="none";
+        document.getElementById("tutorial-overlay").style.display="flex";
+    };
 
-        if (
-            data.finalResolve &&
-            data.finalResolve.special &&
-            data.finalResolve.key
-        ) {
-            const finalKey =
-                data.finalResolve.key;
-
-            if (
-                !vaneKnownWords.has(
-                    finalKey
-                ) &&
-                isAcceptedGuess(
-                    finalKey,
-                    userDict[
-                        finalKey
-                    ]
-                )
-            ) {
-                if (
-                    resolveWord(
-                        finalKey
-                    )
-                ) {
-                    pendingFinalLine =
-                        data.finalResolve.line ||
-                        "";
-                }
-            }
+    document.getElementById("start-init-btn").onclick=()=>{
+        if(hasCompatibleSavedWords()){
+            document.getElementById("tutorial-overlay").style.display="none";
+            document.getElementById("load-overlay").style.display="flex";
+        }else{
+            startGame(false);
         }
+    };
 
-        if (
-            pendingResolvedKeys.length >
-            0 ||
-            pendingFinalLine
-        ) {
-            interactionPhase =
-                "resolution";
+    document.getElementById("load-yes").onclick=()=>startGame(true);
+    document.getElementById("load-no").onclick=()=>startGame(false);
 
-            updateUI(
-                true
-            );
-        }
-        else {
-            advanceScene();
-        }
+    const savedCol=localStorage.getItem("vane_collection_v3");
+    if(savedCol){
+        colSet=new Set(JSON.parse(savedCol));
+        updateColUI();
     }
 
-    function advanceScene() {
-        pendingOption =
-            null;
+    initDict({});
+    renderPastLog();
+    renderWordList();
+    switchMainView("play");
+};
 
-        pendingResolvedKeys =
-            [];
+function startGame(inherit){
+    document.getElementById("tutorial-overlay").style.display="none";
+    document.getElementById("load-overlay").style.display="none";
+    document.getElementById("game-container").style.display="flex";
 
-        pendingFinalLine =
-            "";
+    if(typeof runMode!=="undefined") runMode="story";
+    if(typeof recollectionBaseEndingId!=="undefined") recollectionBaseEndingId=null;
 
-        interactionPhase =
-            "conversation";
+    selectedAnswers=new Array(scenario.length).fill(null);
+    masteredWords=getMasteredWordSet();
+    vaneKnownWords=new Set();
+    vaneUnderstoodAt={};
+    wordSeenCounts={};
+    seenSceneIds=new Set();
+    interactionPhase="conversation";
+    pendingOption=null;
+    pendingResolvedKeys=[];
+    pendingFinalLine="";
+    activeDictKey=null;
+    mainViewMode="play";
 
-        currentStep++;
+    rebuildRunState();
 
-        viewingStep =
-            currentStep;
+    const savedWords=getSavedWords();
+    initDict(inherit?savedWords:{});
 
-        if (
-            currentStep <
-            scenario.length
-        ) {
-            registerSceneWords(
-                currentStep
-            );
+    registerSceneWords(currentStep);
+    renderTabs();
+    updateUI();
+    renderPastLog();
+    renderWordList();
+    switchMainView("play");
+}
 
-            renderTabs();
-            updateUI(
-                true
-            );
+function initDict(initialWords){
+    userDict={};
+    activeDictKey=null;
 
-            renderPastLog();
-            renderWordList();
+    for(let key in wordBank){
+        const isInherited=initialWords[key]&&isAcceptedGuess(key,initialWords[key]);
+        userDict[key]=isInherited?wordBank[key].canonical:"";
 
-            const display =
-                document.getElementById(
-                    'display'
-                );
-
-            if (display) {
-                display.scrollTop =
-                    0;
-            }
-
-            const logPanel =
-                document.getElementById(
-                    'log-panel'
-                );
-
-            if (logPanel) {
-                logPanel.scrollTop =
-                    logPanel.scrollHeight;
-            }
-        }
-        else {
-            showEnd();
+        if(isInherited){
+            masteredWords.add(key);
+            vaneKnownWords.add(key);
+            vaneUnderstoodAt[key]=-1;
         }
     }
 
-    function renderTabs() {
-        const current =
-            document.getElementById(
-                'progress-current'
-            );
+    renderDictPlaceholder();
+    updateIntelUI();
+    renderWordList();
+}
 
-        const total =
-            document.getElementById(
-                'progress-total'
-            );
+function renderDictEntryState(key){
+    if(key!==activeDictKey) return;
 
-        if (current) {
-            current.innerText =
-                String(
-                    viewingStep +
-                    1
-                ).padStart(
-                    2,
-                    "0"
-                );
-        }
+    const entry=document.getElementById(`entry-${key}`);
+    const input=document.getElementById(`input-${key}`);
+    const status=document.getElementById(`status-${key}`);
 
-        if (total) {
-            total.innerText =
-                String(
-                    scenario.length
-                ).padStart(
-                    2,
-                    "0"
-                );
+    if(!entry||!input||!status) return;
+
+    entry.classList.remove("correct","guessing");
+    input.classList.remove("wrong-text");
+
+    if(vaneKnownWords.has(key)){
+        entry.classList.add("correct");
+        status.innerText="状態　理解した";
+        input.disabled=true;
+        input.value=wordBank[key].canonical;
+    }else if((userDict[key]||"").trim().length>0){
+        entry.classList.add("guessing");
+        status.innerText="状態　推測中";
+        input.disabled=false;
+        input.value=userDict[key]||"";
+    }else{
+        status.innerText="状態　未推測";
+        input.disabled=false;
+        input.value="";
+    }
+}
+
+function updateGuess(key,val){
+    if(vaneKnownWords.has(key)) return;
+
+    userDict[key]=val.trim();
+    renderDictEntryState(key);
+    renderWordList();
+}
+
+function registerSceneWords(index){
+    if(index<0||index>=scenario.length||seenSceneIds.has(index)) return;
+
+    seenSceneIds.add(index);
+
+    const text=scenario[index].q;
+
+    for(let key in wordBank){
+        if(sceneContainsWord(text,key)){
+            wordSeenCounts[key]=(wordSeenCounts[key]||0)+1;
         }
     }
 
-    function updateUI(
-        redo = true
-    ) {
-        if (
-            currentStep >=
-            scenario.length
-        ) {
-            return;
-        }
+    renderPastLog();
+    renderWordList();
 
+    if(activeDictKey) renderActiveDictEntry();
+}
+
+function resolveWord(key){
+    if(vaneKnownWords.has(key)) return false;
+
+    const guess=(userDict[key]||"").trim();
+    if(!isAcceptedGuess(key,guess)) return false;
+
+    vaneKnownWords.add(key);
+    vaneUnderstoodAt[key]=currentStep;
+
+    const canonical=wordBank[key].canonical;
+    userDict[key]=canonical;
+
+    if(!masteredWords.has(key)){
+        masteredWords.add(key);
+        persistMasteredWord(key);
+    }
+
+    renderDictEntryState(key);
+    updateIntelUI();
+    renderPastLog();
+    renderWordList();
+
+    return true;
+}
+
+function evaluateUnderstanding(data){
+    let candidates;
+
+    if(Array.isArray(data.resolveChecks)){
+        candidates=[...data.resolveChecks];
+    }else{
+        candidates=Object.keys(wordBank).filter(key=>{
+            const totalClues=wordTotalClueScenes[key]||1;
+            const requiredClues=Math.min(wordBank[key].minClues||2,totalClues);
+            return (wordSeenCounts[key]||0)>=requiredClues;
+        });
+    }
+
+    if(data.finalResolve&&data.finalResolve.special&&data.finalResolve.key){
+        candidates=candidates.filter(key=>key!==data.finalResolve.key);
+    }
+
+    const resolvedNow=[];
+
+    candidates.forEach(key=>{
+        if(resolveWord(key)) resolvedNow.push(key);
+    });
+
+    return resolvedNow;
+}
+
+function updateIntelUI(){
+    const intel=Math.floor((vaneKnownWords.size/Object.keys(wordBank).length)*100);
+    const el=document.getElementById("intel-val");
+    if(el) el.innerText=intel+"%";
+}
+
+function getReactionText(option){
+    if(option&&option.reaction) return option.reaction;
+    return "（ランちゃんは、俺の返事を静かに聞いている。）";
+}
+
+function renderDialogueText(text){
+    let rendered=text||"";
+
+    for(let key in wordBank){
+        const reg=new RegExp("\\[\\["+key+"(?:\\|([^\\]]+))?\\]\\]","g");
+
+        rendered=rendered.replace(reg,(match,surfaceForm)=>{
+            const resolved=vaneKnownWords.has(key);
+            const spanClass=resolved?"resolved":"symbol";
+            const displayVal=resolved?(surfaceForm||wordBank[key].canonical):wordBank[key].q;
+
+            return `<span class="${spanClass}" onclick="jumpToDict('${key}')">${displayVal}</span>`;
+        });
+    }
+
+    return rendered.replace(/\n/g,"<br>");
+}
+
+function buildUnderstandingNarrative(key){
+    if(!wordBank[key]) return "";
+
+    const word=wordBank[key];
+
+    return `
+        <div class="understanding-item">
+            <div class="understanding-lead">……あ。</div>
+            <div class="understanding-copy">
+                何度も聞いた、あの音。<br>
+                これまでの会話が、一つにつながる。
+            </div>
+            <div class="understanding-symbol">${word.q}</div>
+            <div class="understanding-bridge">あれは――</div>
+            <div class="understanding-word">${word.canonical}</div>
+            <div class="understanding-copy">そういう意味だったんだ。</div>
+        </div>
+    `;
+}
+
+function continueFromReaction(){
+    const data=scenario[currentStep];
+
+    pendingResolvedKeys=evaluateUnderstanding(data);
+    pendingFinalLine="";
+
+    if(data.finalResolve&&data.finalResolve.special&&data.finalResolve.key){
+        const finalKey=data.finalResolve.key;
+
+        if(!vaneKnownWords.has(finalKey)&&isAcceptedGuess(finalKey,userDict[finalKey])){
+            if(resolveWord(finalKey)) pendingFinalLine=data.finalResolve.line||"";
+        }
+    }
+
+    if(pendingResolvedKeys.length>0||pendingFinalLine){
+        interactionPhase="resolution";
+        updateUI(true);
+    }else{
+        advanceScene();
+    }
+}
+
+function advanceScene(){
+    pendingOption=null;
+    pendingResolvedKeys=[];
+    pendingFinalLine="";
+    interactionPhase="conversation";
+
+    currentStep++;
+    viewingStep=currentStep;
+
+    if(currentStep<scenario.length){
+        registerSceneWords(currentStep);
         renderTabs();
-
-        const data =
-            scenario[
-                viewingStep
-            ];
-
-        const charaHeader =
-            document.getElementById(
-                'chara-header'
-            );
-
-        const speaker =
-            document.getElementById(
-                'speaker-name'
-            );
-
-        const message =
-            document.getElementById(
-                'message-text'
-            );
-
-        const thoughtBlock =
-            document.getElementById(
-                'vane-thought-block'
-            );
-
-        const thoughtText =
-            document.getElementById(
-                'vane-thought-text'
-            );
-
-        const storyBlock =
-            document.getElementById(
-                'story-block'
-            );
-
-        const storyText =
-            document.getElementById(
-                'story-text'
-            );
-
-        const resolutionBlock =
-            document.getElementById(
-                'resolution-block'
-            );
-
-        const resolutionText =
-            document.getElementById(
-                'resolution-text'
-            );
-
-        updateIntelUI();
-
-        const isCurrent =
-            viewingStep ===
-            currentStep;
-
-        speaker.innerText =
-            "LANCELOT";
-
-        message.innerHTML =
-            renderDialogueText(
-                data.q
-            );
-
-        thoughtText.innerHTML =
-            (
-                data.vaneThought ||
-                ""
-            ).replace(
-                /\n/g,
-                "<br>"
-            );
-
-        charaHeader.style.display =
-            "none";
-
-        message.style.display =
-            "none";
-
-        thoughtBlock.style.display =
-            "none";
-
-        storyBlock.style.display =
-            "none";
-
-        storyText.innerHTML =
-            "";
-
-        resolutionBlock.style.display =
-            "none";
-
-        resolutionText.innerHTML =
-            "";
-
-        const selectedOptionId =
-            selectedAnswers[
-                viewingStep
-            ];
-
-        let selectedOption =
-            null;
-
-        if (
-            isCurrent &&
-            pendingOption
-        ) {
-            selectedOption =
-                pendingOption;
-        }
-        else if (
-            selectedOptionId
-        ) {
-            selectedOption =
-                data.opts.find(
-                    option =>
-                        option.id ===
-                        selectedOptionId
-                ) ||
-                null;
-        }
-
-        const showConversation =
-            isCurrent
-                ? interactionPhase ===
-                    "conversation"
-                : !selectedOption;
-
-        const showStory =
-            selectedOption &&
-            (
-                !isCurrent ||
-                interactionPhase ===
-                    "reaction"
-            );
-
-        const showResolution =
-            isCurrent &&
-            interactionPhase ===
-                "resolution";
-
-        if (
-            showConversation
-        ) {
-            charaHeader.style.display =
-                "flex";
-
-            message.style.display =
-                "block";
-
-            thoughtBlock.style.display =
-                "block";
-        }
-
-        if (
-            showStory
-        ) {
-            const storyParts =
-                [];
-
-            storyParts.push(
-                `<div class="selected-reply">● ${selectedOption.t}</div>`
-            );
-
-            const reaction =
-                getReactionText(
-                    selectedOption
-                );
-
-            if (reaction) {
-                storyParts.push(
-                    reaction.replace(
-                        /\n/g,
-                        "<br>"
-                    )
-                );
-            }
-
-            if (
-                data.afterStory
-            ) {
-                storyParts.push(
-                    data.afterStory.replace(
-                        /\n/g,
-                        "<br>"
-                    )
-                );
-            }
-
-            if (
-                data.nextHook
-            ) {
-                storyParts.push(
-                    data.nextHook.replace(
-                        /\n/g,
-                        "<br>"
-                    )
-                );
-            }
-
-            storyText.innerHTML =
-                storyParts.join(
-                    "<br><br>"
-                );
-
-            storyBlock.style.display =
-                "block";
-        }
-
-        if (
-            showResolution
-        ) {
-            const resolutionParts =
-                [];
-
-            if (
-                pendingResolvedKeys.length >
-                0
-            ) {
-                const narratives =
-                    pendingResolvedKeys
-                        .map(
-                            key =>
-                                buildUnderstandingNarrative(
-                                    key
-                                )
-                        )
-                        .join(
-                            '<div class="understanding-divider"></div>'
-                        );
-
-                resolutionParts.push(
-                    narratives
-                );
-            }
-
-            if (
-                pendingFinalLine
-            ) {
-                resolutionParts.push(
-                    `<div class="final-resolve-line">${pendingFinalLine}</div>`
-                );
-            }
-
-            resolutionText.innerHTML =
-                resolutionParts.join(
-                    ""
-                );
-
-            resolutionBlock.style.display =
-                "block";
-        }
-
+        updateUI(true);
         renderPastLog();
         renderWordList();
 
-        const light =
-            Math.min(
-                85,
-                10 +
-                (
-                    lovePoints /
-                    5
-                )
-            );
+        const display=document.getElementById("display");
+        if(display) display.scrollTop=0;
 
-        const sat =
-            Math.min(
-                100,
-                20 +
-                (
-                    lovePoints /
-                    4
-                )
-            );
+        const logPanel=document.getElementById("log-panel");
+        if(logPanel) logPanel.scrollTop=logPanel.scrollHeight;
+    }else{
+        showEnd();
+    }
+}
 
-        const hue =
-            210 -
-            (
-                lovePoints /
-                10
-            );
+function renderTabs(){
+    const current=document.getElementById("progress-current");
+    const total=document.getElementById("progress-total");
 
-        document.documentElement
-            .style
-            .setProperty(
-                '--love-light',
-                `${light}%`
-            );
+    if(current) current.innerText=String(viewingStep+1).padStart(2,"0");
+    if(total) total.innerText=String(scenario.length).padStart(2,"0");
+}
 
-        document.documentElement
-            .style
-            .setProperty(
-                '--love-sat',
-                `${sat}%`
-            );
+function updateUI(redo=true){
+    if(currentStep>=scenario.length) return;
 
-        document.documentElement
-            .style
-            .setProperty(
-                '--love-hue',
-                `${hue}`
-            );
+    renderTabs();
 
-        if (!redo) {
-            return;
-        }
+    const data=scenario[viewingStep];
+    const charaHeader=document.getElementById("chara-header");
+    const speaker=document.getElementById("speaker-name");
+    const message=document.getElementById("message-text");
+    const thoughtBlock=document.getElementById("vane-thought-block");
+    const thoughtText=document.getElementById("vane-thought-text");
+    const storyBlock=document.getElementById("story-block");
+    const storyText=document.getElementById("story-text");
+    const resolutionBlock=document.getElementById("resolution-block");
+    const resolutionText=document.getElementById("resolution-text");
 
-        const area =
-            document.getElementById(
-                'action-area'
-            );
+    updateIntelUI();
 
-        area.innerHTML =
-            '';
+    const isCurrent=viewingStep===currentStep;
 
-        if (
-            isCurrent
-        ) {
-            if (
-                interactionPhase ===
-                "conversation"
-            ) {
-                shuffle(
-                    [
-                        ...data.opts
-                    ]
-                ).forEach(
-                    o => {
-                        const b =
-                            document.createElement(
-                                'button'
-                            );
+    speaker.innerText="LANCELOT";
+    message.innerHTML=renderDialogueText(data.q);
+    thoughtText.innerHTML=(data.vaneThought||"").replace(/\n/g,"<br>");
 
-                        b.className =
-                            'opt-btn';
+    charaHeader.style.display="none";
+    message.style.display="none";
+    thoughtBlock.style.display="none";
+    storyBlock.style.display="none";
+    storyText.innerHTML="";
+    resolutionBlock.style.display="none";
+    resolutionText.innerHTML="";
 
-                        b.innerText =
-                            `▶ ${o.t}`;
+    const selectedOptionId=selectedAnswers[viewingStep];
+    let selectedOption=null;
 
-                        b.onclick =
-                            () => {
-                                selectedAnswers[
-                                    currentStep
-                                ] =
-                                    o.id;
-
-                                rebuildRunState();
-
-                                pendingOption =
-                                    o;
-
-                                interactionPhase =
-                                    "reaction";
-
-                                updateUI(
-                                    true
-                                );
-
-                                const display =
-                                    document.getElementById(
-                                        'display'
-                                    );
-
-                                if (
-                                    display
-                                ) {
-                                    display.scrollTop =
-                                        0;
-                                }
-                            };
-
-                        area.appendChild(
-                            b
-                        );
-                    }
-                );
-            }
-            else if (
-                interactionPhase ===
-                "reaction"
-            ) {
-                const next =
-                    document.createElement(
-                        'button'
-                    );
-
-                next.className =
-                    'opt-btn';
-
-                next.innerText =
-                    "▶ 次へ";
-
-                next.onclick =
-                    continueFromReaction;
-
-                area.appendChild(
-                    next
-                );
-            }
-            else if (
-                interactionPhase ===
-                "resolution"
-            ) {
-                const next =
-                    document.createElement(
-                        'button'
-                    );
-
-                next.className =
-                    'opt-btn';
-
-                next.innerText =
-                    "▶ 次へ";
-
-                next.onclick =
-                    advanceScene;
-
-                area.appendChild(
-                    next
-                );
-            }
-        }
-        else {
-            data.opts.forEach(
-                o => {
-                    const b =
-                        document.createElement(
-                            'button'
-                        );
-
-                    b.className =
-                        'opt-btn';
-
-                    if (
-                        o.id ===
-                        selectedAnswers[
-                            viewingStep
-                        ]
-                    ) {
-                        b.classList.add(
-                            'my-choice'
-                        );
-                    }
-
-                    b.disabled =
-                        true;
-
-                    b.innerText =
-                        (
-                            o.id ===
-                            selectedAnswers[
-                                viewingStep
-                            ]
-                        )
-                            ? `● ${o.t}`
-                            : `▶ ${o.t}`;
-
-                    area.appendChild(
-                        b
-                    );
-                }
-            );
-        }
+    if(isCurrent&&pendingOption){
+        selectedOption=pendingOption;
+    }else if(selectedOptionId){
+        selectedOption=data.opts.find(option=>option.id===selectedOptionId)||null;
     }
 
-    function updateColUI() {
-        const colVal =
-            document.getElementById(
-                'col-val'
-            );
+    const showConversation=isCurrent?interactionPhase==="conversation":!selectedOption;
+    const showStory=selectedOption&&(!isCurrent||interactionPhase==="reaction");
+    const showResolution=isCurrent&&interactionPhase==="resolution";
 
-        if (colVal) {
-            colVal.innerText =
-                Math.floor(
-                    (
-                        colSet.size /
-                        7
-                    ) *
-                    100
-                ) +
-                "%";
+    if(showConversation){
+        charaHeader.style.display="flex";
+        message.style.display="block";
+        thoughtBlock.style.display="block";
+    }
+
+    if(showStory){
+        const storyParts=[];
+        storyParts.push(`<div class="selected-reply">● ${selectedOption.t}</div>`);
+
+        const reaction=getReactionText(selectedOption);
+        if(reaction) storyParts.push(reaction.replace(/\n/g,"<br>"));
+        if(data.afterStory) storyParts.push(data.afterStory.replace(/\n/g,"<br>"));
+        if(data.nextHook) storyParts.push(data.nextHook.replace(/\n/g,"<br>"));
+
+        storyText.innerHTML=storyParts.join("<br><br>");
+        storyBlock.style.display="block";
+    }
+
+    if(showResolution){
+        const resolutionParts=[];
+
+        if(pendingResolvedKeys.length>0){
+            const narratives=pendingResolvedKeys
+                .map(key=>buildUnderstandingNarrative(key))
+                .join('<div class="understanding-divider"></div>');
+
+            resolutionParts.push(narratives);
         }
 
-        colSet.forEach(
-            id => {
-                const el =
-                    document.getElementById(
-                        `b-${id}`
-                    );
+        if(pendingFinalLine){
+            resolutionParts.push(`<div class="final-resolve-line">${pendingFinalLine}</div>`);
+        }
 
-                if (el) {
-                    el.classList.add(
-                        'unlocked'
-                    );
-                }
-            }
-        );
+        resolutionText.innerHTML=resolutionParts.join("");
+        resolutionBlock.style.display="block";
     }
+
+    renderPastLog();
+    renderWordList();
+
+    const light=Math.min(85,10+(lovePoints/5));
+    const sat=Math.min(100,20+(lovePoints/4));
+    const hue=210-(lovePoints/10);
+
+    document.documentElement.style.setProperty("--love-light",`${light}%`);
+    document.documentElement.style.setProperty("--love-sat",`${sat}%`);
+    document.documentElement.style.setProperty("--love-hue",`${hue}`);
+
+    if(!redo) return;
+
+    const area=document.getElementById("action-area");
+    area.innerHTML="";
+
+    if(isCurrent){
+        if(interactionPhase==="conversation"){
+            shuffle([...data.opts]).forEach(o=>{
+                const b=document.createElement("button");
+                b.className="opt-btn";
+                b.innerText=`▶ ${o.t}`;
+
+                b.onclick=()=>{
+                    selectedAnswers[currentStep]=o.id;
+                    rebuildRunState();
+                    pendingOption=o;
+                    interactionPhase="reaction";
+                    updateUI(true);
+
+                    const display=document.getElementById("display");
+                    if(display) display.scrollTop=0;
+                };
+
+                area.appendChild(b);
+            });
+        }else if(interactionPhase==="reaction"){
+            const next=document.createElement("button");
+            next.className="opt-btn";
+            next.innerText="▶ 次へ";
+            next.onclick=continueFromReaction;
+            area.appendChild(next);
+        }else if(interactionPhase==="resolution"){
+            const next=document.createElement("button");
+            next.className="opt-btn";
+            next.innerText="▶ 次へ";
+            next.onclick=advanceScene;
+            area.appendChild(next);
+        }
+    }else{
+        data.opts.forEach(o=>{
+            const b=document.createElement("button");
+            b.className="opt-btn";
+
+            if(o.id===selectedAnswers[viewingStep]) b.classList.add("my-choice");
+
+            b.disabled=true;
+            b.innerText=o.id===selectedAnswers[viewingStep]?`● ${o.t}`:`▶ ${o.t}`;
+            area.appendChild(b);
+        });
+    }
+}
+
+function updateColUI(){
+    const colVal=document.getElementById("col-val");
+
+    if(colVal){
+        colVal.innerText=Math.floor((colSet.size/7)*100)+"%";
+    }
+
+    colSet.forEach(id=>{
+        const el=document.getElementById(`b-${id}`);
+        if(el) el.classList.add("unlocked");
+    });
+}
 </script>
 
 <script src="recollection.js"></script>
 <script src="endings.js"></script>
-
 </body>
 </html>
