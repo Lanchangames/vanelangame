@@ -1,1377 +1,217 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>声を聴かせて、ランスロット！</title>
-
 <style>
-:root {
-    --main:#7897a5;
-    --main-dark:#506c78;
-    --main-soft:#edf3f5;
-    --main-pale:#f5f8f9;
-    --text:#394b53;
-    --text-soft:#687b84;
-    --muted:#8b9aa1;
-    --muted-light:#aab5ba;
-    --line:#d9e2e6;
-    --line-strong:#c5d2d8;
-    --surface:#ffffff;
-    --surface-soft:#f7f9fa;
-    --surface-hover:#f0f5f6;
-    --correct:#587887;
-    --wrong:#ad7070;
-    --opt-bg:#ffffff;
-    --opt-hover:#f1f5f6;
-    --selected:#eaf1f4;
-    --love-hue:200;
-    --love-light:92%;
-    --love-sat:20%;
-    --gold:#7897a5;
-
-    /* ヴェインのノート用 */
-    --note-bg:#f1f6f4;
-    --note-surface:#fbfdfc;
-    --note-line:#ceddd8;
-    --note-soft:#e7f0ed;
-    --note-active:#dceee9;
-    --note-text:#48625c;
-}
-
-body {
-    background:#edf3f5;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic","YuGothic",Meiryo,sans-serif;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-    margin:0;
-    color:var(--text);
-    overflow:hidden;
-}
-
-#bg-layer {
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:
-        radial-gradient(circle at 20% 15%,rgba(255,255,255,.95) 0%,rgba(255,255,255,0) 38%),
-        linear-gradient(135deg,#edf3f5 0%,#f7f9fa 48%,#e9f0f2 100%);
-    z-index:-1;
-    transition:2s ease;
-}
-
-#device-check-overlay {
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(244,248,249,.98);
-    z-index:200;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-    color:var(--text);
-}
-
-.device-box {
-    width:min(520px,82vw);
-    border:1px solid var(--line);
-    padding:42px;
-    border-radius:16px;
-    background:rgba(255,255,255,.96);
-    box-shadow:0 18px 55px rgba(68,91,101,.10);
-}
-
-#intro-overlay,#tutorial-overlay,#load-overlay {
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(244,248,249,.98);
-    z-index:100;
-    display:none;
-    justify-content:center;
-    align-items:center;
-    text-align:center;
-    color:var(--text);
-}
-
-.content-box {
-    max-width:700px;
-    width:90%;
-    line-height:2.05;
-    max-height:90vh;
-    overflow-y:auto;
-    padding:30px;
-    box-sizing:border-box;
-}
-
-.title-image {
-    display:block;
-    width:min(620px,92%);
-    height:auto;
-    margin:0 auto 28px;
-}
-
-#game-container {
-    width:98vw;
-    max-width:1200px;
-    height:92vh;
-    background:var(--surface);
-    display:none;
-    border:1px solid var(--line-strong);
-    border-radius:12px;
-    overflow:hidden;
-    color:var(--text);
-    box-shadow:0 24px 70px rgba(68,91,101,.14),0 2px 10px rgba(68,91,101,.05);
-}
-
-#main-screen {
-    flex:2;
-    display:flex;
-    flex-direction:column;
-    border-right:1px solid var(--line);
-    min-width:0;
-    height:100%;
-    background:var(--surface);
-}
-
-#progress-bar {
-    height:34px;
-    min-height:34px;
-    flex:0 0 34px;
-    background:var(--surface-soft);
-    color:var(--muted);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:.72em;
-    letter-spacing:.14em;
-    border-bottom:1px solid var(--line);
-    box-sizing:border-box;
-}
-
-#progress-current {
-    color:var(--main-dark);
-    font-weight:700;
-}
-
-.status-bar {
-    height:42px;
-    min-height:42px;
-    flex:0 0 42px;
-    box-sizing:border-box;
-    padding:0 18px;
-    background:var(--surface);
-    color:var(--text-soft);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:.72em;
-    letter-spacing:.08em;
-    border-bottom:1px solid var(--line);
-}
-
-#legacy-state { display:none; }
-
-.ending-collection {
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:10px;
-}
-
-.ending-collection-label {
-    color:var(--muted);
-    font-size:.72rem;
-    font-weight:700;
-    letter-spacing:.13em;
-    white-space:nowrap;
-}
-
-.ending-badge-row {
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:7px;
-}
-
-.ending-progress-badge {
-    display:block;
-    width:15px;
-    height:15px;
-    box-sizing:border-box;
-    border-radius:50%;
-    border:1px solid var(--line-strong);
-    background:var(--surface-soft);
-    box-shadow:inset 0 0 0 3px var(--surface);
-    transition:.2s;
-}
-
-.ending-progress-badge.unlocked {
-    background:var(--main);
-    border-color:var(--main-dark);
-    box-shadow:
-        inset 0 0 0 3px var(--surface),
-        0 0 0 1px rgba(120,151,165,.12);
-}
-
-.ending-progress-badge.gold.unlocked {
-    background:var(--main-dark);
-}
-
-.ending-count {
-    min-width:32px;
-    color:var(--main-dark);
-    font-size:.72rem;
-    font-weight:700;
-    letter-spacing:.05em;
-    white-space:nowrap;
-}
-
-#check-action {
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:10px;
-    margin-top:24px;
-}
-
-#check-action .btn-style {
-    margin:0;
-    min-width:220px;
-}
-
-#check-action #error-msg {
-    margin-top:10px;
-}
-
-#main-view-tabs {
-    height:50px;
-    min-height:50px;
-    flex:0 0 50px;
-    display:flex;
-    box-sizing:border-box;
-    background:#eaf3f7;
-    border-bottom:1px solid var(--line);
-    padding:7px 20px 0;
-    gap:8px;
-}
-
-.main-view-tab {
-    flex:1;
-    border:1px solid transparent;
-    border-bottom:none;
-    background:#f2f8fa;
-    color:var(--muted);
-    font-family:inherit;
-    font-size:.84rem;
-    font-weight:700;
-    letter-spacing:.08em;
-    cursor:pointer;
-    transition:.18s;
-    border-radius:8px 8px 0 0;
-}
-
-.main-view-tab:hover {
-    background:#e0eff5;
-    color:var(--main-dark);
-}
-
-.main-view-tab.active {
-    background:#dceef5;
-    color:var(--main-dark);
-    border-color:var(--line-strong);
-    box-shadow:inset 0 3px 0 var(--main);
-}
-
-#play-view {
-    flex:1 1 auto;
-    min-height:0;
-    display:flex;
-    flex-direction:column;
-    background:var(--surface);
-}
-
-#display {
-    height:auto;
-    min-height:0;
-    max-height:none;
-    flex:0 0 58%;
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-start;
-    align-items:center;
-    gap:12px;
-    padding:24px 34px 20px;
-    background:var(--surface);
-    overflow-y:auto;
-    box-sizing:border-box;
-}
-
-#chara-header {
-    width:90%;
-    flex:0 0 auto;
-    display:flex;
-    align-items:center;
-    box-sizing:border-box;
-    min-height:30px;
-}
-
-#speaker-name {
-    font-weight:700;
-    letter-spacing:.1em;
-    color:var(--main-dark);
-}
-
-.bubble {
-    background:var(--surface);
-    border-left:4px solid var(--main);
-    padding:18px 21px;
-    width:90%;
-    box-sizing:border-box;
-    font-size:1.14rem;
-    line-height:1.9;
-    text-align:left;
-    color:var(--text);
-}
-
-#vane-thought-block,#story-block,#resolution-block {
-    width:90%;
-    box-sizing:border-box;
-    flex:0 0 auto;
-}
-
-.block-label {
-    height:18px;
-    line-height:18px;
-    box-sizing:border-box;
-    font-size:.68em;
-    font-weight:700;
-    letter-spacing:.1em;
-    color:var(--muted);
-    margin-bottom:7px;
-}
-
-.thought-bubble {
-    background:var(--surface-soft);
-    border-left:3px solid var(--line-strong);
-    padding:13px 16px;
-    box-sizing:border-box;
-    line-height:1.75;
-    text-align:left;
-    color:var(--text-soft);
-    font-size:.93em;
-}
-
-.story-bubble {
-    background:var(--main-pale);
-    border:1px solid var(--line);
-    border-radius:7px;
-    padding:14px 16px;
-    box-sizing:border-box;
-    line-height:1.9;
-    text-align:left;
-    color:var(--text);
-}
-
-.resolution-bubble {
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-left:4px solid var(--main);
-    border-radius:7px;
-    padding:15px 17px;
-    box-sizing:border-box;
-    line-height:1.85;
-    text-align:left;
-    color:var(--text);
-}
-
-.understanding-item { padding:4px 0 10px; }
-.understanding-lead { font-size:1.02em; margin-bottom:12px; }
-.understanding-copy { color:var(--text-soft); line-height:1.9; }
-
-.understanding-symbol {
-    margin-top:18px;
-    color:var(--main-dark);
-    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
-    font-size:1.28em;
-    font-weight:700;
-    letter-spacing:.12em;
-}
-
-.understanding-bridge {
-    margin-top:13px;
-    color:var(--text-soft);
-}
-
-.understanding-word {
-    margin-top:8px;
-    font-size:1.45em;
-    font-weight:700;
-    letter-spacing:.05em;
-    color:var(--main-dark);
-}
-
-.understanding-divider {
-    width:100%;
-    height:1px;
-    margin:22px 0;
-    background:var(--line);
-}
-
-.selected-reply {
-    font-weight:700;
-    margin-bottom:12px;
-    color:var(--text);
-}
-
-.final-resolve-line {
-    font-size:1.3em;
-    font-weight:700;
-    margin-top:20px;
-    color:var(--main-dark);
-}
-
-.symbol,.resolved,.wrong-resolved {
-    cursor:pointer;
-    transition:.2s;
-    padding:1px 5px;
-    border-radius:4px;
-}
-
-.symbol:hover,.resolved:hover,.wrong-resolved:hover {
-    background:var(--main-soft);
-    outline:1px solid var(--line-strong);
-}
-
-.resolved {
-    color:var(--main-dark);
-    font-weight:700;
-}
-
-.wrong-resolved {
-    color:var(--wrong);
-    font-weight:700;
-    text-decoration:underline wavy var(--wrong);
-}
-
-.symbol {
-    color:var(--main-dark);
-    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
-    background:var(--main-soft);
-    font-weight:700;
-}
-
-.controls {
-    flex:1 1 auto;
-    min-height:0;
-    height:auto;
-    max-height:none;
-    box-sizing:border-box;
-    padding:16px 34px 20px;
-    background:var(--surface-soft);
-    border-top:1px solid var(--line);
-    overflow-y:auto;
-}
-
-.opt-btn {
-    width:100%;
-    min-height:46px;
-    box-sizing:border-box;
-    padding:12px 16px;
-    margin:6px 0;
-    border:1px solid var(--line);
-    border-left:4px solid var(--line-strong);
-    background:var(--opt-bg);
-    cursor:pointer;
-    font-family:inherit;
-    font-size:.96rem;
-    line-height:1.55;
-    text-align:left;
-    transition:.18s;
-    border-radius:6px;
-    color:var(--text);
-}
-
-.opt-btn:hover:not(:disabled) {
-    border-color:var(--line-strong);
-    border-left-color:var(--main);
-    background:var(--opt-hover);
-    transform:translateX(2px);
-}
-
-.opt-btn:disabled {
-    cursor:default;
-    opacity:.62;
-}
-
-.opt-btn.my-choice {
-    border:1px solid var(--line-strong);
-    border-left:4px solid var(--main);
-    background:var(--selected);
-    font-weight:700;
-}
-
-#log-section {
-    flex:1 1 auto;
-    min-height:0;
-    display:none;
-    flex-direction:column;
-    background:var(--surface);
-    box-sizing:border-box;
-    overflow:hidden;
-}
-
-#log-header {
-    height:42px;
-    min-height:42px;
-    flex:0 0 42px;
-    display:flex;
-    align-items:center;
-    padding:0 38px;
-    box-sizing:border-box;
-    background:var(--surface);
-    border-bottom:1px solid var(--line);
-    color:var(--muted);
-    font-size:.68em;
-    font-weight:700;
-    letter-spacing:.1em;
-}
-
-#log-panel {
-    display:block;
-    flex:1;
-    min-height:0;
-    overflow-y:auto;
-    padding:24px 40px 36px;
-    box-sizing:border-box;
-    background:var(--surface);
-}
-
-.log-empty {
-    color:var(--muted);
-    font-size:.84em;
-    line-height:1.8;
-    text-align:center;
-    padding:40px 0;
-}
-
-.log-entry {
-    position:relative;
-    width:92%;
-    margin:0 auto;
-    padding:0 0 30px 30px;
-    border-left:2px solid var(--line);
-    box-sizing:border-box;
-    transition:background .3s;
-}
-
-.log-entry::before {
-    content:"";
-    position:absolute;
-    top:6px;
-    left:-6px;
-    width:10px;
-    height:10px;
-    border-radius:50%;
-    background:var(--surface);
-    border:2px solid var(--main);
-    box-sizing:border-box;
-}
-
-.log-entry:last-child { padding-bottom:8px; }
-
-.log-entry.log-focus {
-    background:var(--main-pale);
-    border-radius:6px;
-}
-
-.log-scene {
-    display:inline-flex;
-    align-items:center;
-    min-height:24px;
-    margin-bottom:12px;
-    padding:0 9px;
-    border-radius:12px;
-    background:var(--main-soft);
-    color:var(--main-dark);
-    font-size:.66em;
-    font-weight:700;
-    letter-spacing:.1em;
-}
-
-.log-speaker {
-    margin-bottom:7px;
-    color:var(--main-dark);
-    font-size:.72em;
-    font-weight:700;
-    letter-spacing:.08em;
-}
-
-.log-dialogue {
-    color:var(--text);
-    font-size:.94em;
-    line-height:1.85;
-    padding-right:8px;
-}
-
-.log-thought-label {
-    margin-top:14px;
-    margin-bottom:5px;
-    color:var(--muted);
-    font-size:.66em;
-    font-weight:700;
-    letter-spacing:.08em;
-}
-
-.log-thought {
-    padding:10px 13px;
-    background:var(--surface-soft);
-    border-radius:6px;
-    color:var(--text-soft);
-    font-size:.84em;
-    line-height:1.7;
-}
-
-.log-symbol-active {
-    outline:2px solid var(--main);
-    background:var(--main-soft);
-    color:var(--main-dark);
-}
-
-.log-symbol-active:hover {
-    outline:2px solid var(--main-dark);
-    background:var(--selected);
-}
-
-/* ------------------------------
-   ヴェインのノート
------------------------------- */
-
-#dictionary {
-    flex:0 0 330px;
-    min-width:300px;
-    height:100%;
-    display:flex;
-    flex-direction:column;
-    background:var(--note-bg);
-    border-left:1px solid var(--note-line);
-    box-sizing:border-box;
-}
-
-/* 左の SCENE 34px + ENDING 42px = 76px に揃える */
-#dict-header {
-    height:76px;
-    min-height:76px;
-    flex:0 0 76px;
-    box-sizing:border-box;
-    padding:10px 24px 8px;
-    border-bottom:1px solid var(--note-line);
-    background:var(--note-surface);
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-}
-
-#dict-header h3 {
-    margin:0;
-    font-size:1.02em;
-    letter-spacing:.04em;
-    color:var(--note-text);
-    line-height:1.2;
-}
-
-#dict-header p {
-    margin:5px 0 0;
-    font-size:.67em;
-    color:var(--muted);
-    line-height:1.35;
-}
-
-#dict-editor-section {
-    flex:0 0 300px;
-    min-height:300px;
-    box-sizing:border-box;
-    border-bottom:1px solid var(--note-line);
-    background:var(--note-bg);
-    display:flex;
-    flex-direction:column;
-}
-
-#dict-editor-label {
-    height:34px;
-    min-height:34px;
-    flex:0 0 34px;
-    display:flex;
-    align-items:center;
-    padding:0 24px;
-    box-sizing:border-box;
-    color:var(--note-text);
-    font-size:.68em;
-    font-weight:700;
-    letter-spacing:.1em;
-}
-
-#dict-list {
-    flex:1;
-    min-height:0;
-    padding:8px 20px 18px;
-    display:flex;
-    align-items:flex-start;
-    justify-content:center;
-    overflow-y:auto;
-    box-sizing:border-box;
-}
-
-.dict-placeholder {
-    width:100%;
-    margin-top:26px;
-    text-align:center;
-    color:var(--muted);
-    line-height:1.9;
-    font-size:.86em;
-}
-
-.dict-placeholder-symbol {
-    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
-    font-size:1.8em;
-    color:var(--muted-light);
-    margin-bottom:16px;
-}
-
-.dict-entry {
-    width:100%;
-    box-sizing:border-box;
-    padding:15px 17px 17px;
-    background:var(--note-surface);
-    border:1px solid var(--note-line);
-    border-radius:8px;
-    transition:background .5s;
-    box-shadow:0 4px 14px rgba(68,91,101,.04);
-}
-
-.dict-entry.correct {
-    border-left:4px solid var(--main-dark);
-    background:#edf5f2;
-}
-
-.dict-entry.guessing {
-    border-left:4px solid var(--main);
-    background:var(--note-surface);
-}
-
-.dict-entry.highlight-flash {
-    background:var(--note-soft);
-}
-
-.dict-entry label.dict-symbol-label {
-    font-size:1.5em;
-    color:var(--note-text);
-    display:block;
-    margin-bottom:12px;
-    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
-    font-weight:700;
-    text-align:center;
-    letter-spacing:.12em;
-}
-
-.dict-field-label {
-    margin:0 0 6px;
-    color:var(--muted);
-    font-size:.65em;
-    font-weight:700;
-    letter-spacing:.1em;
-}
-
-.dict-entry input {
-    width:100%;
-    box-sizing:border-box;
-    padding:10px 11px;
-    border:1px solid var(--note-line);
-    background:#fff;
-    font-size:.96rem;
-    outline:none;
-    border-radius:6px;
-    font-family:inherit;
-    color:var(--text);
-}
-
-.dict-entry input:focus {
-    border-color:var(--main);
-    box-shadow:0 0 0 3px rgba(120,151,165,.10);
-}
-
-.dict-entry input.wrong-text {
-    color:var(--wrong);
-    font-weight:700;
-    border-color:var(--wrong);
-}
-
-.dict-status {
-    min-height:18px;
-    font-size:.72em;
-    color:var(--muted);
-    margin-top:8px;
-    text-align:left;
-}
-
-.dict-entry.guessing .dict-status {
-    color:var(--note-text);
-}
-
-.dict-entry.correct .dict-status {
-    color:var(--main-dark);
-    font-weight:700;
-}
-
-.dict-vane-memo {
-    margin-top:12px;
-    padding:10px 11px;
-    background:var(--note-soft);
-    border-radius:6px;
-    color:var(--note-text);
-}
-
-.dict-vane-memo-title {
-    margin-bottom:5px;
-    color:var(--muted);
-    font-size:.62em;
-    font-weight:700;
-    letter-spacing:.1em;
-}
-
-.dict-vane-memo-text {
-    font-size:.78em;
-    line-height:1.65;
-}
-
-.dict-feedback {
-    min-height:0;
-    max-height:0;
-    opacity:0;
-    overflow:hidden;
-    margin-top:0;
-    color:var(--note-text);
-    font-size:.72em;
-    font-style:italic;
-    line-height:1.6;
-    transition:
-        opacity .2s ease,
-        max-height .2s ease,
-        margin-top .2s ease;
-}
-
-.dict-feedback.show {
-    max-height:42px;
-    opacity:1;
-    margin-top:8px;
-}
-
-.dict-records {
-    margin-top:14px;
-    padding-top:12px;
-    border-top:1px solid var(--note-line);
-}
-
-.dict-records-title {
-    margin-bottom:8px;
-    color:var(--muted);
-    font-size:.65em;
-    font-weight:700;
-    letter-spacing:.1em;
-}
-
-.dict-record-list {
-    display:flex;
-    flex-direction:column;
-    gap:7px;
-}
-
-.dict-record-item {
-    width:100%;
-    box-sizing:border-box;
-    border:1px solid var(--note-line);
-    background:var(--note-surface);
-    color:var(--text-soft);
-    padding:8px 9px;
-    border-radius:5px;
-    font-family:inherit;
-    text-align:left;
-    cursor:pointer;
-    transition:.15s;
-}
-
-.dict-record-item:hover {
-    background:var(--note-soft);
-    border-color:#b9cec7;
-}
-
-.dict-record-scene {
-    display:block;
-    margin-bottom:4px;
-    color:var(--note-text);
-    font-size:.62em;
-    font-weight:700;
-    letter-spacing:.08em;
-}
-
-.dict-record-text {
-    display:block;
-    font-size:.7em;
-    line-height:1.6;
-}
-
-.dict-record-word {
-    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
-    font-weight:700;
-    color:var(--note-text);
-}
-
-.dict-record-word.focus {
-    padding:1px 3px;
-    border-radius:3px;
-    background:var(--note-active);
-}
-
-.dict-record-empty {
-    color:var(--muted-light);
-    font-size:.7em;
-}
-
-#word-list-section {
-    flex:1 1 auto;
-    min-height:0;
-    display:flex;
-    flex-direction:column;
-    background:var(--note-surface);
-    overflow:hidden;
-}
-
-#word-list-header {
-    height:38px;
-    min-height:38px;
-    flex:0 0 38px;
-    display:flex;
-    align-items:center;
-    padding:0 24px;
-    box-sizing:border-box;
-    background:var(--note-soft);
-    border-bottom:1px solid var(--note-line);
-    color:var(--note-text);
-    font-size:.72em;
-    font-weight:700;
-    letter-spacing:.1em;
-}
-
-#word-list-panel {
-    flex:1;
-    min-height:0;
-    overflow-y:auto;
-    padding:8px 14px 18px;
-    box-sizing:border-box;
-    background:var(--note-surface);
-}
-
-#word-list {
-    width:100%;
-}
-
-.word-list-empty {
-    color:var(--muted);
-    font-size:.8em;
-    line-height:1.8;
-    text-align:center;
-    padding:22px 10px;
-}
-
-.word-row {
-    width:100%;
-    min-height:46px;
-    box-sizing:border-box;
-    display:grid;
-    grid-template-columns:minmax(72px,.8fr) minmax(90px,1.25fr) auto;
-    align-items:center;
-    gap:8px;
-    padding:8px 9px;
-    border:1px solid transparent;
-    border-bottom-color:var(--note-line);
-    background:transparent;
-    color:var(--text);
-    font-family:inherit;
-    text-align:left;
-    cursor:pointer;
-    transition:.15s;
-}
-
-.word-row:hover:not(:disabled) {
-    background:var(--note-soft);
-}
-
-.word-row.active {
-    background:var(--note-active);
-    border-color:var(--note-line);
-    border-radius:5px;
-    box-shadow:inset 3px 0 0 var(--main);
-}
-
-/* 最初から表示するが、まだ遭遇していない語は操作不可 */
-.word-row.unencountered {
-    opacity:.38;
-    cursor:default;
-    background:transparent;
-}
-
-.word-row.unencountered:hover {
-    background:transparent;
-}
-
-.word-row:disabled {
-    color:inherit;
-}
-
-.word-symbol {
-    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
-    font-weight:700;
-    color:var(--note-text);
-    letter-spacing:.04em;
-}
-
-.word-guess {
-    min-width:0;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-    color:var(--text-soft);
-    font-size:.86em;
-}
-
-.word-guess.understood {
-    color:var(--main-dark);
-    font-weight:700;
-}
-
-.word-guess.empty {
-    color:var(--muted-light);
-}
-
-.word-status {
-    white-space:nowrap;
-    font-size:.66em;
-    color:var(--muted);
-}
-
-.word-status.guessing {
-    color:var(--note-text);
-}
-
-.word-status.understood {
-    color:var(--main-dark);
-    font-weight:700;
-}
-
-#understanding-flash {
-    position:fixed;
-    inset:0;
-    z-index:160;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:rgba(239,245,246,.92);
-    opacity:0;
-    visibility:hidden;
-    pointer-events:none;
-    transition:
-        opacity .22s ease,
-        visibility .22s ease;
-}
-
-#understanding-flash.visible {
-    opacity:1;
-    visibility:visible;
-    pointer-events:auto;
-}
-
-.understanding-flash-inner {
-    min-width:320px;
-    max-width:70vw;
-    text-align:center;
-    padding:34px 48px;
-    box-sizing:border-box;
-}
-
-.understanding-flash-label {
-    margin-bottom:24px;
-    color:var(--muted);
-    font-size:.7em;
-    font-weight:700;
-    letter-spacing:.18em;
-}
-
-.understanding-flash-row {
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:22px;
-    margin:12px 0;
-}
-
-.understanding-flash-symbol {
-    min-width:100px;
-    color:var(--main-dark);
-    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
-    font-size:1.65em;
-    font-weight:700;
-    letter-spacing:.12em;
-}
-
-.understanding-flash-arrow {
-    color:var(--muted-light);
-    font-size:1.2em;
-}
-
-.understanding-flash-word {
-    min-width:100px;
-    color:var(--main-dark);
-    font-size:1.65em;
-    font-weight:700;
-    letter-spacing:.05em;
-}
-
-.understanding-flash-copy {
-    margin-top:24px;
-    color:var(--text-soft);
-    font-size:.92em;
-}
-
-.badge-container,.badge {
-    display:none;
-}
-
-.hint-text {
-    font-size:.9em;
-    color:var(--text-soft);
-    margin-top:15px;
-    border-top:1px dashed var(--line-strong);
-    padding-top:10px;
-}
-
-.btn-style {
-    padding:14px 44px;
-    cursor:pointer;
-    border:1px solid transparent;
-    font-family:inherit;
-    font-size:1em;
-    font-weight:700;
-    border-radius:8px;
-    margin:10px;
-    transition:.2s;
-}
-
-.btn-style:hover {
-    transform:translateY(-1px);
-    filter:brightness(.98);
-}
+:root{--main:#7897a5;--main-dark:#506c78;--main-soft:#edf3f5;--main-pale:#f5f8f9;--text:#394b53;--text-soft:#687b84;--muted:#8b9aa1;--muted-light:#aab5ba;--line:#d9e2e6;--line-strong:#c5d2d8;--surface:#fff;--surface-soft:#f7f9fa;--surface-hover:#f0f5f6;--correct:#587887;--wrong:#ad7070;--opt-bg:#fff;--opt-hover:#f1f5f6;--selected:#eaf1f4;--love-hue:200;--love-light:92%;--love-sat:20%;--gold:#7897a5;--note-bg:#f1f6f4;--note-surface:#fbfdfc;--note-line:#ceddd8;--note-soft:#e7f0ed;--note-active:#dceee9;--note-text:#48625c}
+body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic","YuGothic",Meiryo,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;color:var(--text);overflow:hidden}
+#bg-layer{position:fixed;inset:0;background:radial-gradient(circle at 20% 15%,rgba(255,255,255,.95) 0%,rgba(255,255,255,0) 38%),linear-gradient(135deg,#edf3f5 0%,#f7f9fa 48%,#e9f0f2 100%);z-index:-1;transition:2s ease}
+#device-check-overlay,#intro-overlay,#tutorial-overlay,#load-overlay{position:fixed;inset:0;background:rgba(244,248,249,.98);display:flex;justify-content:center;align-items:center;text-align:center;color:var(--text)}
+#device-check-overlay{z-index:200}
+#intro-overlay,#tutorial-overlay,#load-overlay{z-index:100;display:none}
+.device-box{width:min(520px,82vw);border:1px solid var(--line);padding:42px;border-radius:16px;background:rgba(255,255,255,.96);box-shadow:0 18px 55px rgba(68,91,101,.10)}
+.content-box{max-width:700px;width:90%;line-height:2.05;max-height:90vh;overflow-y:auto;padding:30px;box-sizing:border-box}
+.title-image{display:block;width:min(620px,92%);height:auto;margin:0 auto 28px}
+#game-container{width:98vw;max-width:1200px;height:92vh;background:var(--surface);display:none;border:1px solid var(--line-strong);border-radius:12px;overflow:hidden;color:var(--text);box-shadow:0 24px 70px rgba(68,91,101,.14),0 2px 10px rgba(68,91,101,.05)}
+#main-screen{flex:2;display:flex;flex-direction:column;border-right:1px solid var(--line);min-width:0;height:100%;background:var(--surface)}
+#progress-bar{height:34px;min-height:34px;flex:0 0 34px;background:var(--surface-soft);color:var(--muted);display:flex;justify-content:center;align-items:center;font-size:.72em;letter-spacing:.14em;border-bottom:1px solid var(--line);box-sizing:border-box}
+#progress-current{color:var(--main-dark);font-weight:700}
+.status-bar{height:42px;min-height:42px;flex:0 0 42px;box-sizing:border-box;padding:0 18px;background:var(--surface);color:var(--text-soft);display:flex;align-items:center;justify-content:center;font-size:.72em;letter-spacing:.08em;border-bottom:1px solid var(--line)}
+#legacy-state{display:none}
+.ending-collection,.ending-badge-row{display:flex;align-items:center;justify-content:center}
+.ending-collection{gap:10px}.ending-badge-row{gap:7px}
+.ending-collection-label{color:var(--muted);font-size:.72rem;font-weight:700;letter-spacing:.13em;white-space:nowrap}
+.ending-progress-badge{display:block;width:15px;height:15px;box-sizing:border-box;border-radius:50%;border:1px solid var(--line-strong);background:var(--surface-soft);box-shadow:inset 0 0 0 3px var(--surface);transition:.2s}
+.ending-progress-badge.unlocked{background:var(--main);border-color:var(--main-dark);box-shadow:inset 0 0 0 3px var(--surface),0 0 0 1px rgba(120,151,165,.12)}
+.ending-progress-badge.gold.unlocked{background:var(--main-dark)}
+.ending-count{min-width:32px;color:var(--main-dark);font-size:.72rem;font-weight:700;letter-spacing:.05em;white-space:nowrap}
+#check-action{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:24px}
+#check-action .btn-style{margin:0;min-width:220px}#check-action #error-msg{margin-top:10px}
+#main-view-tabs{height:50px;min-height:50px;flex:0 0 50px;display:flex;box-sizing:border-box;background:#eaf3f7;border-bottom:1px solid var(--line);padding:7px 20px 0;gap:8px}
+.main-view-tab{flex:1;border:1px solid transparent;border-bottom:none;background:#f2f8fa;color:var(--muted);font-family:inherit;font-size:.84rem;font-weight:700;letter-spacing:.08em;cursor:pointer;transition:.18s;border-radius:8px 8px 0 0}
+.main-view-tab:hover{background:#e0eff5;color:var(--main-dark)}.main-view-tab.active{background:#dceef5;color:var(--main-dark);border-color:var(--line-strong);box-shadow:inset 0 3px 0 var(--main)}
+#play-view{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;background:var(--surface)}
+#display{height:auto;min-height:0;max-height:none;flex:0 0 58%;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:12px;padding:24px 34px 20px;background:var(--surface);overflow-y:auto;box-sizing:border-box}
+#chara-header{width:90%;flex:0 0 auto;display:flex;align-items:center;box-sizing:border-box;min-height:30px}#speaker-name{font-weight:700;letter-spacing:.1em;color:var(--main-dark)}
+.bubble{background:var(--surface);border-left:4px solid var(--main);padding:18px 21px;width:90%;box-sizing:border-box;font-size:1.14rem;line-height:1.9;text-align:left;color:var(--text)}
+#vane-thought-block,#story-block,#resolution-block{width:90%;box-sizing:border-box;flex:0 0 auto}
+.block-label{height:18px;line-height:18px;box-sizing:border-box;font-size:.68em;font-weight:700;letter-spacing:.1em;color:var(--muted);margin-bottom:7px}
+.thought-bubble{background:var(--surface-soft);border-left:3px solid var(--line-strong);padding:13px 16px;box-sizing:border-box;line-height:1.75;text-align:left;color:var(--text-soft);font-size:.93em}
+.story-bubble{background:var(--main-pale);border:1px solid var(--line);border-radius:7px;padding:14px 16px;box-sizing:border-box;line-height:1.9;text-align:left;color:var(--text)}
+.resolution-bubble{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--main);border-radius:7px;padding:15px 17px;box-sizing:border-box;line-height:1.85;text-align:left;color:var(--text)}
+.understanding-item{padding:4px 0 10px}.understanding-lead{font-size:1.02em;margin-bottom:12px}.understanding-copy{color:var(--text-soft);line-height:1.9}
+.understanding-symbol{margin-top:18px;color:var(--main-dark);font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-size:1.28em;font-weight:700;letter-spacing:.12em}
+.understanding-bridge{margin-top:13px;color:var(--text-soft)}.understanding-word{margin-top:8px;font-size:1.45em;font-weight:700;letter-spacing:.05em;color:var(--main-dark)}
+.understanding-divider{width:100%;height:1px;margin:22px 0;background:var(--line)}.selected-reply{font-weight:700;margin-bottom:12px;color:var(--text)}.final-resolve-line{font-size:1.3em;font-weight:700;margin-top:20px;color:var(--main-dark)}
+.symbol,.resolved,.wrong-resolved{cursor:pointer;transition:.2s;padding:1px 5px;border-radius:4px}
+.symbol:hover,.resolved:hover,.wrong-resolved:hover{background:var(--main-soft);outline:1px solid var(--line-strong)}
+.resolved{color:var(--main-dark);font-weight:700}.wrong-resolved{color:var(--wrong);font-weight:700;text-decoration:underline wavy var(--wrong)}
+.symbol{color:var(--main-dark);font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;background:var(--main-soft);font-weight:700}
+.controls{flex:1 1 auto;min-height:0;height:auto;max-height:none;box-sizing:border-box;padding:16px 34px 20px;background:var(--surface-soft);border-top:1px solid var(--line);overflow-y:auto}
+.opt-btn{width:100%;min-height:46px;box-sizing:border-box;padding:12px 16px;margin:6px 0;border:1px solid var(--line);border-left:4px solid var(--line-strong);background:var(--opt-bg);cursor:pointer;font-family:inherit;font-size:.96rem;line-height:1.55;transition:.18s;border-radius:6px;color:var(--text);text-align:left}
+.opt-btn:hover:not(:disabled){border-color:var(--line-strong);border-left-color:var(--main);background:var(--opt-hover);transform:translateX(2px)}.opt-btn:disabled{cursor:default;opacity:.62}.opt-btn.my-choice{border:1px solid var(--line-strong);border-left:4px solid var(--main);background:var(--selected);font-weight:700}
+#log-section{flex:1 1 auto;min-height:0;display:none;flex-direction:column;background:var(--surface);box-sizing:border-box;overflow:hidden}
+#log-header{height:42px;min-height:42px;flex:0 0 42px;display:flex;align-items:center;padding:0 38px;box-sizing:border-box;background:var(--surface);border-bottom:1px solid var(--line);color:var(--muted);font-size:.68em;font-weight:700;letter-spacing:.1em}
+#log-panel{display:block;flex:1;min-height:0;overflow-y:auto;padding:24px 40px 36px;box-sizing:border-box;background:var(--surface)}
+.log-empty{color:var(--muted);font-size:.84em;line-height:1.8;text-align:center;padding:40px 0}
+.log-entry{position:relative;width:92%;margin:0 auto;padding:0 0 30px 30px;border-left:2px solid var(--line);box-sizing:border-box;transition:background .3s}
+.log-entry::before{content:"";position:absolute;top:6px;left:-6px;width:10px;height:10px;border-radius:50%;background:var(--surface);border:2px solid var(--main);box-sizing:border-box}.log-entry:last-child{padding-bottom:8px}.log-entry.log-focus{background:var(--main-pale);border-radius:6px}
+.log-scene{display:inline-flex;align-items:center;min-height:24px;margin-bottom:12px;padding:0 9px;border-radius:12px;background:var(--main-soft);color:var(--main-dark);font-size:.66em;font-weight:700;letter-spacing:.1em}
+.log-speaker{margin-bottom:7px;color:var(--main-dark);font-size:.72em;font-weight:700;letter-spacing:.08em}.log-dialogue{color:var(--text);font-size:.94em;line-height:1.85;padding-right:8px}
+.log-thought-label{margin-top:14px;margin-bottom:5px;color:var(--muted);font-size:.66em;font-weight:700;letter-spacing:.08em}.log-thought{padding:10px 13px;background:var(--surface-soft);border-radius:6px;color:var(--text-soft);font-size:.84em;line-height:1.7}
+.log-symbol-active{outline:2px solid var(--main);background:var(--main-soft);color:var(--main-dark)}.log-symbol-active:hover{outline:2px solid var(--main-dark);background:var(--selected)}
+#dictionary{flex:0 0 330px;min-width:300px;height:100%;display:flex;flex-direction:column;background:var(--note-bg);border-left:1px solid var(--note-line);box-sizing:border-box}
+#dict-header{height:76px;min-height:76px;flex:0 0 76px;box-sizing:border-box;padding:10px 24px 8px;border-bottom:1px solid var(--note-line);background:var(--note-surface);display:flex;flex-direction:column;justify-content:center}
+#dict-header h3{margin:0;font-size:1.02em;letter-spacing:.04em;color:var(--note-text);line-height:1.2}#dict-header p{margin:5px 0 0;font-size:.67em;color:var(--muted);line-height:1.35}
+#dict-editor-section{flex:0 0 300px;min-height:300px;box-sizing:border-box;border-bottom:1px solid var(--note-line);background:var(--note-bg);display:flex;flex-direction:column}
+#dict-editor-label{height:34px;min-height:34px;flex:0 0 34px;display:flex;align-items:center;padding:0 24px;box-sizing:border-box;color:var(--note-text);font-size:.68em;font-weight:700;letter-spacing:.1em}
+#dict-list{flex:1;min-height:0;padding:8px 20px 18px;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;box-sizing:border-box}
+.dict-placeholder{width:100%;margin-top:26px;text-align:center;color:var(--muted);line-height:1.9;font-size:.86em}.dict-placeholder-symbol{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-size:1.8em;color:var(--muted-light);margin-bottom:16px}
+.dict-entry{width:100%;box-sizing:border-box;padding:15px 17px 17px;background:var(--note-surface);border:1px solid var(--note-line);border-radius:8px;transition:background .5s;box-shadow:0 4px 14px rgba(68,91,101,.04)}
+.dict-entry.correct{border-left:4px solid var(--main-dark);background:#edf5f2}.dict-entry.guessing{border-left:4px solid var(--main);background:var(--note-surface)}.dict-entry.highlight-flash{background:var(--note-soft)}
+.dict-entry label.dict-symbol-label{font-size:1.5em;color:var(--note-text);display:block;margin-bottom:12px;font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-weight:700;text-align:center;letter-spacing:.12em}
+.dict-field-label{margin:0 0 6px;color:var(--muted);font-size:.65em;font-weight:700;letter-spacing:.1em}
+.dict-entry input{width:100%;box-sizing:border-box;padding:10px 11px;border:1px solid var(--note-line);background:#fff;font-size:.96rem;outline:none;border-radius:6px;font-family:inherit;color:var(--text)}.dict-entry input:focus{border-color:var(--main);box-shadow:0 0 0 3px rgba(120,151,165,.10)}.dict-entry input.wrong-text{color:var(--wrong);font-weight:700;border-color:var(--wrong)}
+.dict-status{min-height:18px;font-size:.72em;color:var(--muted);margin-top:8px;text-align:left}.dict-entry.guessing .dict-status{color:var(--note-text)}.dict-entry.correct .dict-status{color:var(--main-dark);font-weight:700}
+.dict-vane-memo{margin-top:12px;padding:10px 11px;background:var(--note-soft);border-radius:6px;color:var(--note-text)}.dict-vane-memo-title{margin-bottom:5px;color:var(--muted);font-size:.62em;font-weight:700;letter-spacing:.1em}.dict-vane-memo-text{font-size:.78em;line-height:1.65}
+.dict-feedback{min-height:0;max-height:0;opacity:0;overflow:hidden;margin-top:0;color:var(--note-text);font-size:.72em;font-style:italic;line-height:1.6;transition:opacity .2s ease,max-height .2s ease,margin-top .2s ease}.dict-feedback.show{max-height:42px;opacity:1;margin-top:8px}
+.dict-records{margin-top:14px;padding-top:12px;border-top:1px solid var(--note-line)}.dict-records-title{margin-bottom:8px;color:var(--muted);font-size:.65em;font-weight:700;letter-spacing:.1em}.dict-record-list{display:flex;flex-direction:column;gap:7px}
+.dict-record-item{width:100%;box-sizing:border-box;border:1px solid var(--note-line);background:var(--note-surface);color:var(--text-soft);padding:8px 9px;border-radius:5px;font-family:inherit;text-align:left;cursor:pointer;transition:.15s}.dict-record-item:hover{background:var(--note-soft);border-color:#b9cec7}
+.dict-record-scene{display:block;margin-bottom:4px;color:var(--note-text);font-size:.62em;font-weight:700;letter-spacing:.08em}.dict-record-text{display:block;font-size:.7em;line-height:1.6}.dict-record-word{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-weight:700;color:var(--note-text)}.dict-record-word.focus{padding:1px 3px;border-radius:3px;background:var(--note-active)}.dict-record-empty{color:var(--muted-light);font-size:.7em}
+#word-list-section{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;background:var(--note-surface);overflow:hidden}
+#word-list-header{height:38px;min-height:38px;flex:0 0 38px;display:flex;align-items:center;padding:0 24px;box-sizing:border-box;background:var(--note-soft);border-bottom:1px solid var(--note-line);color:var(--note-text);font-size:.72em;font-weight:700;letter-spacing:.1em}
+#word-list-panel{flex:1;min-height:0;overflow-y:auto;padding:8px 14px 18px;box-sizing:border-box;background:var(--note-surface)}#word-list{width:100%}
+.word-list-empty{color:var(--muted);font-size:.8em;line-height:1.8;text-align:center;padding:22px 10px}
+.word-row{width:100%;min-height:46px;box-sizing:border-box;display:grid;grid-template-columns:minmax(72px,.8fr) minmax(90px,1.25fr) auto;align-items:center;gap:8px;padding:8px 9px;border:1px solid transparent;border-bottom-color:var(--note-line);background:transparent;color:var(--text);font-family:inherit;text-align:left;cursor:pointer;transition:.15s}
+.word-row:hover:not(:disabled){background:var(--note-soft)}.word-row.active{background:var(--note-active);border-color:var(--note-line);border-radius:5px;box-shadow:inset 3px 0 0 var(--main)}.word-row.unencountered{opacity:.38;cursor:default;background:transparent}.word-row.unencountered:hover{background:transparent}.word-row:disabled{color:inherit}
+.word-symbol{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-weight:700;color:var(--note-text);letter-spacing:.04em}.word-guess{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-soft);font-size:.86em}.word-guess.understood{color:var(--main-dark);font-weight:700}.word-guess.empty{color:var(--muted-light)}
+.word-status{white-space:nowrap;font-size:.66em;color:var(--muted)}.word-status.guessing{color:var(--note-text)}.word-status.understood{color:var(--main-dark);font-weight:700}
+#understanding-flash{position:fixed;inset:0;z-index:160;display:flex;align-items:center;justify-content:center;background:rgba(239,245,246,.92);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease,visibility .22s ease}#understanding-flash.visible{opacity:1;visibility:visible;pointer-events:auto}
+.understanding-flash-inner{min-width:320px;max-width:70vw;text-align:center;padding:34px 48px;box-sizing:border-box}.understanding-flash-label{margin-bottom:24px;color:var(--muted);font-size:.7em;font-weight:700;letter-spacing:.18em}.understanding-flash-row{display:flex;align-items:center;justify-content:center;gap:22px;margin:12px 0}.understanding-flash-symbol{min-width:100px;color:var(--main-dark);font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-size:1.65em;font-weight:700;letter-spacing:.12em}.understanding-flash-arrow{color:var(--muted-light);font-size:1.2em}.understanding-flash-word{min-width:100px;color:var(--main-dark);font-size:1.65em;font-weight:700;letter-spacing:.05em}.understanding-flash-copy{margin-top:24px;color:var(--text-soft);font-size:.92em}
+.badge-container,.badge{display:none}.hint-text{font-size:.9em;color:var(--text-soft);margin-top:15px;border-top:1px dashed var(--line-strong);padding-top:10px}
+.btn-style{padding:14px 44px;cursor:pointer;border:1px solid transparent;font-family:inherit;font-size:1em;font-weight:700;border-radius:8px;margin:10px;transition:.2s}.btn-style:hover{transform:translateY(-1px);filter:brightness(.98)}
+.reply-guide{margin:3px 0 12px;color:var(--text-soft);font-size:.82rem;line-height:1.7}
+.reply-start-button{border-left-color:var(--main);text-align:center;background:#eaf1f4;font-weight:700}
 </style>
 </head>
-
 <body>
 <div id="bg-layer"></div>
-
-<div id="device-check-overlay">
-    <div class="device-box">
-        <h2 id="check-title" style="color:var(--main-dark);">CHECKING ENVIRONMENT...</h2>
-        <p id="check-msg">本ゲームはPCブラウザ環境でのプレイを前提として設計されています。</p>
-
-        <div id="check-action">
-            <button id="entry-btn" class="btn-style" style="background:var(--main);color:#fff;display:none;">物語を始める</button>
-            <button id="recollection-entry-btn" class="btn-style" style="background:var(--main-dark);color:#fff;display:none;">追憶を辿る</button>
-            <p id="error-msg" style="color:var(--wrong);display:none;"><b>MOBILE DEVICE DETECTED</b><br>スマートフォン等のモバイル環境ではプレイできません。</p>
-        </div>
-    </div>
+<div id="device-check-overlay"><div class="device-box">
+<h2 id="check-title" style="color:var(--main-dark)">CHECKING ENVIRONMENT...</h2>
+<p id="check-msg">本ゲームはPCブラウザ環境でのプレイを前提として設計されています。</p>
+<div id="check-action">
+<button id="entry-btn" class="btn-style" style="background:var(--main);color:#fff;display:none">物語を始める</button>
+<button id="recollection-entry-btn" class="btn-style" style="background:var(--main-dark);color:#fff;display:none">追憶を辿る</button>
+<p id="error-msg" style="color:var(--wrong);display:none"><b>MOBILE DEVICE DETECTED</b><br>スマートフォン等のモバイル環境ではプレイできません。</p>
+</div></div></div>
+<div id="intro-overlay"><div class="content-box">
+<img src="title.png" alt="声を聴かせて、ランスロット！" class="title-image">
+<p>ある日。散歩中のランスロットとヴェインは、魔物に襲われている親子を目撃する。<br>
+とっさに動いたランスロットは、背後から魔物が放った呪いに気づけなかった。<br>
+ヴェインは身を投げ出してランスロットをかばい、その拍子に呪いを全身に浴びてしまう。<br>
+魔物を倒して識者に呪いを解析してもらうと、恐ろしい現実を突きつけられた。<br><br>
+「これは孤独の呪いです。最も心を寄せる相手の言葉が理解できなくなる。<br>
+結果的に絆を絶たれてしまうのです」<br>
+……２人の関係にとって大切な言葉ほど、意味不明な音に変わってしまう呪い。<br><br>
+俺が最も心を寄せる相手……考えなくてもわかる。ランちゃんのことだ。<br>
+この呪いが解けない限り、ランちゃんとの絆が絶たれてしまう……？<br>
+いや――俺は絶対にあきらめない！このままランちゃんの声がわからないなんていやだ。<br>
+ヴェインはランスロットの言葉に耳を傾け、ひとつひとつ記録していくことにした。<br>
+いつかまた、お前の言葉を理解できるように。<br>
+あの日以来暗い表情のままの幼馴染の笑顔を取り戻して、大好きだよ、と伝えるために。</p>
+<button id="to-tutorial" class="btn-style" style="background:var(--main);color:#fff">次へ</button>
+</div></div>
+<div id="tutorial-overlay"><div class="content-box">
+<h2 style="color:var(--main-dark)">プレイ方法</h2>
+<div style="text-align:left;background:var(--surface-soft);border:1px solid var(--line);padding:25px;border-radius:10px;font-size:.9em">
+<p><b>【ヴェインのノート】</b><br>
+このゲームはヴェイン視点です。<br>
+ランスロットの言葉すべてが聞こえないわけではなく、２人の絆にとって重要な部分ほど虫食いのような記号に聞こえます。<br>
+会話の文脈やヴェインの観察から意味を考え、ノートへ仮説を書き留めてください。<br>
+入力した時点では、仮説が正しいかどうかは判定されません。<br><br>
+同じ記号は、同じ意味を持つ言葉を表します。文章によって「待って」「待てば」のように形が変わる場合がありますが、ノートには「待つ」のような<b>基本の形・言い切りの形</b>を記してください。<br><br>
+ノートには、ランスロットがその言葉を発したシーンも記録されます。仮説は何度でも書きなおせます。</p><br>
+<p><b>【ヴェインの返答】</b><br>
+ランスロットの台詞を読み、ノートへ仮説を書いたら「返答へ進む」を押してください。<br>
+その時点でヴェインが理解している内容から、返答候補が決まります。<br>
+聞き取れなくても、表情や状況を手がかりに会話を続けられます。<br>
+正しい返答を当てることが目的ではありません。どう返すかは、あなたが選んでください。<br>
+一度返答へ進んだ場面の候補と、その場で選んだ返答は変更できません。</p><br>
+<p><b>【ヴェインの理解】</b><br>
+正しい仮説を書いただけでは、その言葉の理解が確定したことにはなりません。<br>
+会話を重ね、十分な手掛かりが揃ったとき、ヴェイン自身がその意味へ辿り着きます。<br>
+一度理解した言葉は、それ以降の会話と過去LOGで日本語として読めるようになります。</p><br>
+<p><b>【ヴェインの周回】</b><br>
+最初の画面の「追憶を辿る」から、クリア済みの結末を起点に別の展開を辿れます。<br>
+追憶では過去の理解を引き継ぐ状態を選択できます。<br>
+言葉をどう理解したかと、どのように返答したかが結末に影響します。<br>
+エンディングは全てハッピーエンドです。</p>
 </div>
-
-<div id="intro-overlay">
-    <div class="content-box">
-        <img src="title.png" alt="声を聴かせて、ランスロット！" class="title-image">
-        <p>
-            ある日。散歩中のランスロットとヴェインは、魔物に襲われている親子を目撃する。<br>
-            とっさに動いたランスロットは、背後から魔物が放った呪いに気づけなかった。<br>
-            ヴェインは身を投げ出してランスロットをかばい、その拍子に呪いを全身に浴びてしまう。<br>
-            魔物を倒して識者に呪いを解析してもらうと、恐ろしい現実を突きつけられた。<br><br>
-            「これは孤独の呪いです。最も心を寄せる相手の言葉が理解できなくなる。<br>
-            結果的に絆を絶たれてしまうのです」<br>
-            ……２人の関係にとって大切な言葉ほど、意味不明な音に変わってしまう呪い。<br><br>
-            俺か最も心を寄せる相手……考えなくてもわかる。ランちゃんのことだ。<br>
-            この呪いが解けない限り、ランちゃんとの絆が絶たれてしまう……？<br>
-            いや ____俺は絶対にあきらめない！このままランちゃんの声がわからないなんていやだ。<br>
-            ヴェインはランスロットの言葉に耳を傾け、ひとつひとつ記録していくことにした。<br>
-            いつかまた、お前の言葉を理解できるように。<br>
-            あの日以来暗い表情のままの幼馴染の笑顔を取り戻して、大好きだよ、と伝えるために。
-        </p>
-        <button id="to-tutorial" class="btn-style" style="background:var(--main);color:#fff;">次へ</button>
-    </div>
-</div>
-
-<div id="tutorial-overlay">
-    <div class="content-box">
-        <h2 style="color:var(--main-dark);">プレイ方法</h2>
-
-        <div style="text-align:left;background:var(--surface-soft);border:1px solid var(--line);padding:25px;border-radius:10px;font-size:.9em;">
-            <p>
-                <b>【ヴェインのノート】</b><br>
-                このゲームはヴェイン視点です。<br>
-                ランスロットの言葉すべてが聞こえないわけではなく、２人の絆にとって重要な部分ほど虫食いのような記号に聞こえます。<br>
-                会話の文脈やヴェインの観察から意味を考え、ノートへ仮説を書き留めてください。<br>
-                入力した時点では、仮説が正しいかどうかは判定されません。<br><br>
-                同じ記号は、同じ意味を持つ言葉を表します。文章によって「待って」「待てば」のように形が変わる場合がありますが、ノートには「待つ」のような<b>基本の形・言い切りの形</b>を記してください。<br><br>
-                ノートには、ランスロットがその言葉を発したシーンも記録されます。仮説は何度でも書きなおせます。
-            </p><br>
-
-            <p>
-                <b>【ヴェインの返答】</b><br>
-                ランスロットの言葉をどう受け取ったか考え、ヴェインとして返答してください。<br>
-                正しい返答を当てることが目的ではありません。<br>
-                ランスロットの反応そのものが、新しい手掛かりになることがあります。<br>
-                一度選んだ返答は、その周回では変更できません。
-            </p><br>
-
-            <p>
-                <b>【ヴェインの理解】</b><br>
-                正しい仮説を書いただけでは、その言葉を理解したことにはなりません。<br>
-                会話を重ね、十分な手掛かりが揃ったとき、ヴェイン自身がその意味へ辿り着きます。<br>
-                一度理解した言葉は、それ以降の会話と過去LOGで日本語として読めるようになります。
-            </p><br>
-
-            <p>
-                <b>【ヴェインの周回】</b><br>
-                最初の画面の「ヴェインの記録」ボタンから２周目以降をプレイすることができます。<br>
-                ヴェインのノートの正解率や、ヴェインの返答によってエンディングが変化します。<br>
-                周回開始時に、どの場所からやり直すかや、ヴェインのノートの正解率を調整できます。<br>
-                エンディングは全てハッピーエンドです。
-            </p>
-        </div>
-
-        <button id="start-init-btn" class="btn-style" style="background:var(--main);color:#fff;">物語を開始する</button>
-    </div>
-</div>
-
-<div id="load-overlay">
-    <div class="content-box">
-        <h2 style="color:var(--main-dark);">記憶の継承</h2>
-        <p>過去に理解した単語を、最初からノートに引き継ぎますか？</p>
-        <button id="load-yes" class="btn-style" style="background:var(--main);color:#fff;">継承する</button>
-        <button id="load-no" class="btn-style" style="background:var(--main-dark);color:#fff;">最初から解く</button>
-    </div>
-</div>
-
-<div id="understanding-flash" aria-hidden="true">
-    <div class="understanding-flash-inner">
-        <div class="understanding-flash-label">UNDERSTANDING</div>
-        <div id="understanding-flash-words"></div>
-        <div class="understanding-flash-copy">……そういう意味だったんだ。</div>
-    </div>
-</div>
-
+<button id="start-init-btn" class="btn-style" style="background:var(--main);color:#fff">物語を開始する</button>
+</div></div>
+<div id="load-overlay"><div class="content-box">
+<h2 style="color:var(--main-dark)">記憶の継承</h2>
+<p>過去に理解した単語を、最初からノートに引き継ぎますか？</p>
+<button id="load-yes" class="btn-style" style="background:var(--main);color:#fff">継承する</button>
+<button id="load-no" class="btn-style" style="background:var(--main-dark);color:#fff">最初から解く</button>
+</div></div>
+<div id="understanding-flash" aria-hidden="true"><div class="understanding-flash-inner">
+<div class="understanding-flash-label">UNDERSTANDING</div>
+<div id="understanding-flash-words"></div>
+<div class="understanding-flash-copy">……そういう意味だったんだ。</div>
+</div></div>
 <div id="game-container">
-    <div id="main-screen">
-        <div id="progress-bar">SCENE&nbsp;<span id="progress-current">01</span>&nbsp;/&nbsp;<span id="progress-total">20</span></div>
-
-        <div class="status-bar">
-            <div class="ending-collection">
-                <span class="ending-collection-label">ENDING</span>
-                <div class="ending-badge-row">
-                    <span class="ending-progress-badge" data-ending-id="1" title="暁光の誓い"></span>
-                    <span class="ending-progress-badge" data-ending-id="6" title="魂の共鳴"></span>
-                    <span class="ending-progress-badge" data-ending-id="2" title="不滅の双璧"></span>
-                    <span class="ending-progress-badge" data-ending-id="3" title="硝子の距離"></span>
-                    <span class="ending-progress-badge" data-ending-id="4" title="静寂のあとで"></span>
-                    <span class="ending-progress-badge" data-ending-id="5" title="プリンの迷宮"></span>
-                    <span class="ending-progress-badge gold" data-ending-id="7" title="悠久の夜明け"></span>
-                </div>
-                <span class="ending-count" data-ending-count>0 / 7</span>
-            </div>
-
-            <div id="legacy-state">
-                <span id="intel-val">0%</span>
-                <span id="col-val">0%</span>
-                <div class="badge-container" id="badge-area">
-                    <div class="badge" id="b-1" title="暁光の誓い"></div>
-                    <div class="badge" id="b-6" title="魂の共鳴"></div>
-                    <div class="badge" id="b-2" title="不滅の双璧"></div>
-                    <div class="badge" id="b-3" title="硝子の距離"></div>
-                    <div class="badge" id="b-4" title="静寂のあとで"></div>
-                    <div class="badge" id="b-5" title="プリンの迷宮"></div>
-                    <div class="badge gold" id="b-7" title="悠久の夜明け"></div>
-                </div>
-            </div>
-        </div>
-
-        <div id="main-view-tabs">
-            <button type="button" id="play-view-tab" class="main-view-tab active" onclick="switchMainView('play')">会話</button>
-            <button type="button" id="log-view-tab" class="main-view-tab" onclick="switchMainView('log')">過去LOG</button>
-        </div>
-
-        <div id="play-view">
-            <div id="display">
-                <div id="chara-header"><span id="speaker-name">LANCELOT</span></div>
-                <div class="bubble" id="message-text">......</div>
-
-                <div id="vane-thought-block">
-                    <div class="block-label">VANE</div>
-                    <div class="thought-bubble" id="vane-thought-text"></div>
-                </div>
-
-                <div id="story-block" style="display:none;">
-                    <div class="block-label">STORY</div>
-                    <div class="story-bubble" id="story-text"></div>
-                </div>
-
-                <div id="resolution-block" style="display:none;">
-                    <div class="block-label">UNDERSTANDING</div>
-                    <div class="resolution-bubble" id="resolution-text"></div>
-                </div>
-            </div>
-
-            <div class="controls" id="action-area"></div>
-        </div>
-
-        <div id="log-section">
-            <div id="log-header">これまでの会話</div>
-            <div id="log-panel"></div>
-        </div>
-    </div>
-
-    <div id="dictionary">
-        <div id="dict-header">
-            <h3>ヴェインのノート</h3>
-            <p>聞き取れない言葉を選び、<br>思いついた意味を書き留める。</p>
-        </div>
-
-        <div id="dict-editor-section">
-            <div id="dict-editor-label">選択中の言葉</div>
-            <div id="dict-list"></div>
-        </div>
-
-        <div id="word-list-section">
-            <div id="word-list-header">言葉一覧</div>
-            <div id="word-list-panel"><div id="word-list"></div></div>
-        </div>
-    </div>
+<div id="main-screen">
+<div id="progress-bar">SCENE&nbsp;<span id="progress-current">01</span>&nbsp;/&nbsp;<span id="progress-total">20</span></div>
+<div class="status-bar"><div class="ending-collection">
+<span class="ending-collection-label">ENDING</span>
+<div class="ending-badge-row">
+<span class="ending-progress-badge" data-ending-id="1" title="暁光の誓い"></span>
+<span class="ending-progress-badge" data-ending-id="6" title="魂の共鳴"></span>
+<span class="ending-progress-badge" data-ending-id="2" title="不滅の双璧"></span>
+<span class="ending-progress-badge" data-ending-id="3" title="硝子の距離"></span>
+<span class="ending-progress-badge" data-ending-id="4" title="静寂のあとで"></span>
+<span class="ending-progress-badge" data-ending-id="5" title="プリンの迷宮"></span>
+<span class="ending-progress-badge gold" data-ending-id="7" title="悠久の夜明け"></span>
+</div><span class="ending-count" data-ending-count>0 / 7</span></div>
+<div id="legacy-state"><span id="intel-val">0%</span><span id="col-val">0%</span>
+<div class="badge-container" id="badge-area">
+<div class="badge" id="b-1" title="暁光の誓い"></div><div class="badge" id="b-6" title="魂の共鳴"></div>
+<div class="badge" id="b-2" title="不滅の双璧"></div><div class="badge" id="b-3" title="硝子の距離"></div>
+<div class="badge" id="b-4" title="静寂のあとで"></div><div class="badge" id="b-5" title="プリンの迷宮"></div>
+<div class="badge gold" id="b-7" title="悠久の夜明け"></div>
+</div></div></div>
+<div id="main-view-tabs"><button type="button" id="play-view-tab" class="main-view-tab active" onclick="switchMainView('play')">会話</button><button type="button" id="log-view-tab" class="main-view-tab" onclick="switchMainView('log')">過去LOG</button></div>
+<div id="play-view">
+<div id="display">
+<div id="chara-header"><span id="speaker-name">LANCELOT</span></div>
+<div class="bubble" id="message-text">......</div>
+<div id="vane-thought-block"><div class="block-label">VANE</div><div class="thought-bubble" id="vane-thought-text"></div></div>
+<div id="story-block" style="display:none"><div class="block-label">STORY</div><div class="story-bubble" id="story-text"></div></div>
+<div id="resolution-block" style="display:none"><div class="block-label">UNDERSTANDING</div><div class="resolution-bubble" id="resolution-text"></div></div>
+</div><div class="controls" id="action-area"></div>
 </div>
-
+<div id="log-section"><div id="log-header">これまでの会話</div><div id="log-panel"></div></div>
+</div>
+<div id="dictionary">
+<div id="dict-header"><h3>ヴェインのノート</h3><p>聞き取れない言葉を選び、<br>思いついた意味を書き留める。</p></div>
+<div id="dict-editor-section"><div id="dict-editor-label">選択中の言葉</div><div id="dict-list"></div></div>
+<div id="word-list-section"><div id="word-list-header">言葉一覧</div><div id="word-list-panel"><div id="word-list"></div></div></div>
+</div>
+</div>
 <script src="game.js"></script>
-
 <script>
+/*
+    声を聴かせて、ランスロット！
+    index.html 内ゲームロジック
+
+    通常選択肢・完全理解選択肢・誤読選択肢に対応。
+*/
 const wordBank = {
-    W1:{q:"θωε",canonical:"心配",variants:["しんぱい","心配する"],synonyms:["気がかり","気掛かり","懸念"],nearMisses:["怖い","不安","気になる","案じる"],meaning:"ヴェインの状態・安全・心情などを気にかけること",boundary:"「怖い」はランスロット自身の恐怖。「心配」はヴェインへ向く感情。",appearances:[1,5,13],difficulty:"easy",finalRole:"物語の入口。後に「大切」「失う」「怖い」へ繋がる気遣い。",minClues:2},
+    W1:{q:"θωε",canonical:"心配する",variants:["しんぱい","心配","心配する","しんぱいする"],synonyms:["気がかり","気掛かり","懸念"],nearMisses:["怖い","不安","気になる","案じる"],meaning:"ヴェインの状態・安全・心情などを気にかけること",boundary:"「怖い」はランスロット自身の恐怖。「心配」はヴェインへ向く感情。",appearances:[1,5,13],difficulty:"easy",finalRole:"物語の入口。後に「大切」「失う」「怖い」へ繋がる気遣い。",minClues:2},
     W2:{q:"ΣΦμ",canonical:"一緒",variants:["いっしょ"],synonyms:["共に","ともに"],nearMisses:["そば","傍","隣","ずっと","同行"],meaning:"二人で行動する、二人として何かを共有すること",boundary:"「ずっと」は時間的継続。「一緒」は誰と・どのような状態であるか。",appearances:[4,8,17],difficulty:"easy-medium",finalRole:"二人がこの先も共にあることを示す未来語。",minClues:2},
     W3:{q:"αβγδε",canonical:"ありがとう",variants:["ありがと","有難う","有り難う"],synonyms:["感謝","感謝する","お礼"],nearMisses:["嬉しい","助かった","ごめん","すまない"],meaning:"ヴェイン本人がしてくれたことへの感謝",boundary:"謝罪や一般的な礼儀ではなく、ヴェインとの関係に意味を持つ感謝。",appearances:[3,9,18],difficulty:"easy",finalRole:"最後まで理解しようとしてくれたヴェインへの感謝。",minClues:2},
     W4:{q:"λησ",canonical:"親友",variants:["しんゆう"],synonyms:["ベストフレンド"],nearMisses:["友達","友人","相棒","仲間","幼馴染"],meaning:"現在の二人の関係を定義する言葉",boundary:"「親友」は関係名。「愛している」は感情。",appearances:[7,12,17],difficulty:"easy-medium",finalRole:"「親友だからだけではない」と関係を一段深めるための基準点。",minClues:2},
@@ -1390,9 +230,11 @@ const wordBank = {
 
 let currentStep=0,viewingStep=0,lovePoints=0,userDict={},colSet=new Set();
 let selectedAnswers=[];
+let sceneChoiceRecords=[];
 let masteredWords=new Set(),vaneKnownWords=new Set(),vaneUnderstoodAt={};
 let wordSeenCounts={},seenSceneIds=new Set();
 let interactionPhase="conversation",pendingOption=null,pendingResolvedKeys=[],pendingFinalLine="";
+let pendingChoiceContext=null;
 let activeDictKey=null,mainViewMode="play";
 let interpretationCounts={unknown:0,misread:0,understood:0};
 let axisCounts={listen:0,act:0,bond:0,self:0,daily:0};
@@ -1400,16 +242,37 @@ let routeCounts={twin:0,glass:0,resonance:0};
 let understandingFlashTimer=null;
 
 scenario.forEach(scene=>{
-    scene.opts.forEach((option,optionIndex)=>{
-        if(!option.id) option.id=`s${String(scene.id).padStart(2,"0")}_o${optionIndex+1}`;
+    ["opts","insightOpts","misreadOpts"].forEach((group,groupIndex)=>{
+        const prefix=["o","i","m"][groupIndex];
+        (scene[group]||[]).forEach((option,index)=>{
+            if(!option.id) option.id=`s${String(scene.id).padStart(2,"0")}_${prefix}${index+1}`;
+        });
     });
 });
 
 const maxLove=450;
 
+function getAllSceneOptions(scene){
+    if(!scene) return [];
+    return [...(scene.opts||[]),...(scene.insightOpts||[]),...(scene.misreadOpts||[])];
+}
+
+function findSceneOption(scene,id){
+    return getAllSceneOptions(scene).find(o=>o.id===id)||null;
+}
+
+function escapeHtml(value){
+    return String(value??"").replace(/[&<>"']/g,c=>({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        "\"":"&quot;",
+        "'":"&#39;"
+    }[c]));
+}
+
 function switchMainView(mode){
     if(mode!=="play"&&mode!=="log") return;
-
     mainViewMode=mode;
 
     const playView=document.getElementById("play-view");
@@ -1436,53 +299,221 @@ function switchMainView(mode){
 function rebuildRunState(){
     lovePoints=0;
     interpretationCounts={unknown:0,misread:0,understood:0};
+
+    sceneChoiceRecords=sceneChoiceRecords.map((record,index)=>
+        selectedAnswers[index]&&record?.optionId===selectedAnswers[index]
+            ?record
+            :null
+    );
+
     axisCounts={listen:0,act:0,bond:0,self:0,daily:0};
     routeCounts={twin:0,glass:0,resonance:0};
 
     selectedAnswers.forEach((optionId,sceneIndex)=>{
         if(!optionId) return;
 
-        const data=scenario[sceneIndex];
-        if(!data) return;
+        const scene=scenario[sceneIndex];
+        const option=findSceneOption(scene,optionId);
 
-        const option=data.opts.find(o=>o.id===optionId);
         if(!option) return;
 
         lovePoints+=Number(option.v)||0;
+
         if(!option.endingImpact) return;
 
-        if(option.interpretation&&Object.prototype.hasOwnProperty.call(interpretationCounts,option.interpretation)){
-            interpretationCounts[option.interpretation]++;
-        }
-        if(option.axis&&Object.prototype.hasOwnProperty.call(axisCounts,option.axis)){
+        if(Object.prototype.hasOwnProperty.call(axisCounts,option.axis)){
             axisCounts[option.axis]++;
         }
-        if(option.route&&Object.prototype.hasOwnProperty.call(routeCounts,option.route)){
+
+        if(Object.prototype.hasOwnProperty.call(routeCounts,option.route)){
             routeCounts[option.route]++;
         }
     });
 }
 
 function normalizeGuess(value){
-    return String(value||"").normalize("NFKC").replace(/\s+/g,"").trim();
+    return String(value??"").normalize("NFKC").replace(/\s+/g,"").trim();
 }
 
 function isAcceptedGuess(key,value){
     if(!wordBank[key]) return false;
 
-    const normalized=normalizeGuess(value);
-    const acceptedInputs=[
+    const input=normalizeGuess(value);
+    if(!input) return false;
+
+    const accepted=[
         wordBank[key].canonical,
         ...(wordBank[key].variants||[]),
         ...(wordBank[key].synonyms||[])
     ];
 
-    return acceptedInputs.some(candidate=>normalizeGuess(candidate)===normalized);
+    return accepted.some(candidate=>normalizeGuess(candidate)===input);
+}
+
+/*
+    現在シーンの単語理解状態
+*/
+function getSceneWordStates(scene){
+    const wordStates={};
+    const guesses={};
+
+    const keys=[
+        ...new Set(
+            (scene.words||[])
+                .map(item=>item.key)
+                .filter(key=>wordBank[key])
+        )
+    ];
+
+    keys.forEach(key=>{
+        const guess=String(userDict[key]||"").trim();
+
+        guesses[key]=guess;
+        wordStates[key]=
+            vaneKnownWords.has(key)||isAcceptedGuess(key,guess)
+                ?"correct"
+                :(guess?"wrong":"blank");
+    });
+
+    return {
+        wordStates,
+        guesses,
+        allCorrect:keys.every(key=>wordStates[key]==="correct")
+    };
+}
+
+/*
+    誤読選択肢の条件照合
+*/
+function matchesMisreadTrigger(option,wordStates,guesses){
+    const trigger=option.trigger;
+
+    if(
+        !trigger||
+        !wordBank[trigger.key]||
+        wordStates[trigger.key]!=="wrong"
+    ){
+        return false;
+    }
+
+    const actual=normalizeGuess(guesses[trigger.key]);
+
+    if(!actual||isAcceptedGuess(trigger.key,actual)){
+        return false;
+    }
+
+    return Array.isArray(trigger.guesses)&&
+        trigger.guesses.some(
+            guess=>normalizeGuess(guess)===actual
+        );
+}
+
+/*
+    現在の理解状態から返答候補を作る
+*/
+function buildChoicesForScene(scene,states){
+    const choices=(scene.opts||[]).map(
+        option=>({option,kind:"base"})
+    );
+
+    if(states.allCorrect){
+        (scene.insightOpts||[]).forEach(
+            option=>choices.push({option,kind:"insight"})
+        );
+    }else{
+        (scene.misreadOpts||[]).forEach(option=>{
+            if(
+                matchesMisreadTrigger(
+                    option,
+                    states.wordStates,
+                    states.guesses
+                )
+            ){
+                choices.push({option,kind:"misread"});
+            }
+        });
+    }
+
+    return shuffle(choices);
+}
+
+/*
+    「返答へ進む」を押した時だけ実行
+*/
+function lockChoicesForCurrentScene(){
+    if(
+        interactionPhase!=="conversation"||
+        currentStep>=scenario.length
+    ){
+        return;
+    }
+
+    pendingChoiceContext=null;
+
+    const scene=scenario[currentStep];
+    const states=getSceneWordStates(scene);
+
+    pendingChoiceContext={
+        sceneIndex:currentStep,
+        wordStates:Object.freeze({...states.wordStates}),
+        guesses:Object.freeze({...states.guesses}),
+        allGuesses:Object.freeze({...userDict}),
+        options:Object.freeze(buildChoicesForScene(scene,states))
+    };
+
+    interactionPhase="choice";
+    updateUI(true);
+}
+
+/*
+    通常・理解・誤読の返答を共通処理
+*/
+function chooseReply(choice){
+    if(
+        interactionPhase!=="choice"||
+        !pendingChoiceContext||
+        pendingChoiceContext.sceneIndex!==currentStep
+    ){
+        return;
+    }
+
+    if(!pendingChoiceContext.options.includes(choice)){
+        return;
+    }
+
+    const scene=scenario[currentStep];
+    const {option,kind}=choice;
+
+    selectedAnswers[currentStep]=option.id;
+
+    sceneChoiceRecords[currentStep]={
+        sceneId:scene.id,
+        wordStates:{...pendingChoiceContext.wordStates},
+        optionId:option.id,
+        kind,
+        misreadKey:
+            kind==="misread"
+                ?(option.trigger?.key||null)
+                :null,
+        route:option.route||null,
+        guesses:{...pendingChoiceContext.guesses}
+    };
+
+    rebuildRunState();
+
+    pendingOption=option;
+    interactionPhase="reaction";
+    updateUI(true);
+
+    const display=document.getElementById("display");
+    if(display) display.scrollTop=0;
 }
 
 function getSavedWords(){
     try{
-        return JSON.parse(localStorage.getItem("vane_solved_words")||"{}");
+        return JSON.parse(
+            localStorage.getItem("vane_solved_words")||"{}"
+        );
     }catch(e){
         return {};
     }
@@ -1493,7 +524,9 @@ function getMasteredWordSet(){
     const result=new Set();
 
     Object.keys(wordBank).forEach(key=>{
-        if(saved[key]&&isAcceptedGuess(key,saved[key])) result.add(key);
+        if(saved[key]&&isAcceptedGuess(key,saved[key])){
+            result.add(key);
+        }
     });
 
     return result;
@@ -1503,8 +536,13 @@ function persistMasteredWord(key){
     if(!wordBank[key]) return;
 
     const solved=getSavedWords();
+
     solved[key]=wordBank[key].canonical;
-    localStorage.setItem("vane_solved_words",JSON.stringify(solved));
+
+    localStorage.setItem(
+        "vane_solved_words",
+        JSON.stringify(solved)
+    );
 }
 
 function hasCompatibleSavedWords(){
@@ -1516,12 +554,18 @@ function sceneContainsWord(text,key){
 }
 
 const wordTotalClueScenes={};
-for(let key in wordBank){
-    wordTotalClueScenes[key]=scenario.filter(data=>sceneContainsWord(data.q,key)).length;
-}
+
+Object.keys(wordBank).forEach(key=>{
+    wordTotalClueScenes[key]=scenario.filter(
+        scene=>sceneContainsWord(scene.q,key)
+    ).length;
+});
 
 function checkEnvironment(){
-    const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||window.innerWidth<800;
+    const isMobile=
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||
+        window.innerWidth<800;
+
     const title=document.getElementById("check-title");
     const entryBtn=document.getElementById("entry-btn");
     const errorMsg=document.getElementById("error-msg");
@@ -1535,24 +579,28 @@ function checkEnvironment(){
     }
 }
 
-function shuffle(arr){
+function shuffle(array){
+    const arr=array.slice();
     let n=arr.length;
+
     while(n){
-        let i=Math.floor(Math.random()*n--);
+        const i=Math.floor(Math.random()*n--);
         [arr[n],arr[i]]=[arr[i],arr[n]];
     }
+
     return arr;
 }
 
 function getEncounteredScenesForWord(key){
-    const result=[];
-
-    scenario.forEach((scene,sceneIndex)=>{
-        if(!seenSceneIds.has(sceneIndex)) return;
-        if(sceneContainsWord(scene.q,key)) result.push(sceneIndex);
-    });
-
-    return result;
+    return scenario.reduce((result,scene,index)=>{
+        if(
+            seenSceneIds.has(index)&&
+            sceneContainsWord(scene.q,key)
+        ){
+            result.push(index);
+        }
+        return result;
+    },[]);
 }
 
 function getVaneNotebookMemo(key){
@@ -1574,20 +622,20 @@ function getVaneNotebookMemo(key){
 }
 
 function renderNotebookRecordText(text,focusKey){
-    let rendered=text||"";
+    let rendered=escapeHtml(text||"");
 
-    for(let key in wordBank){
-        const reg=new RegExp("\\[\\["+key+"(?:\\|([^\\]]+))?\\]\\]","g");
+    for(const key of Object.keys(wordBank)){
+        const reg=new RegExp(
+            "\\[\\["+key+"(?:\\|([^\\]]+))?\\]\\]",
+            "g"
+        );
 
         rendered=rendered.replace(reg,(match,surfaceForm)=>{
-            const resolved=vaneKnownWords.has(key);
-            const displayVal=resolved
-                ? (surfaceForm||wordBank[key].canonical)
-                : wordBank[key].q;
+            const display=vaneKnownWords.has(key)
+                ?(surfaceForm||wordBank[key].canonical)
+                :wordBank[key].q;
 
-            const focusClass=key===focusKey?" focus":"";
-
-            return `<span class="dict-record-word${focusClass}">${displayVal}</span>`;
+            return `<span class="dict-record-word${key===focusKey?" focus":""}">${escapeHtml(display)}</span>`;
         });
     }
 
@@ -1595,31 +643,51 @@ function renderNotebookRecordText(text,focusKey){
 }
 
 function handleGuessBlur(key){
-    if(vaneKnownWords.has(key)) return;
-    if(!(userDict[key]||"").trim()) return;
+    if(
+        vaneKnownWords.has(key)||
+        !String(userDict[key]||"").trim()
+    ){
+        return;
+    }
 
-    const feedback=document.getElementById(`dict-feedback-${key}`);
+    const feedback=document.getElementById(
+        `dict-feedback-${key}`
+    );
+
     if(!feedback) return;
 
     feedback.innerText="……とりあえず、そう書いておこう。";
     feedback.classList.add("show");
 
     setTimeout(()=>{
-        const currentFeedback=document.getElementById(`dict-feedback-${key}`);
-        if(currentFeedback) currentFeedback.classList.remove("show");
+        const element=document.getElementById(
+            `dict-feedback-${key}`
+        );
+
+        if(element){
+            element.classList.remove("show");
+        }
     },1800);
 }
 
 function playUnderstandingFlash(keys){
-    const uniqueKeys=[...new Set(keys)].filter(key=>wordBank[key]);
-    if(uniqueKeys.length===0) return;
+    const unique=[...new Set(keys)].filter(
+        key=>wordBank[key]
+    );
 
-    const overlay=document.getElementById("understanding-flash");
-    const words=document.getElementById("understanding-flash-words");
+    if(!unique.length) return;
+
+    const overlay=document.getElementById(
+        "understanding-flash"
+    );
+
+    const words=document.getElementById(
+        "understanding-flash-words"
+    );
 
     if(!overlay||!words) return;
 
-    words.innerHTML=uniqueKeys.map(key=>`
+    words.innerHTML=unique.map(key=>`
         <div class="understanding-flash-row">
             <span class="understanding-flash-symbol">${wordBank[key].q}</span>
             <span class="understanding-flash-arrow">→</span>
@@ -1641,40 +709,58 @@ function playUnderstandingFlash(keys){
 }
 
 function jumpToLogScene(sceneIndex,key){
-    if(key&&wordBank[key]) activeDictKey=key;
+    if(key&&wordBank[key]){
+        activeDictKey=key;
+    }
 
     switchMainView("log");
     renderPastLog();
 
     requestAnimationFrame(()=>{
-        const target=document.getElementById(`log-scene-${sceneIndex}`);
+        const target=document.getElementById(
+            `log-scene-${sceneIndex}`
+        );
+
         if(!target) return;
 
-        target.scrollIntoView({behavior:"smooth",block:"center"});
+        target.scrollIntoView({
+            behavior:"smooth",
+            block:"center"
+        });
+
         target.classList.remove("log-focus");
         void target.offsetWidth;
         target.classList.add("log-focus");
 
-        setTimeout(()=>target.classList.remove("log-focus"),1200);
+        setTimeout(()=>{
+            target.classList.remove("log-focus");
+        },1200);
     });
 }
 
 function jumpToDict(key){
     if(!wordBank[key]) return;
 
-    const encountered=getEncounteredScenesForWord(key).length>0;
-    const understood=vaneKnownWords.has(key);
-
-    /* 未遭遇かつ未理解の単語は一覧には表示するが選択不可 */
-    if(!encountered&&!understood) return;
+    if(
+        !getEncounteredScenesForWord(key).length&&
+        !vaneKnownWords.has(key)
+    ){
+        return;
+    }
 
     activeDictKey=key;
+
     renderActiveDictEntry();
     renderPastLog();
     renderWordList();
 
-    const input=document.getElementById(`input-${key}`);
-    if(input&&!input.disabled) input.focus();
+    const input=document.getElementById(
+        `input-${key}`
+    );
+
+    if(input&&!input.disabled){
+        input.focus();
+    }
 }
 
 function renderDictPlaceholder(){
@@ -1684,13 +770,15 @@ function renderDictPlaceholder(){
     list.innerHTML=`
         <div class="dict-placeholder">
             <div class="dict-placeholder-symbol">―――</div>
-            会話の中の聞き取れない言葉を<br>選んでください。
+            会話の中の聞き取れない言葉を<br>
+            選んでください。
         </div>
     `;
 }
 
 function renderActiveDictEntry(){
     const list=document.getElementById("dict-list");
+
     if(!list) return;
 
     if(!activeDictKey||!wordBank[activeDictKey]){
@@ -1699,51 +787,68 @@ function renderActiveDictEntry(){
     }
 
     const key=activeDictKey;
-    const encounteredScenes=getEncounteredScenesForWord(key);
+    const encountered=getEncounteredScenesForWord(key);
 
-    const recordButtons=encounteredScenes.length>0
-        ? encounteredScenes.map(sceneIndex=>`
+    const recordButtons=encountered.length
+        ?encountered.map(index=>`
             <button
                 type="button"
                 class="dict-record-item"
-                onclick="jumpToLogScene(${sceneIndex}, '${key}')"
+                onclick="jumpToLogScene(${index},'${key}')"
             >
-                <span class="dict-record-scene">SCENE ${String(sceneIndex+1).padStart(2,"0")}</span>
-                <span class="dict-record-text">「${renderNotebookRecordText(scenario[sceneIndex].q,key)}」</span>
+                <span class="dict-record-scene">
+                    SCENE ${String(index+1).padStart(2,"0")}
+                </span>
+                <span class="dict-record-text">
+                    ${renderNotebookRecordText(scenario[index].q,key)}
+                </span>
             </button>
         `).join("")
-        : `<span class="dict-record-empty">この周回ではまだ記録がありません。</span>`;
+        :`<span class="dict-record-empty">この周回ではまだ記録がありません。</span>`;
 
     list.innerHTML="";
 
     const div=document.createElement("div");
+
     div.className="dict-entry";
     div.id=`entry-${key}`;
+
     div.innerHTML=`
-        <label class="dict-symbol-label">${wordBank[key].q}</label>
+        <label class="dict-symbol-label">
+            ${wordBank[key].q}
+        </label>
 
         <div class="dict-field-label">俺の予想</div>
+
         <input
             type="text"
             id="input-${key}"
             placeholder="思いついた意味を書き留める"
-            value=""
-            oninput="updateGuess('${key}', this.value)"
+            oninput="updateGuess('${key}',this.value)"
             onblur="handleGuessBlur('${key}')"
         >
 
         <div class="dict-status" id="status-${key}"></div>
 
         <div class="dict-vane-memo">
-            <div class="dict-vane-memo-title">ヴェインのメモ</div>
-            <div class="dict-vane-memo-text">${getVaneNotebookMemo(key)}</div>
+            <div class="dict-vane-memo-title">
+                ヴェインのメモ
+            </div>
+            <div class="dict-vane-memo-text">
+                ${getVaneNotebookMemo(key)}
+            </div>
         </div>
 
-        <div class="dict-feedback" id="dict-feedback-${key}"></div>
+        <div
+            class="dict-feedback"
+            id="dict-feedback-${key}"
+        ></div>
 
         <div class="dict-records">
             <div class="dict-records-title">遭遇記録</div>
-            <div class="dict-record-list">${recordButtons}</div>
+            <div class="dict-record-list">
+                ${recordButtons}
+            </div>
         </div>
     `;
 
@@ -1752,18 +857,26 @@ function renderActiveDictEntry(){
 }
 
 function renderLogDialogueText(text){
-    let rendered=text||"";
+    let rendered=escapeHtml(text||"");
 
-    for(let key in wordBank){
-        const reg=new RegExp("\\[\\["+key+"(?:\\|([^\\]]+))?\\]\\]","g");
+    for(const key of Object.keys(wordBank)){
+        const reg=new RegExp(
+            "\\[\\["+key+"(?:\\|([^\\]]+))?\\]\\]",
+            "g"
+        );
 
         rendered=rendered.replace(reg,(match,surfaceForm)=>{
             const resolved=vaneKnownWords.has(key);
-            const spanClass=resolved?"resolved":"symbol";
-            const activeClass=key===activeDictKey?" log-symbol-active":"";
-            const displayVal=resolved?(surfaceForm||wordBank[key].canonical):wordBank[key].q;
+            const cls=resolved?"resolved":"symbol";
+            const active=key===activeDictKey
+                ?" log-symbol-active"
+                :"";
 
-            return `<span class="${spanClass}${activeClass}" onclick="jumpToDict('${key}')">${displayVal}</span>`;
+            const value=resolved
+                ?(surfaceForm||wordBank[key].canonical)
+                :wordBank[key].q;
+
+            return `<span class="${cls}${active}" onclick="jumpToDict('${key}')">${escapeHtml(value)}</span>`;
         });
     }
 
@@ -1774,29 +887,47 @@ function renderPastLog(){
     const panel=document.getElementById("log-panel");
     if(!panel) return;
 
-    const previousScrollTop=panel.scrollTop;
-    const maxIndex=Math.min(currentStep,scenario.length-1);
+    const scroll=panel.scrollTop;
+    const maxIndex=Math.min(
+        currentStep,
+        scenario.length-1
+    );
 
-    if(maxIndex<0||scenario.length===0){
-        panel.innerHTML=`<div class="log-empty">まだ記録はありません。</div>`;
+    if(maxIndex<0||!scenario.length){
+        panel.innerHTML=`
+            <div class="log-empty">
+                まだ記録はありません。
+            </div>
+        `;
         return;
     }
 
     const entries=[];
 
-    for(let index=0;index<=maxIndex;index++){
-        if(!seenSceneIds.has(index)&&index!==currentStep) continue;
+    for(let i=0;i<=maxIndex;i++){
+        if(
+            !seenSceneIds.has(i)&&
+            i!==currentStep
+        ){
+            continue;
+        }
 
-        const data=scenario[index];
-        if(!data) continue;
+        const scene=scenario[i];
+        if(!scene) continue;
 
-        const thought=(data.vaneThought||"").replace(/\n/g,"<br>");
+        const thought=escapeHtml(
+            scene.vaneThought||""
+        ).replace(/\n/g,"<br>");
 
         entries.push(`
-            <div class="log-entry" id="log-scene-${index}">
-                <div class="log-scene">SCENE ${String(index+1).padStart(2,"0")}</div>
+            <div class="log-entry" id="log-scene-${i}">
+                <div class="log-scene">
+                    SCENE ${String(i+1).padStart(2,"0")}
+                </div>
                 <div class="log-speaker">LANCELOT</div>
-                <div class="log-dialogue">${renderLogDialogueText(data.q)}</div>
+                <div class="log-dialogue">
+                    ${renderLogDialogueText(scene.q)}
+                </div>
                 ${thought?`
                     <div class="log-thought-label">VANE</div>
                     <div class="log-thought">${thought}</div>
@@ -1805,16 +936,13 @@ function renderPastLog(){
         `);
     }
 
-    if(entries.length===0){
-        panel.innerHTML=`<div class="log-empty">まだ記録はありません。</div>`;
-        return;
-    }
+    panel.innerHTML=entries.length
+        ?entries.join("")
+        :`<div class="log-empty">まだ記録はありません。</div>`;
 
-    panel.innerHTML=entries.join("");
-    panel.scrollTop=previousScrollTop;
+    panel.scrollTop=scroll;
 }
 
-/* 最初から全単語を一覧に表示 */
 function getVisibleWordKeys(){
     return Object.keys(wordBank);
 }
@@ -1823,105 +951,143 @@ function renderWordList(){
     const list=document.getElementById("word-list");
     if(!list) return;
 
-    const keys=getVisibleWordKeys();
-
-    list.innerHTML=keys.map(key=>{
+    list.innerHTML=getVisibleWordKeys().map(key=>{
         const understood=vaneKnownWords.has(key);
-        const encountered=getEncounteredScenesForWord(key).length>0;
+        const encountered=
+            getEncounteredScenesForWord(key).length>0;
+
         const selectable=encountered||understood;
 
         const guess=understood
-            ? wordBank[key].canonical
-            : (userDict[key]||"").trim();
+            ?wordBank[key].canonical
+            :String(userDict[key]||"").trim();
 
-        let statusText="未遭遇";
-        let statusClass="";
+        const status=understood
+            ?"✓ 理解"
+            :encountered
+                ?(guess?"推測中":"未推測")
+                :"未遭遇";
 
-        if(understood){
-            statusText="✓ 理解";
-            statusClass=" understood";
-        }else if(encountered&&guess){
-            statusText="推測中";
-            statusClass=" guessing";
-        }else if(encountered){
-            statusText="未推測";
-        }
+        const statusCls=understood
+            ?" understood"
+            :(encountered&&guess?" guessing":"");
 
-        const guessText=guess||"―";
-        const guessClass=understood
-            ? " understood"
-            : (guess?"":" empty");
+        const guessCls=understood
+            ?" understood"
+            :(guess?"":" empty");
 
-        const activeClass=key===activeDictKey?" active":"";
-        const unencounteredClass=!selectable?" unencountered":"";
-        const disabledAttribute=!selectable?" disabled":"";
+        const active=key===activeDictKey?" active":"";
+        const unencountered=selectable?"":" unencountered";
 
         return `
             <button
                 type="button"
-                class="word-row${activeClass}${unencounteredClass}"
+                class="word-row${active}${unencountered}"
                 onclick="jumpToDict('${key}')"
-                ${disabledAttribute}
+                ${selectable?"":"disabled"}
             >
-                <span class="word-symbol">${wordBank[key].q}</span>
-                <span class="word-guess${guessClass}">${guessText}</span>
-                <span class="word-status${statusClass}">${statusText}</span>
+                <span class="word-symbol">
+                    ${wordBank[key].q}
+                </span>
+                <span class="word-guess${guessCls}">
+                    ${escapeHtml(guess||"―")}
+                </span>
+                <span class="word-status${statusCls}">
+                    ${status}
+                </span>
             </button>
         `;
     }).join("");
 }
 
+/*
+    起動処理
+*/
 window.onload=()=>{
     masteredWords=getMasteredWordSet();
     checkEnvironment();
 
-    const entryBtn=document.getElementById("entry-btn");
-    const recollectionEntryBtn=document.getElementById("recollection-entry-btn");
-    const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||window.innerWidth<800;
+    const entry=document.getElementById("entry-btn");
+    const recollectionEntry=document.getElementById(
+        "recollection-entry-btn"
+    );
 
-    if(!isMobile&&typeof recollectionProgress!=="undefined"&&recollectionProgress.gameCleared){
-        entryBtn.innerText="はじめから";
-        recollectionEntryBtn.style.display="inline-block";
+    const mobile=
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||
+        window.innerWidth<800;
+
+    if(
+        !mobile&&
+        typeof recollectionProgress!=="undefined"&&
+        recollectionProgress.gameCleared
+    ){
+        entry.innerText="はじめから";
+        recollectionEntry.style.display="inline-block";
     }
 
-    entryBtn.onclick=()=>{
-        document.getElementById("device-check-overlay").style.display="none";
-        document.getElementById("intro-overlay").style.display="flex";
+    entry.onclick=()=>{
+        document.getElementById(
+            "device-check-overlay"
+        ).style.display="none";
+
+        document.getElementById(
+            "intro-overlay"
+        ).style.display="flex";
     };
 
-    recollectionEntryBtn.onclick=()=>{
-        document.getElementById("device-check-overlay").style.display="none";
+    recollectionEntry.onclick=()=>{
+        document.getElementById(
+            "device-check-overlay"
+        ).style.display="none";
+
         openRecollection();
     };
 
     document.getElementById("to-tutorial").onclick=()=>{
-        document.getElementById("intro-overlay").style.display="none";
-        document.getElementById("tutorial-overlay").style.display="flex";
+        document.getElementById(
+            "intro-overlay"
+        ).style.display="none";
+
+        document.getElementById(
+            "tutorial-overlay"
+        ).style.display="flex";
     };
 
     document.getElementById("start-init-btn").onclick=()=>{
         if(hasCompatibleSavedWords()){
-            document.getElementById("tutorial-overlay").style.display="none";
-            document.getElementById("load-overlay").style.display="flex";
+            document.getElementById(
+                "tutorial-overlay"
+            ).style.display="none";
+
+            document.getElementById(
+                "load-overlay"
+            ).style.display="flex";
         }else{
             startGame(false);
         }
     };
 
-    document.getElementById("load-yes").onclick=()=>startGame(true);
-    document.getElementById("load-no").onclick=()=>startGame(false);
+    document.getElementById("load-yes").onclick=
+        ()=>startGame(true);
 
-    const savedCol=localStorage.getItem("vane_collection_v3");
-    if(savedCol){
-        try{
-            colSet=new Set(JSON.parse(savedCol));
-        }catch(e){
-            colSet=new Set();
-        }
+    document.getElementById("load-no").onclick=
+        ()=>startGame(false);
+
+    try{
+        const saved=JSON.parse(
+            localStorage.getItem(
+                "vane_collection_v3"
+            )||"[]"
+        );
+
+        colSet=new Set(
+            Array.isArray(saved)?saved:[]
+        );
+    }catch(e){
+        colSet=new Set();
     }
 
     updateColUI();
-
     initDict({});
     renderPastLog();
     renderWordList();
@@ -1932,30 +1098,49 @@ function startGame(inherit){
     currentStep=0;
     viewingStep=0;
 
-    document.getElementById("tutorial-overlay").style.display="none";
-    document.getElementById("load-overlay").style.display="none";
-    document.getElementById("game-container").style.display="flex";
+    document.getElementById(
+        "tutorial-overlay"
+    ).style.display="none";
 
-    if(typeof runMode!=="undefined") runMode="story";
-    if(typeof recollectionBaseEndingId!=="undefined") recollectionBaseEndingId=null;
+    document.getElementById(
+        "load-overlay"
+    ).style.display="none";
 
-    selectedAnswers=new Array(scenario.length).fill(null);
+    document.getElementById(
+        "game-container"
+    ).style.display="flex";
+
+    if(typeof runMode!=="undefined"){
+        runMode="story";
+    }
+
+    if(typeof recollectionBaseEndingId!=="undefined"){
+        recollectionBaseEndingId=null;
+    }
+
+    selectedAnswers=
+        new Array(scenario.length).fill(null);
+
+    sceneChoiceRecords=
+        new Array(scenario.length).fill(null);
+
     masteredWords=getMasteredWordSet();
     vaneKnownWords=new Set();
     vaneUnderstoodAt={};
     wordSeenCounts={};
     seenSceneIds=new Set();
+
     interactionPhase="conversation";
     pendingOption=null;
     pendingResolvedKeys=[];
     pendingFinalLine="";
+    pendingChoiceContext=null;
     activeDictKey=null;
     mainViewMode="play";
 
     rebuildRunState();
 
-    const savedWords=getSavedWords();
-    initDict(inherit?savedWords:{});
+    initDict(inherit?getSavedWords():{});
 
     registerSceneWords(currentStep);
     renderTabs();
@@ -1969,11 +1154,17 @@ function initDict(initialWords){
     userDict={};
     activeDictKey=null;
 
-    for(let key in wordBank){
-        const isInherited=initialWords[key]&&isAcceptedGuess(key,initialWords[key]);
-        userDict[key]=isInherited?wordBank[key].canonical:"";
+    for(const key of Object.keys(wordBank)){
+        const inherited=!!(
+            initialWords[key]&&
+            isAcceptedGuess(key,initialWords[key])
+        );
 
-        if(isInherited){
+        userDict[key]=inherited
+            ?wordBank[key].canonical
+            :"";
+
+        if(inherited){
             masteredWords.add(key);
             vaneKnownWords.add(key);
             vaneUnderstoodAt[key]=-1;
@@ -1988,9 +1179,17 @@ function initDict(initialWords){
 function renderDictEntryState(key){
     if(key!==activeDictKey) return;
 
-    const entry=document.getElementById(`entry-${key}`);
-    const input=document.getElementById(`input-${key}`);
-    const status=document.getElementById(`status-${key}`);
+    const entry=document.getElementById(
+        `entry-${key}`
+    );
+
+    const input=document.getElementById(
+        `input-${key}`
+    );
+
+    const status=document.getElementById(
+        `status-${key}`
+    );
 
     if(!entry||!input||!status) return;
 
@@ -2001,57 +1200,87 @@ function renderDictEntryState(key){
         entry.classList.add("correct");
         status.innerText="状態　理解した";
         input.disabled=true;
-        input.value=wordBank[key].canonical;
-    }else if((userDict[key]||"").trim().length>0){
+
+        if(input.value!==wordBank[key].canonical){
+            input.value=wordBank[key].canonical;
+        }
+    }else if(String(userDict[key]||"").trim()){
         entry.classList.add("guessing");
         status.innerText="状態　推測中";
         input.disabled=false;
-        input.value=userDict[key]||"";
+
+        if(input.value!==userDict[key]){
+            input.value=userDict[key];
+        }
     }else{
         status.innerText="状態　未推測";
         input.disabled=false;
-        input.value="";
+
+        if(input.value){
+            input.value="";
+        }
     }
 }
 
 function updateGuess(key,val){
-    if(vaneKnownWords.has(key)) return;
+    if(
+        !wordBank[key]||
+        vaneKnownWords.has(key)
+    ){
+        return;
+    }
 
-    userDict[key]=val.trim();
+    userDict[key]=String(val).trim();
+
     renderDictEntryState(key);
     renderWordList();
+
+    /*
+        ノートの入力中には選択肢を再判定しない。
+        返答へ進んだ後も選択肢は変化しない。
+    */
 }
 
 function registerSceneWords(index){
-    if(index<0||index>=scenario.length||seenSceneIds.has(index)) return;
+    if(
+        index<0||
+        index>=scenario.length||
+        seenSceneIds.has(index)
+    ){
+        return;
+    }
 
     seenSceneIds.add(index);
 
-    const text=scenario[index].q;
-
-    for(let key in wordBank){
-        if(sceneContainsWord(text,key)){
-            wordSeenCounts[key]=(wordSeenCounts[key]||0)+1;
+    for(const key of Object.keys(wordBank)){
+        if(sceneContainsWord(scenario[index].q,key)){
+            wordSeenCounts[key]=
+                (wordSeenCounts[key]||0)+1;
         }
     }
 
     renderPastLog();
     renderWordList();
 
-    if(activeDictKey) renderActiveDictEntry();
+    if(activeDictKey){
+        renderActiveDictEntry();
+    }
 }
 
-function resolveWord(key){
+function resolveWord(key,guessOverride){
     if(vaneKnownWords.has(key)) return false;
 
-    const guess=(userDict[key]||"").trim();
-    if(!isAcceptedGuess(key,guess)) return false;
+    const guess=guessOverride===undefined
+        ?String(userDict[key]||"").trim()
+        :String(guessOverride||"").trim();
+
+    if(!isAcceptedGuess(key,guess)){
+        return false;
+    }
 
     vaneKnownWords.add(key);
     vaneUnderstoodAt[key]=currentStep;
-
-    const canonical=wordBank[key].canonical;
-    userDict[key]=canonical;
+    userDict[key]=wordBank[key].canonical;
 
     if(!masteredWords.has(key)){
         masteredWords.add(key);
@@ -2066,56 +1295,93 @@ function resolveWord(key){
     return true;
 }
 
-function evaluateUnderstanding(data){
+function evaluateUnderstanding(scene,lockedGuesses){
     let candidates;
 
-    if(Array.isArray(data.resolveChecks)){
-        candidates=[...data.resolveChecks];
+    if(Array.isArray(scene.resolveChecks)){
+        candidates=[...scene.resolveChecks];
     }else{
         candidates=Object.keys(wordBank).filter(key=>{
-            const totalClues=wordTotalClueScenes[key]||1;
-            const requiredClues=Math.min(wordBank[key].minClues||2,totalClues);
-            return (wordSeenCounts[key]||0)>=requiredClues;
+            const available=
+                wordTotalClueScenes[key]||1;
+
+            const minimum=Math.min(
+                wordBank[key].minClues||2,
+                available
+            );
+
+            return (
+                (wordSeenCounts[key]||0)>=minimum
+            );
         });
     }
 
-    if(data.finalResolve&&data.finalResolve.special&&data.finalResolve.key){
-        candidates=candidates.filter(key=>key!==data.finalResolve.key);
+    if(
+        scene.finalResolve&&
+        scene.finalResolve.special&&
+        scene.finalResolve.key
+    ){
+        candidates=candidates.filter(
+            key=>key!==scene.finalResolve.key
+        );
     }
 
     const resolvedNow=[];
 
     candidates.forEach(key=>{
-        if(resolveWord(key)) resolvedNow.push(key);
+        const guess=lockedGuesses
+            ?lockedGuesses[key]
+            :undefined;
+
+        if(resolveWord(key,guess)){
+            resolvedNow.push(key);
+        }
     });
 
     return resolvedNow;
 }
 
 function updateIntelUI(){
-    const intel=Math.floor((vaneKnownWords.size/Object.keys(wordBank).length)*100);
+    const total=Object.keys(wordBank).length;
+
+    const value=total
+        ?Math.floor(vaneKnownWords.size/total*100)
+        :0;
+
     const el=document.getElementById("intel-val");
-    if(el) el.innerText=intel+"%";
+
+    if(el){
+        el.innerText=value+"%";
+    }
 }
 
 function getReactionText(option){
-    if(option&&option.reaction) return option.reaction;
-    return "（ランちゃんは、俺の返事を静かに聞いている。）";
+    return option?.reaction||
+        "（ランちゃんは、俺の返事を静かに聞いている。）";
 }
 
 function renderDialogueText(text){
-    let rendered=text||"";
+    let rendered=escapeHtml(text||"");
 
-    for(let key in wordBank){
-        const reg=new RegExp("\\[\\["+key+"(?:\\|([^\\]]+))?\\]\\]","g");
+    for(const key of Object.keys(wordBank)){
+        const reg=new RegExp(
+            "\\[\\["+key+"(?:\\|([^\\]]+))?\\]\\]",
+            "g"
+        );
 
-        rendered=rendered.replace(reg,(match,surfaceForm)=>{
-            const resolved=vaneKnownWords.has(key);
-            const spanClass=resolved?"resolved":"symbol";
-            const displayVal=resolved?(surfaceForm||wordBank[key].canonical):wordBank[key].q;
+        rendered=rendered.replace(
+            reg,
+            (match,surfaceForm)=>{
+                const resolved=vaneKnownWords.has(key);
+                const cls=resolved?"resolved":"symbol";
 
-            return `<span class="${spanClass}" onclick="jumpToDict('${key}')">${displayVal}</span>`;
-        });
+                const value=resolved
+                    ?(surfaceForm||wordBank[key].canonical)
+                    :wordBank[key].q;
+
+                return `<span class="${cls}" onclick="jumpToDict('${key}')">${escapeHtml(value)}</span>`;
+            }
+        );
     }
 
     return rendered.replace(/\n/g,"<br>");
@@ -2129,38 +1395,85 @@ function buildUnderstandingNarrative(key){
     return `
         <div class="understanding-item">
             <div class="understanding-lead">……あ。</div>
+
             <div class="understanding-copy">
                 何度も聞いた、あの音。<br>
                 これまでの会話が、一つにつながる。
             </div>
-            <div class="understanding-symbol">${word.q}</div>
-            <div class="understanding-bridge">あれは――</div>
-            <div class="understanding-word">${word.canonical}</div>
-            <div class="understanding-copy">そういう意味だったんだ。</div>
+
+            <div class="understanding-symbol">
+                ${word.q}
+            </div>
+
+            <div class="understanding-bridge">
+                あれは――
+            </div>
+
+            <div class="understanding-word">
+                ${word.canonical}
+            </div>
+
+            <div class="understanding-copy">
+                そういう意味だったんだ。
+            </div>
         </div>
     `;
 }
 
 function continueFromReaction(){
-    const data=scenario[currentStep];
+    if(
+        interactionPhase!=="reaction"||
+        currentStep>=scenario.length
+    ){
+        return;
+    }
 
-    pendingResolvedKeys=evaluateUnderstanding(data);
+    const scene=scenario[currentStep];
+
+    const lockedGuesses=
+        pendingChoiceContext?.allGuesses||
+        {...userDict};
+
+    pendingResolvedKeys=evaluateUnderstanding(
+        scene,
+        lockedGuesses
+    );
+
     pendingFinalLine="";
 
     const flashKeys=[...pendingResolvedKeys];
 
-    if(data.finalResolve&&data.finalResolve.special&&data.finalResolve.key){
-        const finalKey=data.finalResolve.key;
+    if(
+        scene.finalResolve?.special&&
+        scene.finalResolve.key
+    ){
+        const finalKey=scene.finalResolve.key;
 
-        if(!vaneKnownWords.has(finalKey)&&isAcceptedGuess(finalKey,userDict[finalKey])){
-            if(resolveWord(finalKey)){
-                pendingFinalLine=data.finalResolve.line||"";
+        if(
+            !vaneKnownWords.has(finalKey)&&
+            isAcceptedGuess(
+                finalKey,
+                lockedGuesses[finalKey]
+            )
+        ){
+            if(
+                resolveWord(
+                    finalKey,
+                    lockedGuesses[finalKey]
+                )
+            ){
+                pendingFinalLine=
+                    scene.finalResolve.line||"";
+
                 flashKeys.push(finalKey);
             }
         }
     }
 
-    if(pendingResolvedKeys.length>0||pendingFinalLine){
+    if(
+        pendingResolvedKeys.length||
+        pendingFinalLine
+    ){
         interactionPhase="resolution";
         updateUI(true);
         playUnderstandingFlash(flashKeys);
@@ -2173,6 +1486,7 @@ function advanceScene(){
     pendingOption=null;
     pendingResolvedKeys=[];
     pendingFinalLine="";
+    pendingChoiceContext=null;
     interactionPhase="conversation";
 
     currentStep++;
@@ -2185,49 +1499,118 @@ function advanceScene(){
         renderPastLog();
         renderWordList();
 
-        const display=document.getElementById("display");
-        if(display) display.scrollTop=0;
+        const display=document.getElementById(
+            "display"
+        );
 
-        const logPanel=document.getElementById("log-panel");
-        if(logPanel) logPanel.scrollTop=logPanel.scrollHeight;
+        if(display){
+            display.scrollTop=0;
+        }
+
+        const panel=document.getElementById(
+            "log-panel"
+        );
+
+        if(panel){
+            panel.scrollTop=panel.scrollHeight;
+        }
     }else{
         showEnd();
     }
 }
 
 function renderTabs(){
-    const current=document.getElementById("progress-current");
-    const total=document.getElementById("progress-total");
+    const current=document.getElementById(
+        "progress-current"
+    );
 
-    if(current) current.innerText=String(viewingStep+1).padStart(2,"0");
-    if(total) total.innerText=String(scenario.length).padStart(2,"0");
+    const total=document.getElementById(
+        "progress-total"
+    );
+
+    if(current){
+        current.innerText=
+            String(viewingStep+1).padStart(2,"0");
+    }
+
+    if(total){
+        total.innerText=
+            String(scenario.length).padStart(2,"0");
+    }
 }
 
+/*
+    ゲーム画面更新
+*/
 function updateUI(redo=true){
     if(currentStep>=scenario.length) return;
 
     renderTabs();
 
-    const data=scenario[viewingStep];
-    const charaHeader=document.getElementById("chara-header");
-    const speaker=document.getElementById("speaker-name");
-    const message=document.getElementById("message-text");
-    const thoughtBlock=document.getElementById("vane-thought-block");
-    const thoughtText=document.getElementById("vane-thought-text");
-    const storyBlock=document.getElementById("story-block");
-    const storyText=document.getElementById("story-text");
-    const resolutionBlock=document.getElementById("resolution-block");
-    const resolutionText=document.getElementById("resolution-text");
+    const scene=scenario[viewingStep];
+
+    const header=document.getElementById(
+        "chara-header"
+    );
+
+    const speaker=document.getElementById(
+        "speaker-name"
+    );
+
+    const message=document.getElementById(
+        "message-text"
+    );
+
+    const thoughtBlock=document.getElementById(
+        "vane-thought-block"
+    );
+
+    const thought=document.getElementById(
+        "vane-thought-text"
+    );
+
+    const storyBlock=document.getElementById(
+        "story-block"
+    );
+
+    const storyText=document.getElementById(
+        "story-text"
+    );
+
+    const resolutionBlock=document.getElementById(
+        "resolution-block"
+    );
+
+    const resolutionText=document.getElementById(
+        "resolution-text"
+    );
+
+    if(
+        !header||
+        !speaker||
+        !message||
+        !thoughtBlock||
+        !thought||
+        !storyBlock||
+        !storyText||
+        !resolutionBlock||
+        !resolutionText
+    ){
+        return;
+    }
 
     updateIntelUI();
 
     const isCurrent=viewingStep===currentStep;
 
     speaker.innerText="LANCELOT";
-    message.innerHTML=renderDialogueText(data.q);
-    thoughtText.innerHTML=(data.vaneThought||"").replace(/\n/g,"<br>");
+    message.innerHTML=renderDialogueText(scene.q);
 
-    charaHeader.style.display="none";
+    thought.innerHTML=escapeHtml(
+        scene.vaneThought||""
+    ).replace(/\n/g,"<br>");
+
+    header.style.display="none";
     message.style.display="none";
     thoughtBlock.style.display="none";
     storyBlock.style.display="none";
@@ -2235,146 +1618,265 @@ function updateUI(redo=true){
     resolutionBlock.style.display="none";
     resolutionText.innerHTML="";
 
-    const selectedOptionId=selectedAnswers[viewingStep];
-    let selectedOption=null;
+    const selectedId=selectedAnswers[viewingStep];
 
-    if(isCurrent&&pendingOption){
-        selectedOption=pendingOption;
-    }else if(selectedOptionId){
-        selectedOption=data.opts.find(option=>option.id===selectedOptionId)||null;
-    }
+    const selectedOption=
+        isCurrent&&pendingOption
+            ?pendingOption
+            :findSceneOption(scene,selectedId);
 
-    const showConversation=isCurrent?interactionPhase==="conversation":!selectedOption;
-    const showStory=selectedOption&&(!isCurrent||interactionPhase==="reaction");
-    const showResolution=isCurrent&&interactionPhase==="resolution";
+    const showConversation=isCurrent
+        ?(
+            interactionPhase==="conversation"||
+            interactionPhase==="choice"
+        )
+        :!selectedOption;
+
+    const showStory=!!selectedOption&&(
+        !isCurrent||
+        interactionPhase==="reaction"
+    );
+
+    const showResolution=
+        isCurrent&&interactionPhase==="resolution";
 
     if(showConversation){
-        charaHeader.style.display="flex";
+        header.style.display="flex";
         message.style.display="block";
         thoughtBlock.style.display="block";
     }
 
     if(showStory){
-        const storyParts=[];
-        storyParts.push(`<div class="selected-reply">● ${selectedOption.t}</div>`);
+        const parts=[
+            `<div class="selected-reply">● ${escapeHtml(selectedOption.t)}</div>`
+        ];
 
         const reaction=getReactionText(selectedOption);
-        if(reaction) storyParts.push(reaction.replace(/\n/g,"<br>"));
-        if(data.afterStory) storyParts.push(data.afterStory.replace(/\n/g,"<br>"));
-        if(data.nextHook) storyParts.push(data.nextHook.replace(/\n/g,"<br>"));
 
-        storyText.innerHTML=storyParts.join("<br><br>");
+        if(reaction){
+            parts.push(
+                escapeHtml(reaction).replace(/\n/g,"<br>")
+            );
+        }
+
+        if(scene.afterStory){
+            parts.push(
+                escapeHtml(scene.afterStory)
+                    .replace(/\n/g,"<br>")
+            );
+        }
+
+        if(scene.nextHook){
+            parts.push(
+                escapeHtml(scene.nextHook)
+                    .replace(/\n/g,"<br>")
+            );
+        }
+
+        storyText.innerHTML=parts.join("<br><br>");
         storyBlock.style.display="block";
     }
 
     if(showResolution){
-        const resolutionParts=[];
+        const parts=[];
 
-        if(pendingResolvedKeys.length>0){
-            const narratives=pendingResolvedKeys
-                .map(key=>buildUnderstandingNarrative(key))
-                .join('<div class="understanding-divider"></div>');
-
-            resolutionParts.push(narratives);
+        if(pendingResolvedKeys.length){
+            parts.push(
+                pendingResolvedKeys
+                    .map(buildUnderstandingNarrative)
+                    .join(
+                        '<div class="understanding-divider"></div>'
+                    )
+            );
         }
 
         if(pendingFinalLine){
-            resolutionParts.push(`<div class="final-resolve-line">${pendingFinalLine}</div>`);
+            parts.push(
+                `<div class="final-resolve-line">${escapeHtml(pendingFinalLine)}</div>`
+            );
         }
 
-        resolutionText.innerHTML=resolutionParts.join("");
+        resolutionText.innerHTML=parts.join("");
         resolutionBlock.style.display="block";
     }
 
     renderPastLog();
     renderWordList();
 
-    const light=Math.min(85,10+(lovePoints/5));
-    const sat=Math.min(100,20+(lovePoints/4));
-    const hue=210-(lovePoints/10);
+    const light=Math.min(
+        85,
+        10+lovePoints/5
+    );
 
-    document.documentElement.style.setProperty("--love-light",`${light}%`);
-    document.documentElement.style.setProperty("--love-sat",`${sat}%`);
-    document.documentElement.style.setProperty("--love-hue",`${hue}`);
+    const sat=Math.min(
+        100,
+        20+lovePoints/4
+    );
+
+    const hue=210-lovePoints/10;
+
+    document.documentElement.style.setProperty(
+        "--love-light",
+        `${light}%`
+    );
+
+    document.documentElement.style.setProperty(
+        "--love-sat",
+        `${sat}%`
+    );
+
+    document.documentElement.style.setProperty(
+        "--love-hue",
+        `${hue}`
+    );
 
     if(!redo) return;
 
-    const area=document.getElementById("action-area");
+    const area=document.getElementById(
+        "action-area"
+    );
+
+    if(!area) return;
+
     area.innerHTML="";
 
     if(isCurrent){
         if(interactionPhase==="conversation"){
-            shuffle([...data.opts]).forEach(o=>{
-                const b=document.createElement("button");
-                b.className="opt-btn";
-                b.innerText=`▶ ${o.t}`;
+            const guide=document.createElement("p");
 
-                b.onclick=()=>{
-                    selectedAnswers[currentStep]=o.id;
-                    rebuildRunState();
-                    pendingOption=o;
-                    interactionPhase="reaction";
-                    updateUI(true);
+            guide.className="reply-guide";
+            guide.innerText=
+                "ノートの仮説を見直したら、返答へ進んでください。";
 
-                    const display=document.getElementById("display");
-                    if(display) display.scrollTop=0;
-                };
+            area.appendChild(guide);
 
-                area.appendChild(b);
-            });
-        }else if(interactionPhase==="reaction"){
-            const next=document.createElement("button");
+            const button=document.createElement(
+                "button"
+            );
+
+            button.className=
+                "opt-btn reply-start-button";
+
+            button.innerText=
+                "▶ 返答へ進む";
+
+            button.onclick=
+                lockChoicesForCurrentScene;
+
+            area.appendChild(button);
+
+        }else if(interactionPhase==="choice"){
+            if(
+                !pendingChoiceContext||
+                pendingChoiceContext.sceneIndex!==currentStep
+            ){
+                return;
+            }
+
+            pendingChoiceContext.options.forEach(
+                choice=>{
+                    const button=document.createElement(
+                        "button"
+                    );
+
+                    button.className="opt-btn";
+
+                    button.innerText=
+                        `▶ ${choice.option.t}`;
+
+                    button.onclick=
+                        ()=>chooseReply(choice);
+
+                    area.appendChild(button);
+                }
+            );
+
+        }else if(
+            interactionPhase==="reaction"||
+            interactionPhase==="resolution"
+        ){
+            const next=document.createElement(
+                "button"
+            );
+
             next.className="opt-btn";
             next.innerText="▶ 次へ";
-            next.onclick=continueFromReaction;
-            area.appendChild(next);
-        }else if(interactionPhase==="resolution"){
-            const next=document.createElement("button");
-            next.className="opt-btn";
-            next.innerText="▶ 次へ";
-            next.onclick=advanceScene;
+
+            next.onclick=
+                interactionPhase==="reaction"
+                    ?continueFromReaction
+                    :advanceScene;
+
             area.appendChild(next);
         }
+
     }else{
-        data.opts.forEach(o=>{
-            const b=document.createElement("button");
-            b.className="opt-btn";
+        const options=getAllSceneOptions(scene);
 
-            if(o.id===selectedAnswers[viewingStep]) b.classList.add("my-choice");
+        options.forEach(option=>{
+            const button=document.createElement(
+                "button"
+            );
 
-            b.disabled=true;
-            b.innerText=o.id===selectedAnswers[viewingStep]?`● ${o.t}`:`▶ ${o.t}`;
-            area.appendChild(b);
+            button.className="opt-btn";
+            button.disabled=true;
+
+            if(option.id===selectedId){
+                button.classList.add("my-choice");
+            }
+
+            button.innerText=
+                `${option.id===selectedId?"●":"▶"} ${option.t}`;
+
+            area.appendChild(button);
         });
     }
 }
 
 function updateColUI(){
-    const normalizedCollected=new Set([...colSet].map(id=>String(id)));
-    const collectedCount=normalizedCollected.size;
+    const collected=new Set(
+        [...colSet].map(id=>String(id))
+    );
 
-    const colVal=document.getElementById("col-val");
+    const count=collected.size;
+
+    const colVal=document.getElementById(
+        "col-val"
+    );
 
     if(colVal){
-        colVal.innerText=Math.floor((collectedCount/7)*100)+"%";
+        colVal.innerText=
+            Math.floor(count/7*100)+"%";
     }
 
-    colSet.forEach(id=>{
-        const el=document.getElementById(`b-${id}`);
-        if(el) el.classList.add("unlocked");
+    for(const id of colSet){
+        const badge=document.getElementById(
+            `b-${id}`
+        );
+
+        if(badge){
+            badge.classList.add("unlocked");
+        }
+    }
+
+    document.querySelectorAll(
+        "[data-ending-id]"
+    ).forEach(element=>{
+        element.classList.toggle(
+            "unlocked",
+            collected.has(
+                String(element.dataset.endingId)
+            )
+        );
     });
 
-    document.querySelectorAll("[data-ending-id]").forEach(el=>{
-        const unlocked=normalizedCollected.has(String(el.dataset.endingId));
-        el.classList.toggle("unlocked",unlocked);
-    });
-
-    document.querySelectorAll("[data-ending-count]").forEach(el=>{
-        el.innerText=`${collectedCount} / 7`;
+    document.querySelectorAll(
+        "[data-ending-count]"
+    ).forEach(element=>{
+        element.innerText=`${count} / 7`;
     });
 }
 </script>
-
 <script src="recollection.js"></script>
 <script src="endings.js"></script>
 </body>
