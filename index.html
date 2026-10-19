@@ -107,6 +107,7 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 .continue-choice{border:1px solid var(--line-strong);border-radius:9px;background:var(--surface-soft);padding:16px 12px;text-align:left;min-height:110px;cursor:pointer;color:var(--text);font-family:inherit;transition:.16s}
 .continue-choice:hover{background:var(--main-pale);border-color:var(--main)}
 .continue-choice.active{background:#eaf3f7;border:2px solid var(--main);padding:15px 11px;box-shadow:0 0 0 2px rgba(120,151,165,.08)}
+.continue-choice:disabled{opacity:.42;cursor:not-allowed;background:var(--surface-soft);border-color:var(--line)}
 .continue-choice:focus-visible{outline:3px solid var(--main);outline-offset:2px}
 .continue-choice-label{font-weight:700;font-size:.94rem;display:block;margin:5px 0}
 .continue-choice-caption{display:block;font-size:.74rem;color:var(--text-soft);line-height:1.6}
@@ -551,7 +552,9 @@ function chooseReply(choice){
                 ?(option.trigger?.key||null)
                 :null,
         route:option.route||null,
-        guesses:{...pendingChoiceContext.guesses}
+        guesses:{...pendingChoiceContext.guesses},
+        // 返答確定時のノート全体。途中再開で未来の答えを逆流させないための履歴。
+        notebookGuesses:{...pendingChoiceContext.allGuesses}
     };
 
     rebuildRunState();
@@ -1967,6 +1970,18 @@ let continueOpenedFromGame=false;
 
 function getContinuationSource(){
     if(typeof recollectionProgress==="undefined") return null;
+    // 本当に直近のプレイを優先する。END別の「初到達の基準記録」と混同しない。
+    if(recollectionProgress.latestRunSnapshot &&
+       Number.isInteger(recollectionProgress.latestRunEndingId) &&
+       recollectionProgress.latestRunEndingId>=1 &&
+       recollectionProgress.latestRunEndingId<=6 &&
+       Array.isArray(recollectionProgress.latestRunSnapshot.selectedAnswers)){
+        return {
+            endingId:recollectionProgress.latestRunEndingId,
+            snapshot:recollectionProgress.latestRunSnapshot
+        };
+    }
+    // 旧セーブで直近周回記録がない場合のみ基準記録から代替。
     const snapshots=recollectionProgress.endingSnapshots||{};
     const valid=Object.keys(snapshots).map(key=>({
         endingId:Number(key),
@@ -2028,6 +2043,7 @@ function closeContinueSetup(){
 
 function chooseContinueScene(index){
     if(!continuationPoints.includes(index)) return;
+    if(index!==0 && !getContinuationSource()) return;
     continueSceneIndex=index;
     refreshContinueSetup();
 }
@@ -2053,18 +2069,19 @@ function refreshContinueSetup(){
         allCaption.innerText=`解読実績 ${totalMastered} / ${Object.keys(wordBank).length} 語`;
     }
     document.querySelectorAll("[data-continue-scene]").forEach(button=>{
-        const chosen=Number(button.dataset.continueScene)===continueSceneIndex;
+        const point=Number(button.dataset.continueScene);
+        // 初回クリア情報だけ存在し、履歴がない旧セーブでは途中再開不可。
+        button.disabled=point!==0 && !source;
+        const chosen=point===continueSceneIndex;
         button.classList.toggle("active",chosen);
         button.setAttribute("aria-pressed",chosen?"true":"false");
     });
+    if(!source && continueKnowledgeMode==="memory") continueKnowledgeMode="zero";
     document.querySelectorAll("[data-continue-knowledge]").forEach(button=>{
         const chosen=button.dataset.continueKnowledge===continueKnowledgeMode;
         button.classList.toggle("active",chosen);
         button.setAttribute("aria-pressed",chosen?"true":"false");
-        if(button.dataset.continueKnowledge==="memory"){
-            button.disabled=!source;
-            if(!source && chosen) continueKnowledgeMode="zero";
-        }
+        if(button.dataset.continueKnowledge==="memory") button.disabled=!source;
     });
     const understood=getContinuationKnownKeys(
         continueKnowledgeMode,continueSceneIndex,source
@@ -2111,16 +2128,26 @@ function startChosenContinuation(){
     if(!recollectionProgress.gameCleared) return false;
     const index=continueSceneIndex;
     const source=getContinuationSource();
+    if(index!==0 && !source) return false;
     const snapshot=source?source.snapshot:null;
     const knowledge=getContinuationKnownKeys(continueKnowledgeMode,index,source);
 
     /* はじまりだけは既存の新規開始処理を使う。 */
     if(index===0){
         closeContinueSetup();
+        // END画面の本文で会話用DOMが消えているケースにも対応。
+        restoreContinuationDisplay();
         startGame(false);
         applyContinuationKnowledge(knowledge,snapshot,index);
         runMode="recollection";
         recollectionBaseEndingId=source?source.endingId:null;
+        // closeContinueSetup() はタイトルへ戻る際に確認画面を表示する。
+        // ゲーム再開では必ず閉じ直す。
+        for(const id of ["device-check-overlay","intro-overlay","tutorial-overlay","load-overlay"]){
+            const element=document.getElementById(id);
+            if(element) element.style.display="none";
+        }
+        switchMainView("play");
         updateUI(true);
         return true;
     }
@@ -2161,6 +2188,12 @@ function startChosenContinuation(){
     restoreContinuationDisplay();
     initDict({});
     applyContinuationKnowledge(knowledge,snapshot,index);
+    // 以前のノート内容は、場面ごとの確定した推測からのみ再現。
+    // 最終ページの正解を過去に流し込まない。
+    if(continueKnowledgeMode==="memory" && source &&
+       typeof restoreNotebookGuessesBeforeScene==="function"){
+        restoreNotebookGuessesBeforeScene(snapshot,index,"memory");
+    }
 
     wordSeenCounts={};
     seenSceneIds=new Set();
@@ -2189,7 +2222,8 @@ function applyContinuationKnowledge(keys,snapshot,startIndex){
     vaneUnderstoodAt={};
     const oldAt=snapshot?.vaneUnderstoodAt||{};
     for(const key of wanted){
-        const at=Number(oldAt[key]);
+        const hadEarlierKnowledge=Object.prototype.hasOwnProperty.call(oldAt,key);
+        const at=hadEarlierKnowledge?Number(oldAt[key]):NaN;
         vaneUnderstoodAt[key]=Number.isFinite(at)&&at<startIndex
             ?at:startIndex-1;
         userDict[key]=wordBank[key].canonical;
