@@ -95,6 +95,30 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 .btn-style{padding:14px 44px;cursor:pointer;border:1px solid transparent;font-family:inherit;font-size:1em;font-weight:700;border-radius:8px;margin:10px;transition:.2s}.btn-style:hover{transform:translateY(-1px);filter:brightness(.98)}
 .reply-guide{margin:3px 0 12px;color:var(--text-soft);font-size:.82rem;line-height:1.7}
 .reply-start-button{border-left-color:var(--main);text-align:center;background:#eaf1f4;font-weight:700}
+
+/* 周回用の3つのチェックポイント */
+#continue-overlay{position:fixed;inset:0;z-index:220;background:rgba(237,243,245,.98);display:none;justify-content:center;align-items:center;padding:20px;box-sizing:border-box}
+#continue-panel{width:min(790px,96vw);max-height:94vh;overflow-y:auto;background:#fff;border:1px solid var(--line-strong);border-radius:16px;box-shadow:0 22px 70px rgba(68,91,101,.15);padding:32px;box-sizing:border-box;text-align:left}
+.continue-eyebrow{font-size:.7rem;color:var(--muted);font-weight:700;letter-spacing:.15em;margin:0 0 6px}
+.continue-heading{font-size:1.55rem;color:var(--main-dark);margin:0 0 5px}
+.continue-description{font-size:.84rem;color:var(--text-soft);line-height:1.8;margin:0 0 20px}
+.continue-section-title{font-size:.86rem;font-weight:700;color:var(--main-dark);margin:18px 0 11px}
+.continue-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.continue-choice{border:1px solid var(--line-strong);border-radius:9px;background:var(--surface-soft);padding:16px 12px;text-align:left;min-height:110px;cursor:pointer;color:var(--text);font-family:inherit;transition:.16s}
+.continue-choice:hover{background:var(--main-pale);border-color:var(--main)}
+.continue-choice.active{background:#eaf3f7;border:2px solid var(--main);padding:15px 11px;box-shadow:0 0 0 2px rgba(120,151,165,.08)}
+.continue-choice:focus-visible{outline:3px solid var(--main);outline-offset:2px}
+.continue-choice-label{font-weight:700;font-size:.94rem;display:block;margin:5px 0}
+.continue-choice-caption{display:block;font-size:.74rem;color:var(--text-soft);line-height:1.6}
+.continue-choice-code{display:block;font-size:.65rem;color:var(--muted);letter-spacing:.08em;font-weight:700}
+.continue-summary{margin:20px 0 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-soft);padding:12px 15px;color:var(--text-soft);font-size:.8rem;line-height:1.8}
+.continue-actions{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-top:20px}
+.continue-actions .btn-style{margin:0;font-size:.92rem;padding:12px 22px}
+.continue-actions .continue-primary{background:var(--main);color:#fff}
+.continue-actions .continue-secondary{background:var(--surface-soft);color:var(--main-dark);border-color:var(--line-strong)}
+.continue-final{border-top:1px solid var(--line);margin-top:16px;padding-top:14px;text-align:center}
+.continue-final .btn-style{margin:0;padding:10px 24px;background:var(--main-soft);color:var(--main-dark);border-color:var(--line)}
+@media(max-width:700px){.continue-grid{grid-template-columns:1fr}.continue-choice{min-height:75px}}
 </style>
 </head>
 <body>
@@ -104,7 +128,7 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 <p id="check-msg">本ゲームはPCブラウザ環境でのプレイを前提として設計されています。</p>
 <div id="check-action">
 <button id="entry-btn" class="btn-style" style="background:var(--main);color:#fff;display:none">物語を始める</button>
-<button id="recollection-entry-btn" class="btn-style" style="background:var(--main-dark);color:#fff;display:none">追憶を辿る</button>
+<button id="recollection-entry-btn" class="btn-style" style="background:var(--main-dark);color:#fff;display:none">つづきから</button>
 <p id="error-msg" style="color:var(--wrong);display:none"><b>MOBILE DEVICE DETECTED</b><br>スマートフォン等のモバイル環境ではプレイできません。</p>
 </div></div></div>
 <div id="intro-overlay"><div class="content-box">
@@ -145,8 +169,9 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 会話を重ね、十分な手掛かりが揃ったとき、ヴェイン自身がその意味へ辿り着きます。<br>
 一度理解した言葉は、それ以降の会話と過去LOGで日本語として読めるようになります。</p><br>
 <p><b>【ヴェインの周回】</b><br>
-最初の画面の「追憶を辿る」から、クリア済みの結末を起点に別の展開を辿れます。<br>
-追憶では過去の理解を引き継ぐ状態を選択できます。<br>
+一度クリアすると、タイトル画面に「つづきから」が現れます。<br>
+はじまり・物語の途中・最後の言葉から再開でき、ノートに引き継ぐ理解度も選べます。<br>
+途中から始めると、そこまでの選択は保存済みの結末から引き継ぎます。<br>
 言葉をどう理解したかと、どのように返答したかが結末に影響します。<br>
 エンディングは全てハッピーエンドです。</p>
 </div>
@@ -163,26 +188,56 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 <div id="understanding-flash-words"></div>
 <div class="understanding-flash-copy">……そういう意味だったんだ。</div>
 </div></div>
+
+<!-- クリア済みプレイヤー専用：3地点 × 理解度で再開 -->
+<div id="continue-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="continue-title">
+  <div id="continue-panel">
+    <p class="continue-eyebrow">CONTINUE / MEMORY</p>
+    <h2 class="continue-heading" id="continue-title">つづきから</h2>
+    <p class="continue-description">物語の再開地点と、ヴェインが覚えている言葉を選んでください。<br>ここから先は新しい物語として返答を選び直せます。</p>
+    <div class="continue-section-title">1. どこから始める？</div>
+    <div class="continue-grid" id="continue-scenes">
+      <button type="button" class="continue-choice" data-continue-scene="0" onclick="chooseContinueScene(0)"><span class="continue-choice-code">SCENE 01</span><span class="continue-choice-label">はじまり</span><span class="continue-choice-caption">最初の会話から、もう一度</span></button>
+      <button type="button" class="continue-choice" data-continue-scene="10" onclick="chooseContinueScene(10)"><span class="continue-choice-code">SCENE 11</span><span class="continue-choice-label">物語の途中</span><span class="continue-choice-caption">言葉がすれ違い始めた頃から</span></button>
+      <button type="button" class="continue-choice" data-continue-scene="19" onclick="chooseContinueScene(19)"><span class="continue-choice-code">SCENE 20</span><span class="continue-choice-label">最後の言葉</span><span class="continue-choice-caption">最後の推理と返答から</span></button>
+    </div>
+    <div class="continue-section-title">2. どこまで覚えている？</div>
+    <div class="continue-grid" id="continue-knowledge">
+      <button type="button" class="continue-choice" data-continue-knowledge="zero" onclick="chooseContinueKnowledge('zero')"><span class="continue-choice-code">RESET</span><span class="continue-choice-label">白紙から</span><span class="continue-choice-caption">理解を引き継がずに始める</span></button>
+      <button type="button" class="continue-choice" data-continue-knowledge="memory" onclick="chooseContinueKnowledge('memory')"><span class="continue-choice-code">MEMORY</span><span class="continue-choice-label">保存された記憶</span><span class="continue-choice-caption" id="continue-memory-count">以前の世界線の理解を再現する</span></button>
+      <button type="button" class="continue-choice" data-continue-knowledge="all" onclick="chooseContinueKnowledge('all')"><span class="continue-choice-code">MASTERED</span><span class="continue-choice-label">解読済みを引き継ぐ</span><span class="continue-choice-caption" id="continue-all-count">今までに解いた言葉を使う</span></button>
+    </div>
+    <div class="continue-summary" id="continue-summary" aria-live="polite"></div>
+    <div class="continue-actions">
+      <button type="button" class="btn-style continue-secondary" onclick="closeContinueSetup()">タイトルへ戻る</button>
+      <button type="button" class="btn-style continue-primary" id="continue-start" onclick="startChosenContinuation()">この状態で始める ▶</button>
+    </div>
+    <div class="continue-final" id="continue-final" style="display:none">
+      <button type="button" class="btn-style" onclick="openFinalContinuation()">🌅 最後の追憶へ</button>
+    </div>
+  </div>
+</div>
+
 <div id="game-container">
 <div id="main-screen">
 <div id="progress-bar">SCENE&nbsp;<span id="progress-current">01</span>&nbsp;/&nbsp;<span id="progress-total">20</span></div>
 <div class="status-bar"><div class="ending-collection">
 <span class="ending-collection-label">ENDING</span>
 <div class="ending-badge-row">
-<span class="ending-progress-badge" data-ending-id="1" title="暁光の誓い"></span>
-<span class="ending-progress-badge" data-ending-id="6" title="魂の共鳴"></span>
-<span class="ending-progress-badge" data-ending-id="2" title="不滅の双璧"></span>
-<span class="ending-progress-badge" data-ending-id="3" title="硝子の距離"></span>
-<span class="ending-progress-badge" data-ending-id="4" title="静寂のあとで"></span>
-<span class="ending-progress-badge" data-ending-id="5" title="プリンの迷宮"></span>
-<span class="ending-progress-badge gold" data-ending-id="7" title="悠久の夜明け"></span>
+<span class="ending-progress-badge" data-ending-id="1" title="言葉の果てで、君と"></span>
+<span class="ending-progress-badge" data-ending-id="6" title="その声をたよりに"></span>
+<span class="ending-progress-badge" data-ending-id="2" title="隣り合う剣"></span>
+<span class="ending-progress-badge" data-ending-id="3" title="それぞれの歩幅"></span>
+<span class="ending-progress-badge" data-ending-id="4" title="声が戻るまで"></span>
+<span class="ending-progress-badge" data-ending-id="5" title="プリンと遠回りの恋"></span>
+<span class="ending-progress-badge gold" data-ending-id="7" title="幾度目かの初恋"></span>
 </div><span class="ending-count" data-ending-count>0 / 7</span></div>
 <div id="legacy-state"><span id="intel-val">0%</span><span id="col-val">0%</span>
 <div class="badge-container" id="badge-area">
-<div class="badge" id="b-1" title="暁光の誓い"></div><div class="badge" id="b-6" title="魂の共鳴"></div>
-<div class="badge" id="b-2" title="不滅の双璧"></div><div class="badge" id="b-3" title="硝子の距離"></div>
-<div class="badge" id="b-4" title="静寂のあとで"></div><div class="badge" id="b-5" title="プリンの迷宮"></div>
-<div class="badge gold" id="b-7" title="悠久の夜明け"></div>
+<div class="badge" id="b-1" title="言葉の果てで、君と"></div><div class="badge" id="b-6" title="その声をたよりに"></div>
+<div class="badge" id="b-2" title="隣り合う剣"></div><div class="badge" id="b-3" title="それぞれの歩幅"></div>
+<div class="badge" id="b-4" title="声が戻るまで"></div><div class="badge" id="b-5" title="プリンと遠回りの恋"></div>
+<div class="badge gold" id="b-7" title="幾度目かの初恋"></div>
 </div></div></div>
 <div id="main-view-tabs"><button type="button" id="play-view-tab" class="main-view-tab active" onclick="switchMainView('play')">会話</button><button type="button" id="log-view-tab" class="main-view-tab" onclick="switchMainView('log')">過去LOG</button></div>
 <div id="play-view">
@@ -1035,13 +1090,7 @@ window.onload=()=>{
         ).style.display="flex";
     };
 
-    recollectionEntry.onclick=()=>{
-        document.getElementById(
-            "device-check-overlay"
-        ).style.display="none";
-
-        openRecollection();
-    };
+    recollectionEntry.onclick=()=>openContinueSetup();
 
     document.getElementById("to-tutorial").onclick=()=>{
         document.getElementById(
@@ -1879,5 +1928,288 @@ function updateColUI(){
 </script>
 <script src="recollection.js"></script>
 <script src="endings.js"></script>
+<script>
+/* =========================================================
+   2周目以降：3つの再開地点 × ヴェインの理解度
+   保存済みの結末の選択履歴は、開始地点より前のみ引き継ぐ。
+   過去の誤読履歴はスナップショットに存在するもの以外作らない。
+========================================================= */
+const continueEndingNames = Object.freeze({
+    1:"言葉の果てで、君と",
+    2:"隣り合う剣",
+    3:"それぞれの歩幅",
+    4:"声が戻るまで",
+    5:"プリンと遠回りの恋",
+    6:"その声をたよりに",
+    7:"幾度目かの初恋"
+});
+
+/* 他のファイルの結末名も、表示時に必ず同じ名前を使う。 */
+Object.entries(continueEndingNames).forEach(([id, title])=>{
+    if(typeof endingsData!=="undefined" && endingsData[id]){
+        endingsData[id].title=title;
+    }
+    if(typeof endingLabels!=="undefined" && Number(id)<=6){
+        const icons={1:"💍",2:"🤝",3:"⌛",4:"❄️",5:"🍮",6:"🌌"};
+        endingLabels[id]=`${icons[id]} ${title}`;
+    }
+});
+
+const continuationPoints=Object.freeze([0,10,19]);
+const continuationPointNames=Object.freeze({
+    0:"はじまり",
+    10:"物語の途中",
+    19:"最後の言葉"
+});
+let continueSceneIndex=0;
+let continueKnowledgeMode="zero";
+let continueOpenedFromGame=false;
+
+function getContinuationSource(){
+    if(typeof recollectionProgress==="undefined") return null;
+    const snapshots=recollectionProgress.endingSnapshots||{};
+    const valid=Object.keys(snapshots).map(key=>({
+        endingId:Number(key),
+        snapshot:snapshots[key]
+    })).filter(item=>
+        item.endingId>=1 && item.endingId<=6 &&
+        item.snapshot && Array.isArray(item.snapshot.selectedAnswers)
+    );
+    valid.sort((a,b)=>
+        (Number(b.snapshot.clearedAt)||0)-(Number(a.snapshot.clearedAt)||0)
+        || b.endingId-a.endingId
+    );
+    return valid[0]||null;
+}
+
+function getContinuationKnownKeys(mode,index,source){
+    if(mode==="zero") return [];
+    if(mode==="all") return [...getMasteredWordSet()];
+    if(mode!=="memory"||!source) return [];
+    const snapshot=source.snapshot;
+    if(typeof getSnapshotKnowledgeBeforeScene==="function"){
+        return getSnapshotKnowledgeBeforeScene(snapshot,index)
+            .filter(key=>getMasteredWordSet().has(key));
+    }
+    const understoodAt=snapshot.vaneUnderstoodAt||{};
+    const mastered=getMasteredWordSet();
+    return Object.keys(wordBank).filter(key=>
+        mastered.has(key)&&
+        Number.isFinite(Number(understoodAt[key]))&&
+        Number(understoodAt[key])<index
+    );
+}
+
+function openContinueSetup(){
+    if(typeof recollectionProgress==="undefined") return;
+    recollectionProgress=loadRecollectionProgress();
+    if(!recollectionProgress.gameCleared) return;
+    masteredWords=getMasteredWordSet();
+
+    const game=document.getElementById("game-container");
+    continueOpenedFromGame=!!(game && window.getComputedStyle(game).display!=="none");
+    continueSceneIndex=0;
+    continueKnowledgeMode="zero";
+    document.getElementById("device-check-overlay").style.display="none";
+    const overlay=document.getElementById("continue-overlay");
+    overlay.style.display="flex";
+    overlay.setAttribute("aria-hidden","false");
+    refreshContinueSetup();
+}
+
+function closeContinueSetup(){
+    const overlay=document.getElementById("continue-overlay");
+    overlay.style.display="none";
+    overlay.setAttribute("aria-hidden","true");
+    if(!continueOpenedFromGame){
+        document.getElementById("device-check-overlay").style.display="flex";
+    }
+}
+
+function chooseContinueScene(index){
+    if(!continuationPoints.includes(index)) return;
+    continueSceneIndex=index;
+    refreshContinueSetup();
+}
+
+function chooseContinueKnowledge(mode){
+    if(!["zero","memory","all"].includes(mode)) return;
+    continueKnowledgeMode=mode;
+    refreshContinueSetup();
+}
+
+function refreshContinueSetup(){
+    const source=getContinuationSource();
+    const memoryCount=getContinuationKnownKeys("memory",continueSceneIndex,source).length;
+    const totalMastered=getMasteredWordSet().size;
+    const caption=document.getElementById("continue-memory-count");
+    const allCaption=document.getElementById("continue-all-count");
+    if(caption){
+        caption.innerText=source
+            ?`この地点で理解していた ${memoryCount} 語`
+            :"保存された記憶がありません";
+    }
+    if(allCaption){
+        allCaption.innerText=`解読実績 ${totalMastered} / ${Object.keys(wordBank).length} 語`;
+    }
+    document.querySelectorAll("[data-continue-scene]").forEach(button=>{
+        const chosen=Number(button.dataset.continueScene)===continueSceneIndex;
+        button.classList.toggle("active",chosen);
+        button.setAttribute("aria-pressed",chosen?"true":"false");
+    });
+    document.querySelectorAll("[data-continue-knowledge]").forEach(button=>{
+        const chosen=button.dataset.continueKnowledge===continueKnowledgeMode;
+        button.classList.toggle("active",chosen);
+        button.setAttribute("aria-pressed",chosen?"true":"false");
+        if(button.dataset.continueKnowledge==="memory"){
+            button.disabled=!source;
+            if(!source && chosen) continueKnowledgeMode="zero";
+        }
+    });
+    const understood=getContinuationKnownKeys(
+        continueKnowledgeMode,continueSceneIndex,source
+    ).length;
+    const location=continuationPointNames[continueSceneIndex];
+    const before=continueSceneIndex===0
+        ?"はじめから選び直します。"
+        :source
+            ?`それ以前の返答は「${continueEndingNames[source.endingId]}」を回収した時の記録から引き継ぎます。`
+            :"以前の選択記録がないため、過去の返答傾向は引き継ぎません。";
+    document.getElementById("continue-summary").innerText=
+        `${location}（SCENE ${String(continueSceneIndex+1).padStart(2,"0")}）／`+
+        `理解済み ${understood} 語\n${before} ここから先の返答は選び直せます。`;
+    document.getElementById("continue-final").style.display=
+        recollectionProgress.finalRecollectionUnlocked?"block":"none";
+}
+
+/* END画面では #display が本文に置き換えられるため元のDOMへ戻す。 */
+function restoreContinuationDisplay(){
+    if(document.getElementById("message-text") &&
+       document.getElementById("resolution-text")) return;
+    const display=document.getElementById("display");
+    display.innerHTML=`
+        <div id="chara-header"><span id="speaker-name">LANCELOT</span></div>
+        <div class="bubble" id="message-text">......</div>
+        <div id="vane-thought-block"><div class="block-label">VANE</div>
+            <div class="thought-bubble" id="vane-thought-text"></div></div>
+        <div id="story-block" style="display:none"><div class="block-label">STORY</div>
+            <div class="story-bubble" id="story-text"></div></div>
+        <div id="resolution-block" style="display:none"><div class="block-label">UNDERSTANDING</div>
+            <div class="resolution-bubble" id="resolution-text"></div></div>`;
+}
+
+function normalizeContinuationAnswer(value,index){
+    if(!value||!scenario[index]) return null;
+    const option=getAllSceneOptions(scenario[index]).find(item=>
+        item.id===value || item.t===value
+    );
+    return option?option.id:null;
+}
+
+function startChosenContinuation(){
+    if(!continuationPoints.includes(continueSceneIndex)) return false;
+    if(!recollectionProgress.gameCleared) return false;
+    const index=continueSceneIndex;
+    const source=getContinuationSource();
+    const snapshot=source?source.snapshot:null;
+    const knowledge=getContinuationKnownKeys(continueKnowledgeMode,index,source);
+
+    /* はじまりだけは既存の新規開始処理を使う。 */
+    if(index===0){
+        closeContinueSetup();
+        startGame(false);
+        applyContinuationKnowledge(knowledge,snapshot,index);
+        runMode="recollection";
+        recollectionBaseEndingId=source?source.endingId:null;
+        updateUI(true);
+        return true;
+    }
+
+    /* 途中・最終問題は、直前までの確定した歴史だけ復元する。 */
+    selectedAnswers=new Array(scenario.length).fill(null);
+    sceneChoiceRecords=new Array(scenario.length).fill(null);
+    const pastAnswers=snapshot?.selectedAnswers||[];
+    const pastRecords=Array.isArray(snapshot?.sceneChoiceRecords)
+        ?snapshot.sceneChoiceRecords:[];
+    for(let i=0;i<index;i++){
+        const id=normalizeContinuationAnswer(pastAnswers[i],i);
+        selectedAnswers[i]=id;
+        const record=pastRecords[i];
+        if(id && record && typeof record==="object" && record.optionId===id){
+            sceneChoiceRecords[i]={
+                ...record,
+                wordStates:{...(record.wordStates||{})},
+                guesses:{...(record.guesses||{})}
+            };
+        }
+    }
+
+    runMode="recollection";
+    recollectionBaseEndingId=source?source.endingId:null;
+    currentStep=index;
+    viewingStep=index;
+    interactionPhase="conversation";
+    pendingOption=null;
+    pendingResolvedKeys=[];
+    pendingFinalLine="";
+    pendingChoiceContext=null;
+    vaneKnownWords=new Set();
+    vaneUnderstoodAt={};
+    masteredWords=getMasteredWordSet();
+    activeDictKey=null;
+    mainViewMode="play";
+    restoreContinuationDisplay();
+    initDict({});
+    applyContinuationKnowledge(knowledge,snapshot,index);
+
+    wordSeenCounts={};
+    seenSceneIds=new Set();
+    for(let i=0;i<=index;i++) registerSceneWords(i);
+    rebuildRunState();
+
+    closeContinueSetup();
+    for(const id of ["intro-overlay","tutorial-overlay","load-overlay","device-check-overlay"]){
+        document.getElementById(id).style.display="none";
+    }
+    document.getElementById("game-container").style.display="flex";
+    switchMainView("play");
+    renderTabs();
+    updateUI(true);
+    renderPastLog();
+    renderWordList();
+    const display=document.getElementById("display");
+    if(display) display.scrollTop=0;
+    return true;
+}
+
+function applyContinuationKnowledge(keys,snapshot,startIndex){
+    const allowed=new Set(getMasteredWordSet());
+    const wanted=[...new Set(keys)].filter(key=>allowed.has(key)&&wordBank[key]);
+    vaneKnownWords=new Set(wanted);
+    vaneUnderstoodAt={};
+    const oldAt=snapshot?.vaneUnderstoodAt||{};
+    for(const key of wanted){
+        const at=Number(oldAt[key]);
+        vaneUnderstoodAt[key]=Number.isFinite(at)&&at<startIndex
+            ?at:startIndex-1;
+        userDict[key]=wordBank[key].canonical;
+    }
+    renderDictPlaceholder();
+    updateIntelUI();
+    renderPastLog();
+    renderWordList();
+}
+
+function openFinalContinuation(){
+    if(!recollectionProgress.finalRecollectionUnlocked) return;
+    closeContinueSetup();
+    if(typeof startFinalRecollectionFromUI==="function"){
+        startFinalRecollectionFromUI();
+    }
+}
+
+/* END画面の「追憶へ」も同じシンプルな再開画面へ接続する。 */
+window.openRecollection=openContinueSetup;
+</script>
 </body>
 </html>
