@@ -1,8 +1,49 @@
+/*
+    声を聴かせて、ランスロット！ / endings.js
+
+    このファイルはENDの表示・回収・ヒントを担当する。
+    通常ENDの決定は recollection.js の determineNormalEndingId() のみ。
+    END7は「つづきから」の専用入口からのみ表示する。
+    保存キー vane_collection_v3 は変更しない。
+
+    endingBodies（7編）はお預かりした小説本文を一文字も改稿せずに収録。
+*/
+
+const endingsData = {
+    1: {
+        title: "言葉の果てで、君と",
+        hint: "この物語の中で、十五の言葉すべてをヴェイン自身の理解へ変えてください。"
+    },
+    2: {
+        title: "隣り合う剣",
+        hint: "二人で動き、力を預け合う返答を選び続けてください。"
+    },
+    3: {
+        title: "それぞれの歩幅",
+        hint: "自分の気持ちを伝えながら、相手の意思も尊重する返答を重ねてください。"
+    },
+    4: {
+        title: "声が戻るまで",
+        hint: "多くの言葉が解けないままでも、会話を終わらせずに進んでください。"
+    },
+    5: {
+        title: "プリンと遠回りの恋",
+        hint: "記号を取り違えたまま、その解釈で何度も返事をしてみてください。ノートの誤答だけでは辿り着けません。"
+    },
+    6: {
+        title: "その声をたよりに",
+        hint: "まだ分からない言葉を残しながらも、相手の声に耳を傾ける返答を重ねてください。"
+    },
+    7: {
+        title: "幾度目かの初恋",
+        hint: "異なる三つ以上の結末を見届け、十五の言葉をすべて解読すると、『つづきから』に新しい入口が現れます。"
+    }
+};
 
 const endingBodies = {
 
     // =========================================================
-    // END1　暁光の誓い
+    // END1　言葉の果てで、君と
     // =========================================================
 
     1: `夜明けの光が、草の先に残された露をひとつずつ照らしていた。ランスロットの声はもう、少しも欠けることなくヴェインの耳へ届いている。かつては意味のない音に変わってしまった言葉が、今ではどれも鮮明な輪郭を持ち、聞き慣れた声音の中にあるべき場所を取り戻していた。ヴェインは閉じたノートを胸に抱えたまま、しばらく動くことができなかった。最後の言葉が消えてしまうのを惜しむように、ランスロットの唇を見つめていたが、やがてその視線は、まっすぐこちらを見返す青い瞳へ移っていった。朝靄の向こうで鳥が鳴いている。夜露に濡れた靴の冷たさも、頬を撫でる風の感触も、普段よりずっとはっきりしていた。それなのに、目の前の幼馴染が自分へ告げた言葉だけは、何度思い返しても夢の中の出来事のようだった。<br><br>
@@ -21,7 +62,7 @@ const endingBodies = {
 
 
     // =========================================================
-    // END2　不滅の双璧
+    // END2　隣り合う剣
     // =========================================================
 
     2: `呪いの残滓が、夜明け前の空気を重くしていた。足元の草は風に揺れているのに、地面へ落ちた影だけが不自然に静止している。ランスロットが剣へ手を掛けたのとほとんど同時に、ヴェインも腰の柄を握った。二人の間に短い視線が交わされる。言葉は必要なかった。互いに半歩ずつ距離を取り、背後の見通しを確保する。その動きは訓練場で幾度となく繰り返してきたものでありながら、今朝はひどく鮮明に感じられた。夜の冷気が頬を刺し、土を踏み締めた靴底へ硬い感触が伝わる。ヴェインは隣に立つランスロットの呼吸を確かめ、ゆっくりと剣を抜いた。<br><br>
@@ -40,7 +81,7 @@ const endingBodies = {
 
 
     // =========================================================
-    // END3　硝子の距離
+    // END3　それぞれの歩幅
     // =========================================================
 
     3: `窓硝子を流れる雨粒が、夕暮れの光を細く引き延ばしていた。帰還してから数日が過ぎ、艇にはいつもの賑わいが戻っている。廊下を行き交う足音も、食堂から届く食器の音も、何ひとつ変わらない。しかしヴェインは、窓辺に腰を下ろしてノートを開くたび、胸の奥に静かな違和感を覚えていた。ランスロットの言葉は以前よりずっと近くに感じられるようになったが、そこにはまだ、意味の掴めない記号が残っている。頁をめくる指を止め、ヴェインは硝子へ映る自分の顔を見つめた。窓の向こうには雨に霞む空が広がり、その手前には、ぼんやりとした自分の姿が重なっている。どちらも同じ場所にあるのに、手を伸ばして触れられるのは片方だけだった。<br><br>
@@ -61,7 +102,7 @@ const endingBodies = {
 
 
     // =========================================================
-    // END4　静寂のあとで
+    // END4　声が戻るまで
     // =========================================================
 
     4: `夜明けの草原に、長い沈黙が落ちていた。ランスロットは話し終えたまま、ヴェインの返事を待っている。ヴェインは膝の上に広げたノートを見つめ、何度も同じ頁を行き来していた。そこにはまだ意味の分からない記号が数多く残っている。幾度も聞いた音でさえ、正しい言葉へ辿り着けないままになっていた。ランスロットの声が聞こえないわけではない。むしろ、今朝はいつもよりずっと鮮明に耳へ届いていた。それなのに、大切なところへ差しかかると、意味だけが不自然に抜け落ちてしまう。ヴェインは唇を噛み、ノートの端を強く握った。ここまで来てもまだ分からない。その事実が、胸の奥へ重く沈んでいった。<br><br>
@@ -80,7 +121,7 @@ const endingBodies = {
 
 
     // =========================================================
-    // END5　プリンの迷宮
+    // END5　プリンと遠回りの恋
     // =========================================================
 
     5: `最後の言葉が終わると、ヴェインは深く息を吐いた。夜明けの光が草原を照らし始め、ランスロットの横顔に淡い金色の陰影を落としている。ヴェインはしばらくその顔を見つめていたが、やがて鞄からノートを取り出した。頁のあちこちに書き込まれた言葉を眺めるうちに、胸の奥へ奇妙な違和感が広がっていく。自分なりに考え、意味を推測し、それを頼りに返答してきた。けれど今、すべてを終えたこの場所で振り返ると、どうにも腑に落ちないところが残っている。ランスロットもまた、何かを言いたげにこちらを見ていた。ヴェインは少し迷った末、ノートを開いて相手へ差し出した。ランスロットは不思議そうに眉を寄せたが、やがて静かにその頁へ視線を落とした。<br><br>
@@ -101,7 +142,7 @@ const endingBodies = {
 
 
     // =========================================================
-    // END6　魂の共鳴
+    // END6　その声をたよりに
     // =========================================================
 
     6: `夜明けの風が草原を渡り、ランスロットの髪を静かに揺らしていた。最後の言葉を聞き終えたヴェインは、すぐには返事をしなかった。ノートにはまだ、意味の分からない記号が残っている。何度も聞いた音でさえ、今なお確かな言葉にならないものがあった。しかし、ランスロットの声は、これまでで一番近くに感じられた。言葉の途中で息を吸う音も、何かを伝えようとして僅かに震える語尾も、すべて鮮明に耳へ届いている。ヴェインはその響きを逃さないように、じっと相手を見つめていた。朝靄の向こうで鳥が鳴き、遠くの木々が風に揺れる。その小さな音の中に、ランスロットの呼吸が重なっていた。<br><br>
@@ -122,7 +163,7 @@ const endingBodies = {
 
 
     // =========================================================
-    // END7　悠久の夜明け
+    // END7　幾度目かの初恋
     // =========================================================
 
     7: `夜明け前の空には、まだ星が幾つか残っていた。東の地平が淡く白み始め、深い青の中に薄紫の光が滲んでいる。ヴェインは呪いを受けた場所に立ち、使い込んだノートを開いていた。十五の記号は、どれも今では意味を知っている。書き直された文字も、何度も消した跡も、そのまま頁に残されていた。ヴェインはその一つを指でなぞり、ふと奇妙な感覚を覚えた。どこかでこれとよく似た朝を迎えたことがあるような気がする。草原を渡る風も、遠くから聞こえる鳥の声も、何もかもが懐かしかった。けれど、その記憶を辿ろうとすると、輪郭は朝靄のように曖昧になってしまう。ヴェインはしばらく考えていたが、やがて小さく笑い、ノートを閉じた。何かを思い出そうとするよりも、今この瞬間を大切にしたかった。<br><br>
@@ -142,4 +183,167 @@ const endingBodies = {
     朝日が昇り、草原を覆っていた霧がゆっくりと消えていった。遠くの空には、もう星の姿は見えない。ヴェインはランスロットの肩へ額を寄せ、しばらくその光景を眺めていた。何度も夢に見たような、初めて迎えるような、不思議な朝だった。けれど、そんなことはもう気にならなかった。隣にはランスロットがいる。その手は温かく、自分の指をしっかりと握り返してくれている。ヴェインは顔を上げ、相手の唇へもう一度だけ口づけた。ランスロットが微笑むと、ヴェインも笑った。やがて二人は立ち上がり、朝の光に満ちた道を歩き始めた。帰り道の話をしているうちに、いつもの調子で笑い合う声が響いた。<br><br>
 
     ノートの白紙は、まだ何枚も残されている。ヴェインは鞄の中へそっと手を触れ、最後の頁に書いた言葉を思い返した。明日も、その次の日も、きっとこの人の声を聞きたいと思うのだろう。今はもう、何も欠けていない。ランスロットが隣から名前を呼ぶと、ヴェインは嬉しそうに振り返った。朝の光を受けた青い瞳が、やわらかく細められている。その表情を見た瞬間、ヴェインはまた胸がいっぱいになった。言葉にしたいことはまだいくらでもある。けれど今は、ただその手を握り、同じ道を歩いていればよかった。二人の足音は、夜明けの草原にいつまでも響いていた。`
+};
+
+// =========================================================
+// コレクションの互換読み込み
+// =========================================================
+
+function normalizeEndingCollection() {
+    // 旧版に数値IDと文字列IDが混在していても二重計上しない。
+    const current = colSet instanceof Set ? [...colSet] : [];
+    colSet = new Set(current.map(Number).filter(id =>
+        Number.isInteger(id) && id >= 1 && id <= 7
+    ));
+    return colSet;
+}
+
+function saveEndingCollection() {
+    normalizeEndingCollection();
+    localStorage.setItem("vane_collection_v3", JSON.stringify([...colSet]));
+    updateColUI();
+}
+
+// =========================================================
+// 共通END表示
+// =========================================================
+
+function renderEndingScreen(id, progressResult = null) {
+    const ending = endingsData[id];
+    const body = endingBodies[id];
+    if (!ending || typeof body !== "string") return false;
+
+    const endingIcons = {
+        1: "✨💍✨",
+        2: "⚔️🤝",
+        3: "⌛",
+        4: "🌤️",
+        5: "🍮⁉️",
+        6: "🌌🤝",
+        7: "🌅✨"
+    };
+    const icon = endingIcons[id] || "✨";
+    const progressMessages = [];
+
+    if (progressResult?.isFirstClear) {
+        progressMessages.push(
+            "『つづきから』が解放されました。<br>次の周回では、物語のはじまり・途中・最後の言葉から再開できます。"
+        );
+    }
+    if (progressResult?.recollectionUnlimitedUnlockedNow) {
+        progressMessages.push(
+            "新しい記憶が、またひとつ重なりました。<br>『つづきから』で別の未来を探せます。"
+        );
+    }
+    if (progressResult?.finalRecollectionUnlockedNow) {
+        progressMessages.push(
+            "🌅 『最後の追憶』が開きました。『つづきから』から辿れます。"
+        );
+    }
+
+    const progressHtml = progressMessages.length ? `
+        <div class="hint-text" style="color:var(--correct)">
+            ${progressMessages.join("<br><br>")}
+        </div>` : "";
+
+    normalizeEndingCollection();
+    const uncollectedNormal = [1, 2, 3, 4, 5, 6].filter(normalId =>
+        !colSet.has(normalId)
+    );
+    let hintHtml = "";
+
+    if (uncollectedNormal.length) {
+        const hintId = uncollectedNormal[
+            Math.floor(Math.random() * uncollectedNormal.length)
+        ];
+        hintHtml = `
+            <div class="hint-text">
+                <b>記憶の導き：</b>
+                「${endingsData[hintId].title}」へ至るには、
+                ${endingsData[hintId].hint}
+            </div>`;
+    } else if (!colSet.has(7) &&
+        typeof recollectionProgress !== "undefined" &&
+        recollectionProgress.finalRecollectionUnlocked
+    ) {
+        hintHtml = `
+            <div class="hint-text">
+                <b>記憶の導き：</b>『つづきから』に「最後の追憶」が現れています。
+            </div>`;
+    } else if (colSet.size === 7) {
+        hintHtml = `
+            <div class="hint-text" style="color:var(--correct)">
+                <b>祝福：</b>すべての結末を綴り、二人の物語を見届けた。
+            </div>`;
+    } else {
+        hintHtml = `
+            <div class="hint-text">
+                <b>記憶の導き：</b>${endingsData[7].hint}
+            </div>`;
+    }
+
+    const display = document.getElementById("display");
+    const actionArea = document.getElementById("action-area");
+    if (!display || !actionArea) return false;
+
+    // クリア後に解放する周回ボタン。初回プレイ中には出現しない。
+    const canContinue = typeof recollectionProgress !== "undefined" &&
+        recollectionProgress.gameCleared;
+    const continueButton = canContinue ? `
+        <button onclick="openRecollection()" class="btn-style"
+            style="background:#d4af37;color:#000;margin-top:20px">
+            つづきから
+        </button>` : "";
+
+    display.innerHTML = `
+        <div style="font-size:70px">${icon}</div>
+        <h2 style="color:#d4af37">【 ${ending.title} 】</h2>
+        <p style="padding:20px 40px;line-height:2.2;text-align:left">
+            ${body}
+        </p>
+        ${progressHtml}
+        ${hintHtml}
+        ${continueButton}
+        <button onclick="location.reload()" class="btn-style"
+            style="background:var(--main);color:#fff;margin-top:20px">
+            タイトルへ
+        </button>`;
+    actionArea.innerHTML = "";
+    display.scrollTop = 0;
+    return true;
+}
+
+// =========================================================
+// 通常END1〜6
+// =========================================================
+
+function showEnd() {
+    // 判定は recollection.js に集約。ここで独自に再判定しない。
+    const id = determineNormalEndingId();
+    if (!Number.isInteger(id) || id < 1 || id > 6) return false;
+
+    const progressResult = recordEndingProgress(id);
+    normalizeEndingCollection();
+    colSet.add(id);
+    saveEndingCollection();
+    return renderEndingScreen(id, progressResult);
+}
+
+// =========================================================
+// END7：最後の追憶専用
+// =========================================================
+
+window.showSpecialEnding = function(id) {
+    if (Number(id) !== 7) return false;
+    // 解放条件は回収した通常END3種類以上 ＋ 全15語の解読実績。
+    if (typeof recollectionProgress === "undefined" ||
+        !recollectionProgress.finalRecollectionUnlocked) return false;
+
+    document.documentElement.style.setProperty("--love-light", "90%");
+    document.documentElement.style.setProperty("--love-hue", "45");
+
+    normalizeEndingCollection();
+    colSet.add(7);
+    saveEndingCollection();
+    return renderEndingScreen(7, null);
 };
