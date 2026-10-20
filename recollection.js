@@ -1,19 +1,34 @@
+/*
+    声を聴かせて、ランスロット！ / recollection.js
+
+    2周目以降の「つづきから」は index.html の画面から利用する。
+    再開地点は SCENE 01 / 11 / 20 の3箇所だけ。
+
+    このファイルの役割:
+    ・旧セーブの安全な移行
+    ・各ENDの基準snapshotと直近周回snapshotの保存
+    ・返答時点のsceneChoiceRecordsの復元
+    ・理解状態と返答傾向を分離した通常END判定
+    ・END7の解放判定と専用入口
+
+    ストレージキーは変更しない。
+    以前の欠片・任意シーン解放データは削除せず保持するが、
+    新しい「つづきから」画面では使用しない。
+*/
+
 const RECOLLECTION_STORAGE_KEY = "vane_recollection_v4";
 const RECOLLECTION_SCHEMA_VERSION = 8;
 
 let runMode = "story"; // "story" | "recollection"
 let recollectionBaseEndingId = null;
 
-const endingLabels = {
-    1: "言葉の果てで、君と",
-    2: "隣り合う剣",
-    3: "それぞれの歩幅",
-    4: "声が戻るまで",
-    5: "プリンと遠回りの恋",
-    6: "その声をたよりに"
-};
+// END名は endings.js の ENDING_TITLES が唯一の定義。
 
 const CONTINUATION_SCENE_INDICES = Object.freeze([0, 10, 19]);
+
+// ---------------------------------------------------------
+// 選択肢とID
+// ---------------------------------------------------------
 
 function isValidNormalEndingId(value) {
     const id = Number(value);
@@ -409,43 +424,18 @@ function restoreNotebookGuessesBeforeScene(snapshot, startIndex, mode = "memory"
 // ---------------------------------------------------------
 
 /*
-    優先順位:
+    通常判定の優先順位:
     1) 全15語理解 -> END1
-    2) 実際の誤読返答を3回以上 -> END5
-    3) 理解確定0〜3語 -> END4
-    4) それ以外 -> route最多の END2 / END3 / END6
-
-    END7は絶対に返さない。
+    2) 理解確定0〜3語 -> END4
+    3) それ以外 -> route最多の END2 / END3 / END6
+    END5は異なる誤答が3語以上残る場合、最後の任意選択からのみ到達。
+    END7は通常判定では返さない。
 */
 const ENDING_RULES = Object.freeze({
-    misreadRepliesForPudding: 3,
+    notebookWrongGuessesForPudding: 3,
     maximumUnderstoodForSilence: 3,
     minimumUnresolvedForSilence: 12
 });
-
-function countActualMisreadReplies() {
-    if (!Array.isArray(sceneChoiceRecords)) return 0;
-    let count = 0;
-    sceneChoiceRecords.forEach((record, index) => {
-        if (!record || record.kind !== "misread") return;
-        const scene = scenario[index];
-        const option = (scene?.misreadOpts || []).find(item =>
-            item.id === record.optionId && item.misreadImpact === true
-        );
-        if (!option || selectedAnswers[index] !== option.id) return;
-        const key = option.trigger?.key;
-        if (!key || record.misreadKey !== key) return;
-        if (record.wordStates?.[key] !== "wrong") return;
-        const guess = record.guesses?.[key];
-        if (typeof guess !== "string" || !normalizeGuess(guess)) return;
-        if (isAcceptedGuess(key, guess)) return;
-        if (!(option.trigger?.guesses || []).some(candidate =>
-            normalizeGuess(candidate) === normalizeGuess(guess)
-        )) return;
-        count++;
-    });
-    return count;
-}
 
 function getLatestTiedRoute(tiedRoutes) {
     for (let i = scenario.length - 1; i >= 0; i--) {
@@ -457,6 +447,19 @@ function getLatestTiedRoute(tiedRoutes) {
     return "twin";
 }
 
+// 現在のノートに残る「異なる単語ID」の誤答数。履歴や特殊返答とは無関係。
+function countNotebookWrongGuesses(){
+    return Object.keys(wordBank).filter(key=>{
+        if(vaneKnownWords.has(key)) return false;
+        const guess=String(userDict[key]||"").trim();
+        return !!normalizeGuess(guess) && !isAcceptedGuess(key,guess);
+    }).length;
+}
+function canChoosePuddingEnding(){
+    return countNotebookWrongGuesses()>=ENDING_RULES.notebookWrongGuessesForPudding &&
+        [...vaneKnownWords].filter(key=>wordBank[key]).length<Object.keys(wordBank).length;
+}
+
 function determineNormalEndingId() {
     rebuildRunState();
     const total = Object.keys(wordBank).length;
@@ -464,7 +467,6 @@ function determineNormalEndingId() {
     const unresolved = total - understood;
 
     if (understood === total) return 1;
-    if (countActualMisreadReplies() >= ENDING_RULES.misreadRepliesForPudding) return 5;
     if (understood <= ENDING_RULES.maximumUnderstoodForSilence
         && unresolved >= ENDING_RULES.minimumUnresolvedForSilence) return 4;
 
