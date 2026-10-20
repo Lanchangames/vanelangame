@@ -165,11 +165,11 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 聞き取れなくても、表情や状況を手がかりに会話を続けられます。<br>
 正しい返答を当てることが目的ではありません。どう返すかは、あなたが選んでください。<br>
 一度返答へ進んだ場面の候補と、その場で選んだ返答は変更できません。</p><br>
-<p><b>【ヴェインの理解】</b><br>
+<p><b>【理解度】</b><br>
 正しい仮説を書いただけでは、その言葉の理解が確定したことにはなりません。<br>
 会話を重ね、十分な手掛かりが揃ったとき、ヴェイン自身がその意味へ辿り着きます。<br>
 一度理解した言葉は、それ以降の会話と過去LOGで日本語として読めるようになります。</p><br>
-<p><b>【ヴェインの周回】</b><br>
+<p><b>【周回】</b><br>
 一度クリアすると、タイトル画面に「つづきから」が現れます。<br>
 はじまり・物語の途中・最後の言葉から再開でき、ノートに引き継ぐ理解度も選べます。<br>
 途中から始めると、そこまでの選択は保存済みの結末から引き継ぎます。<br>
@@ -252,19 +252,14 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 <div id="log-section"><div id="log-header">これまでの会話</div><div id="log-panel"></div></div>
 </div>
 <div id="dictionary">
-<div id="dict-header"><h3>ヴェインのノート</h3><p>聞き取れない言葉の意味を推測しよう。<br>思いついた意味を書き留める。</p></div>
+<div id="dict-header"><h3>ヴェインのノート</h3><p>聞き取れない言葉の意味を推測しましょう。<br>推測した意味を書き留めてください。</p></div>
 <div id="dict-editor-section"><div id="dict-editor-label">選択中の言葉</div><div id="dict-list"></div></div>
 <div id="word-list-section"><div id="word-list-header">言葉一覧</div><div id="word-list-panel"><div id="word-list"></div></div></div>
 </div>
 </div>
 <script src="game.js"></script>
 <script>
-/*
-    声を聴かせて、ランスロット！
-    index.html 内ゲームロジック
 
-    通常選択肢・完全理解選択肢・誤読選択肢に対応。
-*/
 const wordBank = {
     W1:{q:"θωε",canonical:"心配する",variants:["しんぱい","心配","心配する","しんぱいする"],synonyms:["気がかり","気掛かり","懸念"],nearMisses:["怖い","不安","気になる","案じる"],meaning:"ヴェインの状態・安全・心情などを気にかけること",boundary:"「怖い」はランスロット自身の恐怖。「心配」はヴェインへ向く感情。",appearances:[1,5,13],difficulty:"easy",finalRole:"物語の入口。後に「大切」「失う」「怖い」へ繋がる気遣い。",minClues:2},
     W2:{q:"ΣΦμ",canonical:"一緒",variants:["いっしょ"],synonyms:["共に","ともに"],nearMisses:["そば","傍","隣","ずっと","同行"],meaning:"二人で行動する、二人として何かを共有すること",boundary:"「ずっと」は時間的継続。「一緒」は誰と・どのような状態であるか。",appearances:[4,8,17],difficulty:"easy-medium",finalRole:"二人がこの先も共にあることを示す未来語。",minClues:2},
@@ -405,9 +400,6 @@ function isAcceptedGuess(key,value){
     return accepted.some(candidate=>normalizeGuess(candidate)===input);
 }
 
-/*
-    現在シーンの単語理解状態
-*/
 function getSceneWordStates(scene){
     const wordStates={};
     const guesses={};
@@ -437,9 +429,6 @@ function getSceneWordStates(scene){
     };
 }
 
-/*
-    誤読選択肢の条件照合
-*/
 function matchesMisreadTrigger(option,wordStates,guesses){
     const trigger=option.trigger;
 
@@ -463,9 +452,6 @@ function matchesMisreadTrigger(option,wordStates,guesses){
         );
 }
 
-/*
-    現在の理解状態から返答候補を作る
-*/
 function buildChoicesForScene(scene,states){
     const choices=(scene.opts||[]).map(
         option=>({option,kind:"base"})
@@ -492,9 +478,6 @@ function buildChoicesForScene(scene,states){
     return shuffle(choices);
 }
 
-/*
-    「返答へ進む」を押した時だけ実行
-*/
 function lockChoicesForCurrentScene(){
     if(
         interactionPhase!=="conversation"||
@@ -520,9 +503,6 @@ function lockChoicesForCurrentScene(){
     updateUI(true);
 }
 
-/*
-    通常・理解・誤読の返答を共通処理
-*/
 function chooseReply(choice){
     if(
         interactionPhase!=="choice"||
@@ -552,7 +532,6 @@ function chooseReply(choice){
                 :null,
         route:option.route||null,
         guesses:{...pendingChoiceContext.guesses},
-        // 返答確定時のノート全体。途中再開で未来の答えを逆流させないための履歴。
         notebookGuesses:{...pendingChoiceContext.allGuesses}
     };
 
@@ -668,14 +647,14 @@ function getVaneNotebookMemo(key){
     const count=getEncounteredScenesForWord(key).length;
 
     if(count<=1){
-        return "初めて聞いた音だ。覚えておこう。";
+        return "初めて聞いた音だ。ノートに書いておこうかな。";
     }
 
     if(count===2){
         return "前にも聞いたな。同じ意味のはずだ。";
     }
 
-    return "使われ方を並べれば、何かわかるかも。";
+    return "ランちゃんの言葉を思い出せば、何かわかるかも。";
 }
 
 function renderNotebookRecordText(text,focusKey){
@@ -713,7 +692,7 @@ function handleGuessBlur(key){
 
     if(!feedback) return;
 
-    feedback.innerText="……とりあえず、そう書いておこう。";
+    feedback.innerText="……とりあえず、書き留めておこう。";
     feedback.classList.add("show");
 
     setTimeout(()=>{
@@ -827,8 +806,8 @@ function renderDictPlaceholder(){
     list.innerHTML=`
         <div class="dict-placeholder">
             <div class="dict-placeholder-symbol">―――</div>
-            会話の中の聞き取れない言葉を<br>
-            選んでください。
+            ランスロットの言葉の一部が聴き取れないようです。<br>
+            聴き取れない言葉を選択してください。
         </div>
     `;
 }
@@ -861,7 +840,7 @@ function renderActiveDictEntry(){
                 </span>
             </button>
         `).join("")
-        :`<span class="dict-record-empty">この周回ではまだ記録がありません。</span>`;
+        :`<span class="dict-record-empty">記録がありません。</span>`;
 
     list.innerHTML="";
 
@@ -875,7 +854,7 @@ function renderActiveDictEntry(){
             ${wordBank[key].q}
         </label>
 
-        <div class="dict-field-label">俺の予想</div>
+        <div class="dict-field-label">ヴェインの推測</div>
 
         <input
             type="text"
@@ -902,7 +881,7 @@ function renderActiveDictEntry(){
         ></div>
 
         <div class="dict-records">
-            <div class="dict-records-title">遭遇記録</div>
+            <div class="dict-records-title">ランちゃんがこの言葉を使ったとき</div>
             <div class="dict-record-list">
                 ${recordButtons}
             </div>
@@ -1023,7 +1002,7 @@ function renderWordList(){
             ?"理解"
             :encountered
                 ?(guess?"推測中":"未推測")
-                :"未遭遇";
+                :"？？？";
 
         const statusCls=understood
             ?" understood"
@@ -1057,9 +1036,6 @@ function renderWordList(){
     }).join("");
 }
 
-/*
-    起動処理
-*/
 window.onload=()=>{
     masteredWords=getMasteredWordSet();
     checkEnvironment();
@@ -1286,11 +1262,6 @@ function updateGuess(key,val){
     renderDictEntryState(key);
     renderWordList();
 
-    /*
-        ノートの入力中には選択肢を再判定しない。
-        返答へ進んだ後も選択肢は変化しない。
-    */
-}
 
 function registerSceneWords(index){
     if(
@@ -1448,8 +1419,8 @@ function buildUnderstandingNarrative(key){
             <div class="understanding-lead">……あ。</div>
 
             <div class="understanding-copy">
-                何度も聞いた、あの音。<br>
-                これまでの会話が、一つにつながる。
+                この音、前も聞いたやつだよな……。<br>
+                ランちゃんが伝えたかったのは、きっと……。
             </div>
 
             <div class="understanding-symbol">
@@ -1797,7 +1768,7 @@ function updateUI(redo=true){
 
             guide.className="reply-guide";
             guide.innerText=
-                "ノートの仮説を見直したら、返答へ進んでください。";
+                "ノートに書き終わったら、ランちゃんに返事しないとな。";
 
             area.appendChild(guide);
 
@@ -1931,11 +1902,7 @@ function updateColUI(){
 <script src="recollection.js"></script>
 <script src="endings.js"></script>
 <script>
-/* =========================================================
-   2周目以降：3つの再開地点 × ヴェインの理解度
-   保存済みの結末の選択履歴は、開始地点より前のみ引き継ぐ。
-   過去の誤読履歴はスナップショットに存在するもの以外作らない。
-========================================================= */
+
 const continueEndingNames = Object.freeze({
     1:"言葉の果てで、君と",
     2:"隣り合う剣",
@@ -1946,7 +1913,6 @@ const continueEndingNames = Object.freeze({
     7:"幾度目かの初恋"
 });
 
-/* 他のファイルの結末名も、表示時に必ず同じ名前を使う。 */
 Object.entries(continueEndingNames).forEach(([id, title])=>{
     if(typeof endingsData!=="undefined" && endingsData[id]){
         endingsData[id].title=title;
@@ -1968,7 +1934,7 @@ let continueOpenedFromGame=false;
 
 function getContinuationSource(){
     if(typeof recollectionProgress==="undefined") return null;
-    // 本当に直近のプレイを優先する。END別の「初到達の基準記録」と混同しない。
+
     if(recollectionProgress.latestRunSnapshot &&
        Number.isInteger(recollectionProgress.latestRunEndingId) &&
        recollectionProgress.latestRunEndingId>=1 &&
@@ -1979,7 +1945,7 @@ function getContinuationSource(){
             snapshot:recollectionProgress.latestRunSnapshot
         };
     }
-    // 旧セーブで直近周回記録がない場合のみ基準記録から代替。
+
     const snapshots=recollectionProgress.endingSnapshots||{};
     const valid=Object.keys(snapshots).map(key=>({
         endingId:Number(key),
@@ -2068,7 +2034,7 @@ function refreshContinueSetup(){
     }
     document.querySelectorAll("[data-continue-scene]").forEach(button=>{
         const point=Number(button.dataset.continueScene);
-        // 初回クリア情報だけ存在し、履歴がない旧セーブでは途中再開不可。
+
         button.disabled=point!==0 && !source;
         const chosen=point===continueSceneIndex;
         button.classList.toggle("active",chosen);
@@ -2097,7 +2063,6 @@ function refreshContinueSetup(){
         recollectionProgress.finalRecollectionUnlocked?"block":"none";
 }
 
-/* END画面では #display が本文に置き換えられるため元のDOMへ戻す。 */
 function restoreContinuationDisplay(){
     if(document.getElementById("message-text") &&
        document.getElementById("resolution-text")) return;
@@ -2130,17 +2095,13 @@ function startChosenContinuation(){
     const snapshot=source?source.snapshot:null;
     const knowledge=getContinuationKnownKeys(continueKnowledgeMode,index,source);
 
-    /* はじまりだけは既存の新規開始処理を使う。 */
     if(index===0){
         closeContinueSetup();
-        // END画面の本文で会話用DOMが消えているケースにも対応。
         restoreContinuationDisplay();
         startGame(false);
         applyContinuationKnowledge(knowledge,snapshot,index);
         runMode="recollection";
         recollectionBaseEndingId=source?source.endingId:null;
-        // closeContinueSetup() はタイトルへ戻る際に確認画面を表示する。
-        // ゲーム再開では必ず閉じ直す。
         for(const id of ["device-check-overlay","intro-overlay","tutorial-overlay","load-overlay"]){
             const element=document.getElementById(id);
             if(element) element.style.display="none";
@@ -2150,7 +2111,6 @@ function startChosenContinuation(){
         return true;
     }
 
-    /* 途中・最終問題は、直前までの確定した歴史だけ復元する。 */
     selectedAnswers=new Array(scenario.length).fill(null);
     sceneChoiceRecords=new Array(scenario.length).fill(null);
     const pastAnswers=snapshot?.selectedAnswers||[];
@@ -2186,8 +2146,6 @@ function startChosenContinuation(){
     restoreContinuationDisplay();
     initDict({});
     applyContinuationKnowledge(knowledge,snapshot,index);
-    // 以前のノート内容は、場面ごとの確定した推測からのみ再現。
-    // 最終ページの正解を過去に流し込まない。
     if(continueKnowledgeMode==="memory" && source &&
        typeof restoreNotebookGuessesBeforeScene==="function"){
         restoreNotebookGuessesBeforeScene(snapshot,index,"memory");
@@ -2240,7 +2198,6 @@ function openFinalContinuation(){
     }
 }
 
-/* END画面の「追憶へ」も同じシンプルな再開画面へ接続する。 */
 window.openRecollection=openContinueSetup;
 </script>
 </body>
