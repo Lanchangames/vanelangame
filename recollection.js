@@ -23,12 +23,12 @@ let runMode = "story"; // "story" | "recollection"
 let recollectionBaseEndingId = null;
 
 const endingLabels = {
-    1: "💍 言葉の果てで、君と",
-    2: "🤝 隣り合う剣",
-    3: "⌛ それぞれの歩幅",
-    4: "❄️ 声が戻るまで",
-    5: "🍮 プリンと遠回りの恋",
-    6: "🌌 その声をたよりに"
+    1: "言葉の果てで、君と",
+    2: "隣り合う剣",
+    3: "それぞれの歩幅",
+    4: "声が戻るまで",
+    5: "プリンと遠回りの恋",
+    6: "その声をたよりに"
 };
 
 const CONTINUATION_SCENE_INDICES = Object.freeze([0, 10, 19]);
