@@ -120,6 +120,16 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 .continue-final{border-top:1px solid var(--line);margin-top:16px;padding-top:14px;text-align:center}
 .continue-final .btn-style{margin:0;padding:10px 24px;background:var(--main-soft);color:var(--main-dark);border-color:var(--line)}
 @media(max-width:700px){.continue-grid{grid-template-columns:1fr}.continue-choice{min-height:75px}}
+
+/* タイトル画面のおしらせ（ゲーム本体のスタイルに影響しない） */
+#notice-overlay{position:fixed;inset:0;z-index:210;display:none;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;background:rgba(237,243,245,.98)}
+#notice-panel{width:min(580px,96vw);max-height:90vh;overflow-y:auto;box-sizing:border-box;padding:32px;background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;text-align:left;box-shadow:0 18px 55px rgba(68,91,101,.1)}
+#notice-panel h2{margin:0 0 20px;font-size:1.4rem;color:var(--main-dark)}
+#notice-panel h3{font-size:.91rem;color:var(--main-dark);margin:20px 0 7px}
+#notice-panel p{margin:0;color:var(--text-soft);font-size:.86rem;line-height:1.9}
+#notice-panel a{color:var(--main-dark);text-underline-offset:3px;overflow-wrap:anywhere}
+#notice-panel .notice-footer{margin-top:26px;text-align:center}
+#notice-panel .notice-footer .btn-style{background:var(--main);color:#fff;margin:0}
 </style>
 </head>
 <body>
@@ -130,8 +140,26 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 <div id="check-action">
 <button id="entry-btn" class="btn-style" style="background:var(--main);color:#fff;display:none">物語を始める</button>
 <button id="recollection-entry-btn" class="btn-style" style="background:var(--main-dark);color:#fff;display:none">つづきから</button>
+<button id="notice-entry-btn" class="btn-style" type="button" style="background:var(--surface-soft);color:var(--main-dark);border-color:var(--line-strong)" onclick="openNotice()">おしらせ</button>
 <p id="error-msg" style="color:var(--wrong);display:none"><b>MOBILE DEVICE DETECTED</b><br>スマートフォン等のモバイル環境ではプレイできません。</p>
 </div></div></div>
+<div id="notice-overlay" role="dialog" aria-modal="true" aria-labelledby="notice-title" aria-hidden="true">
+  <section id="notice-panel">
+    <h2 id="notice-title" tabindex="-1">おしらせ</h2>
+    <h3>このゲームについて</h3>
+    <p>『声を聴かせて、ランスロット！』は、『グランブルーファンタジー』を題材とした非公式の二次創作ゲームです。原作の公式運営・制作関係者および権利者とは関係ありません。</p>
+    <p>原作に関する権利は、それぞれの権利者に帰属します。</p>
+    <h3>ご利用にあたって</h3>
+    <p>本作のデータ・文章・プログラム等の無断転載、再配布、ミラー公開、改変版の公開、商用利用はご遠慮ください。</p>
+    <p>本作に関するお問い合わせを、原作の公式窓口へ送ることはお控えください。</p>
+    <h3>製作者・お問い合わせ</h3>
+    <!-- 製作者名の変更は、下の表示テキストを編集してください。 -->
+    <p>製作者：<span id="notice-author">まひかす</span></p>
+    <!-- マシュマロのリンクを変更する場合は、下の href を編集してください。 -->
+    <p>ご感想・お問い合わせ：<a id="notice-marshmallow" href="https://marshmallow-qa.com/oj0afz3donoawsc" target="_blank" rel="noopener noreferrer">マシュマロはこちら</a></p>
+    <div class="notice-footer"><button type="button" class="btn-style" onclick="closeNotice()">タイトルへ戻る</button></div>
+  </section>
+</div>
 <div id="intro-overlay"><div class="content-box">
 <img src="title.png" alt="声を聴かせて、ランスロット！" class="title-image">
 <p>ある日。散歩中のランスロットとヴェインは、魔物に襲われている親子を目撃する。<br>
@@ -1261,7 +1289,7 @@ function updateGuess(key,val){
 
     renderDictEntryState(key);
     renderWordList();
-
+}
 
 function registerSceneWords(index){
     if(
@@ -1561,9 +1589,6 @@ function renderTabs(){
     }
 }
 
-/*
-    ゲーム画面更新
-*/
 function updateUI(redo=true){
     if(currentStep>=scenario.length) return;
 
@@ -2055,7 +2080,7 @@ function refreshContinueSetup(){
         ?"はじめから選び直します。"
         :source
             ?`それ以前の返答は「${continueEndingNames[source.endingId]}」を回収した時の記録から引き継ぎます。`
-            :"以前の選択記録がないため、過去の返答傾向は引き継ぎません。";
+            :"以前の選択記録がないため、過去の返答は引き継ぎません。";
     document.getElementById("continue-summary").innerText=
         `${location}（SCENE ${String(continueSceneIndex+1).padStart(2,"0")}）／`+
         `理解済み ${understood} 語\n${before} ここから先の返答は選び直せます。`;
@@ -2199,6 +2224,21 @@ function openFinalContinuation(){
 }
 
 window.openRecollection=openContinueSetup;
+
+function openNotice(){
+    const overlay=document.getElementById("notice-overlay");
+    if(!overlay) return;
+    overlay.style.display="flex";
+    overlay.setAttribute("aria-hidden","false");
+    document.getElementById("notice-title")?.focus?.();
+}
+function closeNotice(){
+    const overlay=document.getElementById("notice-overlay");
+    if(!overlay) return;
+    overlay.style.display="none";
+    overlay.setAttribute("aria-hidden","true");
+    document.getElementById("notice-entry-btn")?.focus();
+}
 </script>
 </body>
 </html>
