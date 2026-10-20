@@ -213,16 +213,6 @@ function renderEndingScreen(id, progressResult = null) {
     const body = endingBodies[id];
     if (!ending || typeof body !== "string") return false;
 
-    const endingIcons = {
-        1: "✨💍✨",
-        2: "⚔️🤝",
-        3: "⌛",
-        4: "🌤️",
-        5: "🍮⁉️",
-        6: "🌌🤝",
-        7: "🌅✨"
-    };
-    const icon = endingIcons[id] || "✨";
     const progressMessages = [];
 
     if (progressResult?.isFirstClear) {
@@ -237,7 +227,7 @@ function renderEndingScreen(id, progressResult = null) {
     }
     if (progressResult?.finalRecollectionUnlockedNow) {
         progressMessages.push(
-            "🌅 『最後の追憶』が開きました。『つづきから』から辿れます。"
+            "『最後の追憶』が開きました。『つづきから』から辿れます。"
         );
     }
 
@@ -296,8 +286,9 @@ function renderEndingScreen(id, progressResult = null) {
         </button>` : "";
 
     display.innerHTML = `
-        <div style="font-size:70px">${icon}</div>
+        <div style="font-size:.72rem;letter-spacing:.18em;color:var(--muted)">END ${String(id).padStart(2, "0")}</div>
         <h2 style="color:#d4af37">【 ${ending.title} 】</h2>
+        <div style="width:72px;height:1px;background:var(--line-strong);margin:0 auto 12px"></div>
         <p style="padding:20px 40px;line-height:2.2;text-align:left">
             ${body}
         </p>
