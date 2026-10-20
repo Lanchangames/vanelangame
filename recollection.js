@@ -1,21 +1,3 @@
-/*
-    声を聴かせて、ランスロット！ / recollection.js
-
-    2周目以降の「つづきから」は index.html の画面から利用する。
-    再開地点は SCENE 01 / 11 / 20 の3箇所だけ。
-
-    このファイルの役割:
-    ・旧セーブの安全な移行
-    ・各ENDの基準snapshotと直近周回snapshotの保存
-    ・返答時点のsceneChoiceRecordsの復元
-    ・理解状態と返答傾向を分離した通常END判定
-    ・END7の解放判定と専用入口
-
-    ストレージキーは変更しない。
-    以前の欠片・任意シーン解放データは削除せず保持するが、
-    新しい「つづきから」画面では使用しない。
-*/
-
 const RECOLLECTION_STORAGE_KEY = "vane_recollection_v4";
 const RECOLLECTION_SCHEMA_VERSION = 8;
 
@@ -32,10 +14,6 @@ const endingLabels = {
 };
 
 const CONTINUATION_SCENE_INDICES = Object.freeze([0, 10, 19]);
-
-// ---------------------------------------------------------
-// 選択肢とID
-// ---------------------------------------------------------
 
 function isValidNormalEndingId(value) {
     const id = Number(value);
