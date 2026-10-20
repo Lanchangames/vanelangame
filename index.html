@@ -130,6 +130,19 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 #notice-panel a{color:var(--main-dark);text-underline-offset:3px;overflow-wrap:anywhere}
 #notice-panel .notice-footer{margin-top:26px;text-align:center}
 #notice-panel .notice-footer .btn-style{background:var(--main);color:#fff;margin:0}
+
+/* ノート内の任意ヒント・答え合わせ、最後の確認（既存レイアウトの変更なし） */
+.notebook-tools{margin-top:13px;border-top:1px solid var(--note-line);padding-top:12px}
+.notebook-tool-actions{display:flex;flex-wrap:wrap;gap:7px}
+.notebook-tool-button{padding:8px 11px;border:1px solid var(--note-line);border-radius:5px;background:var(--note-surface);color:var(--note-text);font:inherit;font-size:.75rem;cursor:pointer}
+.notebook-tool-button:disabled{opacity:.5;cursor:default}
+.notebook-check-result,.notebook-hint-row{margin:9px 0 0;font-size:.78rem;line-height:1.65;color:var(--note-text)}
+.notebook-check-result{font-weight:600}
+.notebook-tool-caption{font-size:.69rem;color:var(--muted);line-height:1.6;margin-top:7px}
+.final-notebook-panel{margin-top:12px;border:1px solid var(--line);border-radius:7px;padding:12px;background:var(--surface)}
+.final-notebook-summary{font-size:.79rem;color:var(--text-soft);line-height:1.6;margin-bottom:8px}
+.final-notebook-word{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0;font-size:.78rem;border-bottom:1px solid var(--line)}
+.final-notebook-word button{font:inherit;color:var(--main-dark);background:var(--surface-soft);border:1px solid var(--line);border-radius:4px;padding:4px 10px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -252,20 +265,20 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 <div class="status-bar"><div class="ending-collection">
 <span class="ending-collection-label">ENDING</span>
 <div class="ending-badge-row">
-<span class="ending-progress-badge" data-ending-id="1" title="言葉の果てで、君と">END 01</span>
-<span class="ending-progress-badge" data-ending-id="6" title="その声をたよりに">END 06</span>
-<span class="ending-progress-badge" data-ending-id="2" title="隣り合う剣">END 02</span>
-<span class="ending-progress-badge" data-ending-id="3" title="それぞれの歩幅">END 03</span>
-<span class="ending-progress-badge" data-ending-id="4" title="声が戻るまで">END 04</span>
-<span class="ending-progress-badge" data-ending-id="5" title="プリンと遠回りの恋">END 05</span>
-<span class="ending-progress-badge gold" data-ending-id="7" title="幾度目かの初恋">END 07</span>
+<span class="ending-progress-badge" data-ending-id="1">END 01</span>
+<span class="ending-progress-badge" data-ending-id="6">END 06</span>
+<span class="ending-progress-badge" data-ending-id="2">END 02</span>
+<span class="ending-progress-badge" data-ending-id="3">END 03</span>
+<span class="ending-progress-badge" data-ending-id="4">END 04</span>
+<span class="ending-progress-badge" data-ending-id="5">END 05</span>
+<span class="ending-progress-badge gold" data-ending-id="7">END 07</span>
 </div><span class="ending-count" data-ending-count>0 / 7</span></div>
 <div id="legacy-state"><span id="intel-val">0%</span><span id="col-val">0%</span>
 <div class="badge-container" id="badge-area">
-<div class="badge" id="b-1" title="言葉の果てで、君と"></div><div class="badge" id="b-6" title="その声をたよりに"></div>
-<div class="badge" id="b-2" title="隣り合う剣"></div><div class="badge" id="b-3" title="それぞれの歩幅"></div>
-<div class="badge" id="b-4" title="声が戻るまで"></div><div class="badge" id="b-5" title="プリンと遠回りの恋"></div>
-<div class="badge gold" id="b-7" title="幾度目かの初恋"></div>
+<div class="badge" id="b-1"></div><div class="badge" id="b-6"></div>
+<div class="badge" id="b-2"></div><div class="badge" id="b-3"></div>
+<div class="badge" id="b-4"></div><div class="badge" id="b-5"></div>
+<div class="badge gold" id="b-7"></div>
 </div></div></div>
 <div id="main-view-tabs"><button type="button" id="play-view-tab" class="main-view-tab active" onclick="switchMainView('play')">会話</button><button type="button" id="log-view-tab" class="main-view-tab" onclick="switchMainView('log')">過去LOG</button></div>
 <div id="play-view">
@@ -305,6 +318,88 @@ const wordBank = {
     W14:{q:"ΓΔ",canonical:"約束",variants:["やくそく","約束する"],synonyms:[],nearMisses:["誓う","誓い","誓約","保証","決める","契約"],meaning:"二人の間で未来についての意志を言葉として確定すること",boundary:"「一緒」は望む状態。「ずっと」は時間。「約束」はその未来を二人で確認する行為。",appearances:[8,13,19],difficulty:"medium",finalRole:"「ずっと」「一緒」など複数の既知語を未来へ結びつける。",minClues:2},
     W15:{q:"ΨΩ",canonical:"伝える",variants:["つたえる"],synonyms:["届ける"],nearMisses:["言う","話す","知らせる","伝達する","分かってほしい","聞いて"],meaning:"自分の本心・感情・願いを言葉としてヴェインへ届けること",boundary:"「愛している」などは伝える内容。「伝える」は届けようとする行為。",appearances:[2,11,20],difficulty:"medium",finalRole:"「言葉が届かない」というゲームそのもののテーマを回収する。",minClues:2}
 };
+
+// 伏せ字の正解データとは独立した、プレイヤー向け3段階ヒント。
+const wordHints = {
+    "W1": [
+        "目を覚ましたとき、ランちゃんは安堵したのに、まだ顔が強張っていた。",
+        "相手が無事でいられるか気にかける気持ちの言葉だ。",
+        "自分が感じる恐怖そのものとは、目を向けている先が違う。"
+    ],
+    "W2": [
+        "体調が戻ったら訓練も食事も、とランちゃんは話していた。最初の音は何を表すんだろう。",
+        "何かをする『人数』や、二人でいる状態を表す。",
+        "『いつまで』かではなく、『誰と』なのかを考えてみよう。"
+    ],
+    "W3": [
+        "ランちゃんは、あの日ヴェインにかばわれたことを思い出してから、この短い音を口にした。",
+        "相手がしてくれたことに向ける、短い気持ちの言葉。",
+        "『嬉しい』という自分の状態を述べるだけではない。"
+    ],
+    "W4": [
+        "昔からの関係を、ランちゃんはわざわざ言葉にしようとした。",
+        "二人の親しさを表す、関係の名前だ。",
+        "仕事の仲間というだけでも、ただの知り合いというだけでもない。"
+    ],
+    "W5": [
+        "『お前は俺にとって――』。ランちゃんは、ヴェインという存在をどう思っているのだろう。",
+        "相手の存在そのものに向ける、重みのある評価の言葉。",
+        "相手をどう思っているかを示す言葉だが、恋心だけを表すとは限らない。"
+    ],
+    "W6": [
+        "あの日のことを話すたび、ランちゃんは自分の行動を悔やむ。",
+        "危険から誰かを遠ざけたいという、行動や意志の言葉。",
+        "手を差し伸べるだけでなく、危害が及ばないようにすること。"
+    ],
+    "W7": [
+        "「さっきのことは――してくれ」。ランちゃんは何をしてほしいんだろう。",
+        "記憶に対して、人が意識して行おうとすること。",
+        "知らないうちに『失くす』こととは違って、自分から手放そうとする。"
+    ],
+    "W8": [
+        "『お前を――たくない』と言うとき、ランちゃんは声を震わせていた。",
+        "自分にとって大切なものが、手元からなくなること。",
+        "自分で離れようと決めるのではなく、望まない別れへの恐れに近い。"
+    ],
+    "W9": [
+        "話しかけることすらためらうランちゃんの目は、何を映していた？",
+        "相手を気遣うだけでなく、自分の内側に生じる感情の言葉。",
+        "『相手を心配する』よりも、自分が何かにおびえる気持ちに近い。"
+    ],
+    "W10": [
+        "「俺は――待っている」。出発前、ランちゃんは帰りを待つ時間について話していた。",
+        "一瞬ではなく、時間が続いていくことを表す。",
+        "『誰といるか』ではなく、『いつまで』続くか。"
+    ],
+    "W11": [
+        "「俺はお前を――いるから」。ランちゃんはその言葉を口にするまで、何度もためらっていた。",
+        "彼がずっと胸の奥へ隠してきた、相手への気持ちを表す。",
+        "『大切』だけでは収まらない。恋人になりたい人へ告げる、最も深い気持ち。"
+    ],
+    "W12": [
+        "ヴェインが自分で決めると言ったとき、ランちゃんはそれを受け止めようとした。",
+        "相手の判断を受け入れ、疑わずにいようとする姿勢。",
+        "『頼る』は行動を預けること。こちらはその前提になる気持ち。"
+    ],
+    "W13": [
+        "料理を作ってもらった夜。ランちゃんは一人で抱えてきたものを思い返した。",
+        "自分だけではなく、相手の力を借りる行為。",
+        "相手の力を認めるだけでは足りない。自分の負担を預けること。"
+    ],
+    "W14": [
+        "「また来よう。そう――してくれるか？」。ランちゃんは次の機会を大事にしたいようだ。",
+        "未来に向けて、互いの意志を交わす言葉。",
+        "単なる予定の『確認』より、守ろうとする気持ちを伴う。"
+    ],
+    "W15": [
+        "『俺から、お前にちゃんと――られるか試したい』。何が欠けてしまったのだろう。",
+        "胸の中の思いを相手へ届かせようとする行為。",
+        "気持ちの中身ではなく、それを相手に届けることを考えてみよう。"
+    ]
+};
+let notebookChecks={};       // 自分で押した答え合わせ結果（入力変更時は無効）
+let notebookHintLevels={};   // 当該プレイ中に開いた段階
+let finalReviewOpen=false;
 
 let currentStep=0,viewingStep=0,lovePoints=0,userDict={},colSet=new Set();
 let selectedAnswers=[];
@@ -655,6 +750,60 @@ function shuffle(array){
     return arr;
 }
 
+function canCheckNotebookWord(key){
+    if(!wordBank[key] || !getEncounteredScenesForWord(key).length) return false;
+    return scenario.some((scene,index)=>
+        index<=currentStep && (
+            (scene.resolveChecks||[]).includes(key) ||
+            scene.finalResolve?.key===key
+        )
+    );
+}
+function availableNotebookHintLevel(key){
+    const seen=getEncounteredScenesForWord(key).length;
+    if(!seen) return 0;
+    if(currentStep===scenario.length-1 || seen>=3) return 3;
+    if(canCheckNotebookWord(key)) return 2;
+    return 1;
+}
+function checkNotebookGuess(key){
+    if(!canCheckNotebookWord(key) || vaneKnownWords.has(key)) return;
+    const guess=String(userDict[key]||"").trim();
+    let message;
+    if(!guess){
+        message="まだ推測を書いていない。";
+    }else if(isAcceptedGuess(key,guess)){
+        message="正解。この推測で合っている。理解の演出は物語が進んだ時に起こる。";
+    }else if((wordBank[key].nearMisses||[]).some(value=>
+        normalizeGuess(value)===normalizeGuess(guess)
+    )){
+        message="惜しい！ 方向は近いけれど、少し意味が違うようだ。";
+    }else{
+        message="不正解。この言葉は別の意味のようだ。";
+    }
+    notebookChecks[key]={guess,message};
+    renderActiveDictEntry();
+}
+function revealNotebookHint(key){
+    const available=availableNotebookHintLevel(key);
+    const current=notebookHintLevels[key]||0;
+    if(available<=current) return;
+    notebookHintLevels[key]=current+1;
+    renderActiveDictEntry();
+}
+function toggleFinalNotebookReview(){
+    if(currentStep!==scenario.length-1 || interactionPhase!=="conversation") return;
+    finalReviewOpen=!finalReviewOpen;
+    updateUI(true);
+}
+function refreshFinalNotebookRow(key){
+    if(!finalReviewOpen || currentStep!==scenario.length-1) return;
+    const row=document.querySelector(`[data-final-word-key="${key}"] .final-notebook-status`);
+    if(!row) return;
+    row.innerText=vaneKnownWords.has(key)?"理解済み"
+        :String(userDict[key]||"").trim()?"推測あり":"未推測";
+}
+
 function getEncounteredScenesForWord(key){
     return scenario.reduce((result,scene,index)=>{
         if(
@@ -903,6 +1052,19 @@ function renderActiveDictEntry(){
             </div>
         </div>
 
+        <div class="notebook-tools">
+            <div class="notebook-tool-actions">
+                <button type="button" class="notebook-tool-button"
+                    onclick="checkNotebookGuess('${key}')"
+                    ${canCheckNotebookWord(key)&&!vaneKnownWords.has(key)?"":"disabled"}>答え合わせ</button>
+                <button type="button" class="notebook-tool-button"
+                    onclick="revealNotebookHint('${key}')"
+                    ${availableNotebookHintLevel(key)>(notebookHintLevels[key]||0)?"":"disabled"}>ヒントをひとつ見る</button>
+            </div>
+            <div class="notebook-tool-caption">答え合わせは会話の手掛かりが揃うと解放されます。初回は正誤を表示しません。</div>
+            <div class="notebook-check-result" id="notebook-check-result-${key}" aria-live="polite"></div>
+            <div class="notebook-hints" id="notebook-hints-${key}"></div>
+        </div>
         <div
             class="dict-feedback"
             id="dict-feedback-${key}"
@@ -918,6 +1080,19 @@ function renderActiveDictEntry(){
 
     list.appendChild(div);
     renderDictEntryState(key);
+    const checkElement=document.getElementById(`notebook-check-result-${key}`);
+    const currentGuess=String(userDict[key]||"").trim();
+    if(checkElement){
+        const check=notebookChecks[key];
+        checkElement.innerText=check && check.guess===currentGuess
+            ?check.message : "";
+    }
+    const hintsElement=document.getElementById(`notebook-hints-${key}`);
+    if(hintsElement){
+        const n=notebookHintLevels[key]||0;
+        hintsElement.innerHTML=(wordHints[key]||[]).slice(0,n)
+            .map((hint,i)=>`<p class="notebook-hint-row"><b>ヒント ${i+1}</b>　${escapeHtml(hint)}</p>`).join("");
+    }
 }
 
 function renderLogDialogueText(text){
@@ -1185,6 +1360,9 @@ function startGame(inherit){
     wordSeenCounts={};
     seenSceneIds=new Set();
 
+    notebookChecks={};
+    notebookHintLevels={};
+    finalReviewOpen=false;
     interactionPhase="conversation";
     pendingOption=null;
     pendingResolvedKeys=[];
@@ -1286,9 +1464,13 @@ function updateGuess(key,val){
     }
 
     userDict[key]=String(val).trim();
+    delete notebookChecks[key];
+    const checkElement=document.getElementById(`notebook-check-result-${key}`);
+    if(checkElement) checkElement.innerText="";
 
     renderDictEntryState(key);
     renderWordList();
+    refreshFinalNotebookRow(key);
 }
 
 function registerSceneWords(index){
@@ -1565,8 +1747,36 @@ function advanceScene(){
             panel.scrollTop=panel.scrollHeight;
         }
     }else{
-        showEnd();
+        if(typeof canChoosePuddingEnding==="function" && canChoosePuddingEnding()){
+            renderPuddingEndingChoice();
+        }else{
+            showEnd();
+        }
     }
+}
+
+function renderPuddingEndingChoice(){
+    const display=document.getElementById("display");
+    const area=document.getElementById("action-area");
+    if(!display || !area) return;
+    display.innerHTML=`<div class="story-bubble" style="margin:auto 0;max-width:90%">
+        <div class="block-label">LAST PAGE</div>
+        最後の言葉を聞き終えて、ヴェインはノートを開いた。<br>
+        ノートには、まだ確かめきれていない言葉が残っている。<br>
+        今までの行き違いを確かめてみようか。それとも、今の気持ちのまま前へ進もうか。
+    </div>`;
+    area.innerHTML="";
+    const review=document.createElement("button");
+    review.className="opt-btn";
+    review.innerText="ノートに残る食い違いを確かめる";
+    review.onclick=()=>showEnd(5);
+    const goOn=document.createElement("button");
+    goOn.className="opt-btn";
+    goOn.innerText="このまま物語を結ぶ";
+    goOn.onclick=()=>showEnd();
+    area.appendChild(review);
+    area.appendChild(goOn);
+    display.scrollTop=0;
 }
 
 function renderTabs(){
@@ -1812,6 +2022,29 @@ function updateUI(redo=true){
 
             area.appendChild(button);
 
+            if(currentStep===scenario.length-1){
+                const reviewButton=document.createElement("button");
+                reviewButton.className="opt-btn";
+                reviewButton.innerText=finalReviewOpen
+                    ?"最終確認を閉じる" : "ノートを最終確認する（任意）";
+                reviewButton.onclick=toggleFinalNotebookReview;
+                area.appendChild(reviewButton);
+                if(finalReviewOpen){
+                    const review=document.createElement("div");
+                    review.className="final-notebook-panel";
+                    const rows=Object.keys(wordBank).map(key=>{
+                        const status=vaneKnownWords.has(key)?"理解済み"
+                            :String(userDict[key]||"").trim()?"推測あり":"未推測";
+                        return `<div class="final-notebook-word" data-final-word-key="${key}">
+                            <span>${escapeHtml(wordBank[key].q)}　<span class="final-notebook-status">${status}</span></span>
+                            <button type="button" onclick="jumpToDict('${key}')">ノートで確認</button>
+                        </div>`;
+                    }).join("");
+                    review.innerHTML=`<div class="final-notebook-summary">未確定の言葉は、右側のノートで答え合わせやヒントを確認して書き直せます。返答を確定すると、この場面の解釈は固定されます。</div>${rows}`;
+                    area.appendChild(review);
+                }
+            }
+
         }else if(interactionPhase==="choice"){
             if(
                 !pendingChoiceContext||
@@ -1928,24 +2161,22 @@ function updateColUI(){
 <script src="endings.js"></script>
 <script>
 
-const continueEndingNames = Object.freeze({
-    1:"言葉の果てで、君と",
-    2:"隣り合う剣",
-    3:"それぞれの歩幅",
-    4:"声が戻るまで",
-    5:"プリンと遠回りの恋",
-    6:"その声をたよりに",
-    7:"幾度目かの初恋"
-});
-
-Object.entries(continueEndingNames).forEach(([id, title])=>{
-    if(typeof endingsData!=="undefined" && endingsData[id]){
-        endingsData[id].title=title;
+// エンディング名の唯一の設定場所は endings.js の ENDING_TITLES。
+function getEndingTitle(id){
+    return typeof endingsData!=="undefined" && endingsData[id]
+        ? endingsData[id].title
+        : `END ${String(id).padStart(2,"0")}`;
+}
+function syncEndingTitleUI(){
+    document.querySelectorAll("[data-ending-id]").forEach(element=>{
+        element.title=getEndingTitle(element.dataset.endingId);
+    });
+    for(let id=1;id<=7;id++){
+        const badge=document.getElementById(`b-${id}`);
+        if(badge) badge.title=getEndingTitle(id);
     }
-    if(typeof endingLabels!=="undefined" && Number(id)<=6){
-        endingLabels[id]=title;
-    }
-});
+}
+syncEndingTitleUI();
 
 const continuationPoints=Object.freeze([0,10,19]);
 const continuationPointNames=Object.freeze({
@@ -2079,7 +2310,7 @@ function refreshContinueSetup(){
     const before=continueSceneIndex===0
         ?"はじめから選び直します。"
         :source
-            ?`それ以前の返答は「${continueEndingNames[source.endingId]}」を回収した時の記録から引き継ぎます。`
+            ?`それ以前の返答は「${getEndingTitle(source.endingId)}」を回収した時の記録から引き継ぎます。`
             :"以前の選択記録がないため、過去の返答は引き継ぎません。";
     document.getElementById("continue-summary").innerText=
         `${location}（SCENE ${String(continueSceneIndex+1).padStart(2,"0")}）／`+
@@ -2136,6 +2367,9 @@ function startChosenContinuation(){
         return true;
     }
 
+    notebookChecks={};
+    notebookHintLevels={};
+    finalReviewOpen=false;
     selectedAnswers=new Array(scenario.length).fill(null);
     sceneChoiceRecords=new Array(scenario.length).fill(null);
     const pastAnswers=snapshot?.selectedAnswers||[];
