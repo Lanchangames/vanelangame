@@ -24,9 +24,9 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 .ending-collection,.ending-badge-row{display:flex;align-items:center;justify-content:center}
 .ending-collection{gap:10px}.ending-badge-row{gap:7px}
 .ending-collection-label{color:var(--muted);font-size:.72rem;font-weight:700;letter-spacing:.13em;white-space:nowrap}
-.ending-progress-badge{display:block;width:15px;height:15px;box-sizing:border-box;border-radius:50%;border:1px solid var(--line-strong);background:var(--surface-soft);box-shadow:inset 0 0 0 3px var(--surface);transition:.2s}
-.ending-progress-badge.unlocked{background:var(--main);border-color:var(--main-dark);box-shadow:inset 0 0 0 3px var(--surface),0 0 0 1px rgba(120,151,165,.12)}
-.ending-progress-badge.gold.unlocked{background:var(--main-dark)}
+.ending-progress-badge{display:inline-flex;align-items:center;justify-content:center;min-width:46px;height:22px;padding:0 5px;box-sizing:border-box;border-radius:4px;border:1px solid var(--line-strong);background:var(--surface-soft);color:var(--muted);font-size:.62rem;font-weight:700;letter-spacing:.04em;white-space:nowrap;transition:.2s}
+.ending-progress-badge.unlocked{background:var(--main-soft);border-color:var(--main);color:var(--main-dark)}
+.ending-progress-badge.gold.unlocked{background:var(--main-soft);border-color:var(--main-dark)}
 .ending-count{min-width:32px;color:var(--main-dark);font-size:.72rem;font-weight:700;letter-spacing:.05em;white-space:nowrap}
 #check-action{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:24px}
 #check-action .btn-style{margin:0;min-width:220px}#check-action #error-msg{margin-top:10px}
@@ -211,10 +211,10 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
     <div class="continue-summary" id="continue-summary" aria-live="polite"></div>
     <div class="continue-actions">
       <button type="button" class="btn-style continue-secondary" onclick="closeContinueSetup()">タイトルへ戻る</button>
-      <button type="button" class="btn-style continue-primary" id="continue-start" onclick="startChosenContinuation()">この状態で始める ▶</button>
+      <button type="button" class="btn-style continue-primary" id="continue-start" onclick="startChosenContinuation()">この状態で始める</button>
     </div>
     <div class="continue-final" id="continue-final" style="display:none">
-      <button type="button" class="btn-style" onclick="openFinalContinuation()">🌅 最後の追憶へ</button>
+      <button type="button" class="btn-style" onclick="openFinalContinuation()">最後の追憶へ</button>
     </div>
   </div>
 </div>
@@ -225,13 +225,13 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 <div class="status-bar"><div class="ending-collection">
 <span class="ending-collection-label">ENDING</span>
 <div class="ending-badge-row">
-<span class="ending-progress-badge" data-ending-id="1" title="言葉の果てで、君と"></span>
-<span class="ending-progress-badge" data-ending-id="6" title="その声をたよりに"></span>
-<span class="ending-progress-badge" data-ending-id="2" title="隣り合う剣"></span>
-<span class="ending-progress-badge" data-ending-id="3" title="それぞれの歩幅"></span>
-<span class="ending-progress-badge" data-ending-id="4" title="声が戻るまで"></span>
-<span class="ending-progress-badge" data-ending-id="5" title="プリンと遠回りの恋"></span>
-<span class="ending-progress-badge gold" data-ending-id="7" title="幾度目かの初恋"></span>
+<span class="ending-progress-badge" data-ending-id="1" title="言葉の果てで、君と">END 01</span>
+<span class="ending-progress-badge" data-ending-id="6" title="その声をたよりに">END 06</span>
+<span class="ending-progress-badge" data-ending-id="2" title="隣り合う剣">END 02</span>
+<span class="ending-progress-badge" data-ending-id="3" title="それぞれの歩幅">END 03</span>
+<span class="ending-progress-badge" data-ending-id="4" title="声が戻るまで">END 04</span>
+<span class="ending-progress-badge" data-ending-id="5" title="プリンと遠回りの恋">END 05</span>
+<span class="ending-progress-badge gold" data-ending-id="7" title="幾度目かの初恋">END 07</span>
 </div><span class="ending-count" data-ending-count>0 / 7</span></div>
 <div id="legacy-state"><span id="intel-val">0%</span><span id="col-val">0%</span>
 <div class="badge-container" id="badge-area">
@@ -1021,7 +1021,7 @@ function renderWordList(){
             :String(userDict[key]||"").trim();
 
         const status=understood
-            ?"✓ 理解"
+            ?"理解"
             :encountered
                 ?(guess?"推測中":"未推測")
                 :"未遭遇";
@@ -1700,7 +1700,7 @@ function updateUI(redo=true){
 
     if(showStory){
         const parts=[
-            `<div class="selected-reply">● ${escapeHtml(selectedOption.t)}</div>`
+            `<div class="selected-reply">${escapeHtml(selectedOption.t)}</div>`
         ];
 
         const reaction=getReactionText(selectedOption);
@@ -1810,7 +1810,7 @@ function updateUI(redo=true){
                 "opt-btn reply-start-button";
 
             button.innerText=
-                "▶ 返答へ進む";
+                "返答へ進む";
 
             button.onclick=
                 lockChoicesForCurrentScene;
@@ -1834,7 +1834,7 @@ function updateUI(redo=true){
                     button.className="opt-btn";
 
                     button.innerText=
-                        `▶ ${choice.option.t}`;
+                        `${choice.option.t}`;
 
                     button.onclick=
                         ()=>chooseReply(choice);
@@ -1852,7 +1852,7 @@ function updateUI(redo=true){
             );
 
             next.className="opt-btn";
-            next.innerText="▶ 次へ";
+            next.innerText="次へ";
 
             next.onclick=
                 interactionPhase==="reaction"
@@ -1878,7 +1878,7 @@ function updateUI(redo=true){
             }
 
             button.innerText=
-                `${option.id===selectedId?"●":"▶"} ${option.t}`;
+                `${option.t}`;
 
             area.appendChild(button);
         });
@@ -1953,8 +1953,7 @@ Object.entries(continueEndingNames).forEach(([id, title])=>{
         endingsData[id].title=title;
     }
     if(typeof endingLabels!=="undefined" && Number(id)<=6){
-        const icons={1:"💍",2:"🤝",3:"⌛",4:"❄️",5:"🍮",6:"🌌"};
-        endingLabels[id]=`${icons[id]} ${title}`;
+        endingLabels[id]=title;
     }
 });
 
