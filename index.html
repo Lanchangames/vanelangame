@@ -135,15 +135,15 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 <div id="intro-overlay"><div class="content-box">
 <img src="title.png" alt="声を聴かせて、ランスロット！" class="title-image">
 <p>ある日。散歩中のランスロットとヴェインは、魔物に襲われている親子を目撃する。<br>
-とっさに動いたランスロットは、背後から魔物が放った呪いに気づけなかった。<br>
+とっさに動いたランスロットは背後から魔物が放った呪いに気づけなかった。<br>
 ヴェインは身を投げ出してランスロットをかばい、その拍子に呪いを全身に浴びてしまう。<br>
-魔物を倒して識者に呪いを解析してもらうと、恐ろしい現実を突きつけられた。<br><br>
+魔物を倒して識者に呪いを解析してもらった２人は、恐ろしい現実を突きつけられた。<br><br>
 「これは孤独の呪いです。最も心を寄せる相手の言葉が理解できなくなる。<br>
 結果的に絆を絶たれてしまうのです」<br>
 ……２人の関係にとって大切な言葉ほど、意味不明な音に変わってしまう呪い。<br><br>
 俺が最も心を寄せる相手……考えなくてもわかる。ランちゃんのことだ。<br>
 この呪いが解けない限り、ランちゃんとの絆が絶たれてしまう……？<br>
-いや――俺は絶対にあきらめない！このままランちゃんの声がわからないなんていやだ。<br>
+いやだ。……俺は絶対にあきらめない！このままランちゃんの声がわからないなんていやだ。<br>
 ヴェインはランスロットの言葉に耳を傾け、ひとつひとつ記録していくことにした。<br>
 いつかまた、お前の言葉を理解できるように。<br>
 あの日以来暗い表情のままの幼馴染の笑顔を取り戻して、大好きだよ、と伝えるために。</p>
@@ -153,14 +153,14 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 <h2 style="color:var(--main-dark)">プレイ方法</h2>
 <div style="text-align:left;background:var(--surface-soft);border:1px solid var(--line);padding:25px;border-radius:10px;font-size:.9em">
 <p><b>【ヴェインのノート】</b><br>
-このゲームはヴェイン視点です。<br>
-ランスロットの言葉すべてが聞こえないわけではなく、２人の絆にとって重要な部分ほど虫食いのような記号に聞こえます。<br>
-会話の文脈やヴェインの観察から意味を考え、ノートへ仮説を書き留めてください。<br>
+このゲームはヴェイン視点で進行します。<br>
+ランスロットの言葉すべてが聞こえないわけではなく、２人の絆にとって重要な部分のみ虫食いのような記号に聞こえます。<br>
+会話の文脈やヴェインの観察から虫食いとなっている言葉の意味を考え、ノートに仮説を書き留めてください。<br>
 入力した時点では、仮説が正しいかどうかは判定されません。<br><br>
 同じ記号は、同じ意味を持つ言葉を表します。文章によって「待って」「待てば」のように形が変わる場合がありますが、ノートには「待つ」のような<b>基本の形・言い切りの形</b>を記してください。<br><br>
-ノートには、ランスロットがその言葉を発したシーンも記録されます。仮説は何度でも書きなおせます。</p><br>
+ノートには、ランスロットがその言葉を発したシーンも記録されます。ノートは何度でも書きなおせます。</p><br>
 <p><b>【ヴェインの返答】</b><br>
-ランスロットの台詞を読み、ノートへ仮説を書いたら「返答へ進む」を押してください。<br>
+ノートへ仮説を書いたら「返答へ進む」を押してください。<br>
 その時点でヴェインが理解している内容から、返答候補が決まります。<br>
 聞き取れなくても、表情や状況を手がかりに会話を続けられます。<br>
 正しい返答を当てることが目的ではありません。どう返すかは、あなたが選んでください。<br>
@@ -179,9 +179,9 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 <button id="start-init-btn" class="btn-style" style="background:var(--main);color:#fff">物語を開始する</button>
 </div></div>
 <div id="load-overlay"><div class="content-box">
-<h2 style="color:var(--main-dark)">記憶の継承</h2>
+<h2 style="color:var(--main-dark)">ヴェインの記憶</h2>
 <p>過去に理解した単語を、最初からノートに引き継ぎますか？</p>
-<button id="load-yes" class="btn-style" style="background:var(--main);color:#fff">継承する</button>
+<button id="load-yes" class="btn-style" style="background:var(--main);color:#fff">引き継ぐ</button>
 <button id="load-no" class="btn-style" style="background:var(--main-dark);color:#fff">最初から解く</button>
 </div></div>
 <div id="understanding-flash" aria-hidden="true"><div class="understanding-flash-inner">
@@ -189,13 +189,12 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 <div id="understanding-flash-words"></div>
 <div class="understanding-flash-copy">……そういう意味だったんだ。</div>
 </div></div>
-
-<!-- クリア済みプレイヤー専用：3地点 × 理解度で再開 -->
+  
 <div id="continue-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="continue-title">
   <div id="continue-panel">
     <p class="continue-eyebrow">CONTINUE / MEMORY</p>
     <h2 class="continue-heading" id="continue-title">つづきから</h2>
-    <p class="continue-description">物語の再開地点と、ヴェインが覚えている言葉を選んでください。<br>ここから先は新しい物語として返答を選び直せます。</p>
+    <p class="continue-description">ゲームの再開地点とヴェインのノートの状態を選んでください。<br>ヴェインの返答とノートの状態でエンディングが変化します。</p>
     <div class="continue-section-title">1. どこから始める？</div>
     <div class="continue-grid" id="continue-scenes">
       <button type="button" class="continue-choice" data-continue-scene="0" onclick="chooseContinueScene(0)"><span class="continue-choice-code">SCENE 01</span><span class="continue-choice-label">はじまり</span><span class="continue-choice-caption">最初の会話から、もう一度</span></button>
@@ -214,7 +213,7 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
       <button type="button" class="btn-style continue-primary" id="continue-start" onclick="startChosenContinuation()">この状態で始める</button>
     </div>
     <div class="continue-final" id="continue-final" style="display:none">
-      <button type="button" class="btn-style" onclick="openFinalContinuation()">最後の追憶へ</button>
+      <button type="button" class="btn-style" onclick="openFinalContinuation()">最後の記憶へ</button>
     </div>
   </div>
 </div>
@@ -253,7 +252,7 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 <div id="log-section"><div id="log-header">これまでの会話</div><div id="log-panel"></div></div>
 </div>
 <div id="dictionary">
-<div id="dict-header"><h3>ヴェインのノート</h3><p>聞き取れない言葉を選び、<br>思いついた意味を書き留める。</p></div>
+<div id="dict-header"><h3>ヴェインのノート</h3><p>聞き取れない言葉の意味を推測しよう。<br>思いついた意味を書き留める。</p></div>
 <div id="dict-editor-section"><div id="dict-editor-label">選択中の言葉</div><div id="dict-list"></div></div>
 <div id="word-list-section"><div id="word-list-header">言葉一覧</div><div id="word-list-panel"><div id="word-list"></div></div></div>
 </div>
