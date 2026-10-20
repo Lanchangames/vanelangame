@@ -14,19 +14,19 @@ const scenario = [
                 t: "ランちゃん、めちゃくちゃ顔色が悪いぞ。……少し休んでくれよ",
                 v: 27,
                 axis: "listen",
-                reaction: "ランスロットは何か言いかけて視線を逸らし、ようやく椅子に座り直した。手はまだ寝台の縁から離れないままだ。"
+                reaction: "ランちゃんは何か言いかけて視線を逸らし、ようやく椅子に座り直した。手はまだ寝台の縁から離れないままだ。"
             },
             {
                 t: "……今の、途中ちょっと聞き取れなかったかも。もう１回、ランちゃんの声で聞きたい",
                 v: 25,
                 axis: "self",
-                reaction: "ランスロットはヴェインの目を見て、同じ言葉をゆっくり繰り返してくれた。欠けた音だけは変わらなかった。"
+                reaction: "ランちゃんはヴェインの目を見て、同じ言葉をゆっくり繰り返してくれた。欠けた音だけは変わらなかった。"
             },
             {
                 t: "起きられたし腹も減ったぞ！　食堂まで走ってみようかな、なんて……",
                 v: 8,
                 axis: "act",
-                reaction: "ランスロットは慌てて立ち上がり、まだ寝ていろとヴェインの肩を支えた。"
+                reaction: "ランちゃんは慌てて立ち上がり、まだ寝ていろとヴェインの肩を支えた。"
             }
         ],
         insightOpts: [
@@ -35,7 +35,7 @@ const scenario = [
                 t: "……俺は大丈夫だぞ。目を覚ますまでそばにいてくれて、ありがとな",
                 v: 30,
                 axis: "listen",
-                reaction: "ランスロットは何度か瞬きをし、安堵したようにヴェインの手を包んだ。"
+                reaction: "ランちゃんは何度か瞬きをし、安堵したようにヴェインの手を包んだ。"
             }
         ],
         misreadOpts: [
@@ -49,7 +49,7 @@ const scenario = [
                     guesses: ["監視する", "見張る"]
                 },
                 misreadImpact: true,
-                reaction: "ランスロットはきょとんとしたあと、苦笑して首を横に振った。"
+                reaction: "ランちゃんはきょとんとしたあと、苦笑して首を横に振った。"
             }
         ],
         afterStory: "俺が起き上がろうとすると、ランちゃんの手が先に伸びた。触れた指先の冷たさに驚く。苦しそうな顔をしている。……俺が未熟なせいだ。",
@@ -69,19 +69,19 @@ const scenario = [
                 t: "試したいことがあるんだな。……肝心なところが聞こえなかった。何をするのか教えてくれよ",
                 v: 27,
                 axis: "listen",
-                reaction: "ランスロットは頷き、言い方を変えてみた。けれど同じところでまた音が途切れ、二人は顔を見合わせた。"
+                reaction: "ランちゃんは頷き、言い方を変えてみた。けれど同じところでまた音が途切れ、二人は顔を見合わせた。"
             },
             {
                 t: "検査は終わったんだよな？　それでもランちゃんが気になるなら、俺も付き合うぜ",
                 v: 23,
                 axis: "self",
-                reaction: "ランスロットは少しほっとして頷いたが、言いたかったことがまだ届いていないようだった。"
+                reaction: "ランちゃんは少しほっとして頷いたが、言いたかったことがまだ届いていないようだった。"
             },
             {
                 t: "ええっ、また注射か？　俺、さっきので十分だと思うんだけど！",
                 v: 7,
                 axis: "act",
-                reaction: "ランスロットは驚き、検査の話ではないと何度も首を振った。"
+                reaction: "ランちゃんは驚き、検査の話ではないと何度も首を振った。"
             }
         ],
         insightOpts: [
@@ -90,7 +90,7 @@ const scenario = [
                 t: "俺にちゃんと言葉を伝えられるか、試したいんだな。……うん、何度でも聞くよ",
                 v: 30,
                 axis: "act",
-                reaction: "ランスロットは嬉しそうに目を細め、それから少し緊張した顔で言葉を選んだ。"
+                reaction: "ランちゃんは嬉しそうに目を細め、それから少し緊張した顔で言葉を選んだ。"
             }
         ],
         misreadOpts: [
@@ -104,10 +104,10 @@ const scenario = [
                     guesses: ["確かめる"]
                 },
                 misreadImpact: true,
-                reaction: "ランスロットは戸惑い、医師を呼ぼうとするヴェインをそっと止めた。"
+                reaction: "ランちゃんは戸惑い、医師を呼ぼうとするヴェインをそっと止めた。"
             }
         ],
-        afterStory: "医師はすでに孤独の呪いについて説明していた。今確かめているのは、ヴェインにどの言葉がどう聞こえるかだ。医師の問いは分かるのに、ランスロットの言葉だけが一部分欠ける。ヴェインはその音を紙に書き留めた。",
+        afterStory: "医師はすでに孤独の呪いについて説明していた。今確かめているのは、ヴェインにどの言葉がどう聞こえるかだ。医師の問いは分かるのに、ランちゃんの言葉だけが一部分欠ける。ヴェインはその音を紙に書き留めた。",
         nextHook: "同じ音がもう一度出てくれば、何か分かるかもしれない。"
     },
     {
@@ -124,19 +124,19 @@ const scenario = [
                 t: "……最後の言葉、もう一度言ってくれる？　そのまま聞き流したくないんだ",
                 v: 27,
                 axis: "act",
-                reaction: "ランスロットは戸惑いながらも頷き、ヴェインの名前を呼んでから同じ言葉を繰り返した。"
+                reaction: "ランちゃんは戸惑いながらも頷き、ヴェインの名前を呼んでから同じ言葉を繰り返した。"
             },
             {
                 t: "あのときのこと、まだ気にしてるのか？　俺はランちゃんが無事でよかったよ",
                 v: 25,
                 axis: "self",
-                reaction: "ランスロットは目を伏せた。少しして、ヴェインの皿の方へ手を伸ばし、冷めた料理を気遣った。"
+                reaction: "ランちゃんは目を伏せた。少しして、ヴェインの皿の方へ手を伸ばし、冷めた料理を気遣った。"
             },
             {
                 t: "見てくれよ、もうこんなに食えるんだ！　追加の一皿も頼んでいい？",
                 v: 9,
                 axis: "listen",
-                reaction: "ランスロットは笑いかけたが、言いかけた気持ちは飲み込んだようだった。"
+                reaction: "ランちゃんは笑いかけたが、言いかけた気持ちは飲み込んだようだった。"
             }
         ],
         insightOpts: [
@@ -145,7 +145,7 @@ const scenario = [
                 t: "お礼なんていいって。あのとき助けたかったのは、ランちゃんだったからさ",
                 v: 30,
                 axis: "listen",
-                reaction: "ランスロットは息を呑んだ。頬がわずかに赤くなり、しばらく皿に目を落としていた。"
+                reaction: "ランちゃんは息を呑んだ。頬がわずかに赤くなり、しばらく皿に目を落としていた。"
             }
         ],
         misreadOpts: [
@@ -159,10 +159,10 @@ const scenario = [
                     guesses: ["嬉しい", "喜ぶ"]
                 },
                 misreadImpact: true,
-                reaction: "ランスロットは意外そうに首を傾げ、言い直そうとして小さく息を吐いた。"
+                reaction: "ランちゃんは意外そうに首を傾げ、言い直そうとして小さく息を吐いた。"
             }
         ],
-        afterStory: "食堂のざわめきの中、ランスロットの視線だけは何度もヴェインへ戻ってきた。ヴェインは聞こえなかった音をノートに書き、向かいの席が空いていないことにひそかに安心した。",
+        afterStory: "食堂のざわめきの中、ランちゃんの視線だけは何度もヴェインへ戻ってきた。ヴェインは聞こえなかった音をノートに書き、向かいの席が空いていないことにひそかに安心した。",
         nextHook: "ノートには、これで三つの言葉が並んだ。まだ先は長い。"
     },
     {
@@ -179,19 +179,19 @@ const scenario = [
                 t: "訓練も飯も楽しみだな。……あれ、誰とやるかまでは聞き取れなかったぞ",
                 v: 25,
                 axis: "act",
-                reaction: "ランスロットは一瞬きょとんとし、そっと自分とヴェインを指さした。"
+                reaction: "ランちゃんは一瞬きょとんとし、そっと自分とヴェインを指さした。"
             },
             {
                 t: "まずは身体を戻さないとな。ランちゃんにも、復帰したら相手をしてほしいんだ",
                 v: 27,
                 axis: "self",
-                reaction: "ランスロットは嬉しそうに頷き、無理のない稽古から始めようと提案した。"
+                reaction: "ランちゃんは嬉しそうに頷き、無理のない稽古から始めようと提案した。"
             },
             {
                 t: "よーし、飯だけ先に行こうぜ！　訓練はランちゃん一人で頼んだ！",
                 v: 9,
                 axis: "listen",
-                reaction: "ランスロットは思わず笑ったが、どちらも二人でしたいのだと言い直した。"
+                reaction: "ランちゃんは思わず笑ったが、どちらも二人でしたいのだと言い直した。"
             }
         ],
         insightOpts: [
@@ -200,7 +200,7 @@ const scenario = [
                 t: "また一緒にいられるんだな。……訓練のあと、二人で飯を食うのも楽しみだ",
                 v: 30,
                 axis: "act",
-                reaction: "ランスロットは少し照れたように微笑んだ。隣に並ぶ日を思い浮かべているようだった。"
+                reaction: "ランちゃんは少し照れたように微笑んだ。隣に並ぶ日を思い浮かべているようだった。"
             }
         ],
         misreadOpts: [
@@ -214,10 +214,10 @@ const scenario = [
                     guesses: ["静か"]
                 },
                 misreadImpact: true,
-                reaction: "ランスロットは目を丸くし、場所の話ではないと穏やかに説明し始めた。"
+                reaction: "ランちゃんは目を丸くし、場所の話ではないと穏やかに説明し始めた。"
             }
         ],
-        afterStory: "甲板で風に吹かれながら、二人は復帰後の予定を話した。ヴェインは「二人で」と言いたくなったが、ランスロットの言葉にも同じ気持ちがあったのかは、まだ分からない。",
+        afterStory: "甲板で風に吹かれながら、二人は復帰後の予定を話した。ヴェインは「二人で」と言いたくなったが、ランちゃんの言葉にも同じ気持ちがあったのかは、まだ分からない。",
         nextHook: "翌朝、ヴェインは軽い訓練への復帰を許可された。"
     },
 
@@ -242,7 +242,7 @@ const scenario = [
                 axis: "daily",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは木剣を下ろし、ヴェインを見た。気遣いに答えようと、ゆっくり話し始めた。"
+                reaction: "ランちゃんは木剣を下ろし、ヴェインを見た。気遣いに答えようと、ゆっくり話し始めた。"
             },
             {
                 id: "s04_misread",
@@ -251,7 +251,7 @@ const scenario = [
                 axis: "act",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットの顔が強張った。一人で背負わせたくない気持ちを伝えようとして、また言葉に詰まった。"
+                reaction: "ランちゃんの顔が強張った。一人で背負わせたくない気持ちを伝えようとして、また言葉に詰まった。"
             },
             {
                 id: "s04_understood",
@@ -260,7 +260,7 @@ const scenario = [
                 axis: "self",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットはしばらくヴェインの顔を見つめ、ようやく頷いた。二人で稽古の強さを決めた。"
+                reaction: "ランちゃんはしばらくヴェインの顔を見つめ、ようやく頷いた。二人で稽古の強さを決めた。"
             }
         ],
         insightOpts: [
@@ -271,7 +271,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは安堵の息を吐いた。木剣を握る手から、少し力が抜けた。"
+                reaction: "ランちゃんは安堵の息を吐いた。木剣を握る手から、少し力が抜けた。"
             },
             {
                 id: "s04_insight_twin",
@@ -280,7 +280,7 @@ const scenario = [
                 axis: "act",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットは頷き、ヴェインと木剣を合わせて開始の合図にした。"
+                reaction: "ランちゃんは頷き、ヴェインと木剣を合わせて開始の合図にした。"
             },
             {
                 id: "s04_insight_glass",
@@ -289,7 +289,7 @@ const scenario = [
                 axis: "self",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは視線を落としてから笑い、ヴェインの言葉を受け入れた。"
+                reaction: "ランちゃんは視線を落としてから笑い、ヴェインの言葉を受け入れた。"
             }
         ],
         misreadOpts: [
@@ -305,7 +305,7 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットははっとした顔になり、誤解を解こうと言葉を探した。"
+                reaction: "ランちゃんははっとした顔になり、誤解を解こうと言葉を探した。"
             },
             {
                 id: "s04_guess_w12",
@@ -319,11 +319,11 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは慌てて首を振ったが、否定の言葉も同じ音に欠けてしまった。"
+                reaction: "ランちゃんは慌てて首を振ったが、否定の言葉も同じ音に欠けてしまった。"
             }
         ],
-        afterStory: "木剣が触れるたび、ランスロットの視線がヴェインの足元へ動いた。ヴェインは嬉しいような、少しもどかしいような気持ちで、その気遣いの理由をノートへ書いた。",
-        nextHook: "訓練を終えたあと、ランスロットは武器庫であの日の出来事を口にした。"
+        afterStory: "木剣が触れるたび、ランちゃんの視線がヴェインの足元へ動いた。ヴェインは嬉しいような、少しもどかしいような気持ちで、その気遣いの理由をノートへ書いた。",
+        nextHook: "訓練を終えたあと、ランちゃんは武器庫であの日の出来事を口にした。"
     },
     {
         id: 5,
@@ -340,19 +340,19 @@ const scenario = [
                 t: "ランちゃん、また自分を責めてるだろ。……俺はここにいる。顔を上げてくれよ",
                 v: 28,
                 axis: "self",
-                reaction: "ランスロットは剣を磨く手を止めた。ヴェインの顔を見るまでに、少し時間がかかった。"
+                reaction: "ランちゃんは剣を磨く手を止めた。ヴェインの顔を見るまでに、少し時間がかかった。"
             },
             {
                 t: "次に同じことがあったら、今度は二人で動こう。俺だってランちゃんを守りたい",
                 v: 26,
                 axis: "act",
-                reaction: "ランスロットは驚いたように目を上げ、やがて小さく頷いた。"
+                reaction: "ランちゃんは驚いたように目を上げ、やがて小さく頷いた。"
             },
             {
                 t: "なあ、その剣の手入れって俺も手伝える？　新しい砥石もあるぜ",
                 v: 9,
                 axis: "listen",
-                reaction: "ランスロットは曖昧に笑い、置きかけた剣をもう一度手に取った。"
+                reaction: "ランちゃんは曖昧に笑い、置きかけた剣をもう一度手に取った。"
             }
         ],
         insightOpts: [
@@ -361,7 +361,7 @@ const scenario = [
                 t: "大切だから守りたかったんだよな。俺もランちゃんを大切にしたい。……一人で責めないで",
                 v: 30,
                 axis: "self",
-                reaction: "ランスロットは剣を机に置き、言葉を失ったようにヴェインを見つめた。"
+                reaction: "ランちゃんは剣を机に置き、言葉を失ったようにヴェインを見つめた。"
             }
         ],
         misreadOpts: [
@@ -375,10 +375,10 @@ const scenario = [
                     guesses: ["弱点", "足手まとい"]
                 },
                 misreadImpact: true,
-                reaction: "ランスロットは強く首を横に振り、思わずヴェインの手首を掴んだ。"
+                reaction: "ランちゃんは強く首を横に振り、思わずヴェインの手首を掴んだ。"
             }
         ],
-        afterStory: "剣の手入れが終わっても、ランスロットは布を畳み続けた。ヴェインは隣に座ったまま、もう一度その声を聞きたいと思った。今日の言葉は、忘れないようノートに書いた。",
+        afterStory: "剣の手入れが終わっても、ランちゃんは布を畳み続けた。ヴェインは隣に座ったまま、もう一度その声を聞きたいと思った。今日の言葉は、忘れないようノートに書いた。",
         nextHook: "昼には、いつもの仲間たちが二人を待っていた。"
     },
     {
@@ -395,19 +395,19 @@ const scenario = [
                 t: "昔から変わらないってのは、俺もそう思う。……あの頃も今も、ランちゃんの隣が落ち着くよ",
                 v: 27,
                 axis: "act",
-                reaction: "ランスロットはふっと笑い、幼い頃の話をひとつ持ち出した。"
+                reaction: "ランちゃんはふっと笑い、幼い頃の話をひとつ持ち出した。"
             },
             {
                 t: "肝心な呼び方だけ分からなかった。……もう一回言って？　忘れたくないんだ",
                 v: 25,
                 axis: "self",
-                reaction: "ランスロットは少し頬を赤らめ、同じ言葉を丁寧に繰り返した。"
+                reaction: "ランちゃんは少し頬を赤らめ、同じ言葉を丁寧に繰り返した。"
             },
             {
                 t: "そうだ！　今度こそ子どもの頃の勝負、決着つけようぜ！",
                 v: 10,
                 axis: "listen",
-                reaction: "ランスロットは懐かしそうに微笑んだが、今の言葉に込めた気持ちは届かなかったらしい。"
+                reaction: "ランちゃんは懐かしそうに微笑んだが、今の言葉に込めた気持ちは届かなかったらしい。"
             }
         ],
         insightOpts: [
@@ -416,7 +416,7 @@ const scenario = [
                 t: "親友、か。……嬉しいよ。けど俺、ランちゃんのことはそれだけじゃ言い足りない気もする",
                 v: 30,
                 axis: "listen",
-                reaction: "ランスロットの笑みが一瞬止まり、やがて照れたように視線を逸らした。"
+                reaction: "ランちゃんの笑みが一瞬止まり、やがて照れたように視線を逸らした。"
             }
         ],
         misreadOpts: [
@@ -430,10 +430,10 @@ const scenario = [
                     guesses: ["ライバル", "競争相手"]
                 },
                 misreadImpact: true,
-                reaction: "ランスロットは吹き出しかけ、それでもどこか言い足りなそうに笑った。"
+                reaction: "ランちゃんは吹き出しかけ、それでもどこか言い足りなそうに笑った。"
             }
         ],
-        afterStory: "仲間が昔の失敗談を持ち出し、二人で笑った。ランスロットが笑うと、胸の奥が妙にあたたかい。ヴェインはその理由を知らないふりをしてノートを閉じた。",
+        afterStory: "仲間が昔の失敗談を持ち出し、二人で笑った。ランちゃんが笑うと、胸の奥が妙にあたたかい。ヴェインはその理由を知らないふりをしてノートを閉じた。",
         nextHook: "翌日、二人は物資の買い出しを任される。"
     },
     {
@@ -451,19 +451,19 @@ const scenario = [
                 t: "また来たいな。……次は荷物なしで、ランちゃんとゆっくり見て歩きたい",
                 v: 27,
                 axis: "act",
-                reaction: "ランスロットははにかんで、ヴェインの荷物をひとつ持った。"
+                reaction: "ランちゃんははにかんで、ヴェインの荷物をひとつ持った。"
             },
             {
                 t: "次の休み、俺の予定もあるんだけどさ。ランちゃんと行ける日を探してもいい？",
                 v: 26,
                 axis: "self",
-                reaction: "ランスロットは嬉しそうに頷き、手帳を開く仕草をした。"
+                reaction: "ランちゃんは嬉しそうに頷き、手帳を開く仕草をした。"
             },
             {
                 t: "そういえばあの店のプリン、まだ売ってるかな。今すぐ戻っていい？",
                 v: 9,
                 axis: "listen",
-                reaction: "ランスロットは笑ったが、約束の返事を待つように足を止めていた。"
+                reaction: "ランちゃんは笑ったが、約束の返事を待つように足を止めていた。"
             }
         ],
         insightOpts: [
@@ -472,7 +472,7 @@ const scenario = [
                 t: "一緒に来る約束だな。もちろん。……次は俺から誘ってもいいか？",
                 v: 30,
                 axis: "act",
-                reaction: "ランスロットは一瞬驚き、それから街のざわめきに紛れるほど小さく「ぜひ」と答えた。"
+                reaction: "ランちゃんは一瞬驚き、それから街のざわめきに紛れるほど小さく「ぜひ」と答えた。"
             }
         ],
         misreadOpts: [
@@ -486,10 +486,10 @@ const scenario = [
                     guesses: ["確認する", "確認"]
                 },
                 misreadImpact: true,
-                reaction: "ランスロットは戸惑って瞬きした。予定より先に聞きたかった言葉があるらしい。"
+                reaction: "ランちゃんは戸惑って瞬きした。予定より先に聞きたかった言葉があるらしい。"
             }
         ],
-        afterStory: "店先の明かりの下で、二人の肩が何度か触れた。ランスロットが荷物を持ち替えると、ヴェインは空いた手をつい見てしまう。何でもない帰り道を、もう少しだけ長く歩きたかった。",
+        afterStory: "店先の明かりの下で、二人の肩が何度か触れた。ランちゃんが荷物を持ち替えると、ヴェインは空いた手をつい見てしまう。何でもない帰り道を、もう少しだけ長く歩きたかった。",
         nextHook: "その夜、ヴェインは厨房で夜食を作ることにした。"
     },
     {
@@ -507,19 +507,19 @@ const scenario = [
                 t: "ランちゃんが食べてくれるなら、何皿でも作るぜ。……おかわり、いる？",
                 v: 25,
                 axis: "act",
-                reaction: "ランスロットは柔らかく笑い、少しだけ皿を差し出した。"
+                reaction: "ランちゃんは柔らかく笑い、少しだけ皿を差し出した。"
             },
             {
                 t: "……その先、言いにくそうだな。飯が冷めてもいいから、ちゃんと聞かせてよ",
                 v: 28,
                 axis: "self",
-                reaction: "ランスロットはスプーンを置いた。ヴェインと目を合わせ、ゆっくり言葉を探した。"
+                reaction: "ランちゃんはスプーンを置いた。ヴェインと目を合わせ、ゆっくり言葉を探した。"
             },
             {
                 t: "あっ、プリンは一人一個だからな！　そこは譲らないぞ！",
                 v: 9,
                 axis: "listen",
-                reaction: "ランスロットは一度目を丸くし、くすっと笑ったあと、まだ話したそうに視線を残した。"
+                reaction: "ランちゃんは一度目を丸くし、くすっと笑ったあと、まだ話したそうに視線を残した。"
             }
         ],
         insightOpts: [
@@ -528,7 +528,7 @@ const scenario = [
                 t: "ありがとな、って。……それから俺を頼りたいって言ってくれたのか？　嬉しいよ",
                 v: 30,
                 axis: "act",
-                reaction: "ランスロットは驚いたように顔を上げ、頬を赤らめて小さく頷いた。"
+                reaction: "ランちゃんは驚いたように顔を上げ、頬を赤らめて小さく頷いた。"
             }
         ],
         misreadOpts: [
@@ -542,10 +542,10 @@ const scenario = [
                     guesses: ["褒める"]
                 },
                 misreadImpact: true,
-                reaction: "ランスロットは照れたように笑ったが、伝えたかったことは料理の腕前だけではないらしい。"
+                reaction: "ランちゃんは照れたように笑ったが、伝えたかったことは料理の腕前だけではないらしい。"
             }
         ],
-        afterStory: "ランスロットが言葉を選ぶたび、ヴェインも次の声を待った。皿を片づけながら、二人の手が触れそうになって思わず引っ込める。気づかれただろうか。",
+        afterStory: "ランちゃんが言葉を選ぶたび、ヴェインも次の声を待った。皿を片づけながら、二人の手が触れそうになって思わず引っ込める。気づかれただろうか。",
         nextHook: "数日後、二人は短い巡回任務へ復帰する。"
     },
     {
@@ -566,7 +566,7 @@ const scenario = [
                 axis: "act",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットの指が包帯の上で止まった。ゆっくり頷いてから、傷を痛めないよう手を添えた。"
+                reaction: "ランちゃんの指が包帯の上で止まった。ゆっくり頷いてから、傷を痛めないよう手を添えた。"
             },
             {
                 id: "s09_misread",
@@ -575,7 +575,7 @@ const scenario = [
                 axis: "self",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは反論しかけたが、ヴェインの目を見て言葉を飲み込んだ。"
+                reaction: "ランちゃんは反論しかけたが、ヴェインの目を見て言葉を飲み込んだ。"
             },
             {
                 id: "s09_understood",
@@ -584,7 +584,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは笑おうとしたが、上手くいかなかった。包帯を巻く指が少し震えていた。"
+                reaction: "ランちゃんは笑おうとしたが、上手くいかなかった。包帯を巻く指が少し震えていた。"
             }
         ],
         insightOpts: [
@@ -595,7 +595,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは息を呑んだ。ヴェインの手を握りかけて、そっと包帯に触れ直した。"
+                reaction: "ランちゃんは息を呑んだ。ヴェインの手を握りかけて、そっと包帯に触れ直した。"
             },
             {
                 id: "s09_insight_twin",
@@ -604,7 +604,7 @@ const scenario = [
                 axis: "act",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットはようやく肩の力を抜き、ヴェインの手を一瞬だけ握った。"
+                reaction: "ランちゃんはようやく肩の力を抜き、ヴェインの手を一瞬だけ握った。"
             },
             {
                 id: "s09_insight_glass",
@@ -613,7 +613,7 @@ const scenario = [
                 axis: "self",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは黙って頷いた。ヴェインの手を放すまでに、少し時間がかかった。"
+                reaction: "ランちゃんは黙って頷いた。ヴェインの手を放すまでに、少し時間がかかった。"
             }
         ],
         misreadOpts: [
@@ -629,7 +629,7 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは言葉を探し、悲しそうに視線を落とした。"
+                reaction: "ランちゃんは言葉を探し、悲しそうに視線を落とした。"
             },
             {
                 id: "s09_guess_w5",
@@ -643,11 +643,11 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットは驚いて手を止め、今度こそ強く首を横に振った。"
+                reaction: "ランちゃんは驚いて手を止め、今度こそ強く首を横に振った。"
             }
         ],
-        afterStory: "包帯を巻き終わっても、ランスロットはしばらく手を離さなかった。帰り道、少し離れるたびに互いを振り返る。傷よりも、言えなかったことの方が痛かった。",
-        nextHook: "その夜から、ランスロットの言葉数が少しずつ減り始めた。"
+        afterStory: "包帯を巻き終わっても、ランちゃんはしばらく手を離さなかった。帰り道、少し離れるたびに互いを振り返る。傷よりも、言えなかったことの方が痛かった。",
+        nextHook: "その夜から、ランちゃんの言葉数が少しずつ減り始めた。"
     },
 
     // =========================================================
@@ -669,19 +669,19 @@ const scenario = [
                 t: "さっきのことって、何の話？　……ランちゃんがそんな顔する理由を、もう少し聞きたい",
                 v: 27,
                 axis: "listen",
-                reaction: "ランスロットは顔を上げたが、答えを探すうちに再び資料へ目を落とした。"
+                reaction: "ランちゃんは顔を上げたが、答えを探すうちに再び資料へ目を落とした。"
             },
             {
                 t: "俺のことなら、俺にも話してくれよ。ランちゃんが一人で決めてしまうのは寂しい",
                 v: 26,
                 axis: "self",
-                reaction: "ランスロットは資料を握り締め、ヴェインの方へ身体を向けた。"
+                reaction: "ランちゃんは資料を握り締め、ヴェインの方へ身体を向けた。"
             },
             {
                 t: "分かった、もう聞かない！　俺も仕事戻らなきゃだしな",
                 v: 8,
                 axis: "act",
-                reaction: "ランスロットは口を開きかけて止めた。引き止めたいのに、言葉が見つからないようだった。"
+                reaction: "ランちゃんは口を開きかけて止めた。引き止めたいのに、言葉が見つからないようだった。"
             }
         ],
         insightOpts: [
@@ -690,7 +690,7 @@ const scenario = [
                 t: "信じてくれてるのに忘れろって、難しいよ。……ランちゃんが本当は何を言いたいのか聞きたい",
                 v: 30,
                 axis: "listen",
-                reaction: "ランスロットは苦しそうに笑い、閉じた資料へ手を置いた。"
+                reaction: "ランちゃんは苦しそうに笑い、閉じた資料へ手を置いた。"
             }
         ],
         misreadOpts: [
@@ -704,10 +704,10 @@ const scenario = [
                     guesses: ["許す", "許してほしい"]
                 },
                 misreadImpact: true,
-                reaction: "ランスロットは戸惑い、何かを否定するように首を振った。"
+                reaction: "ランちゃんは戸惑い、何かを否定するように首を振った。"
             }
         ],
-        afterStory: "ランスロットが資料を閉じる音だけが響いた。ヴェインはその手に触れたいと思ったが、伸ばしかけた指を止めた。言葉を待つことが、こんなに難しいなんて。",
+        afterStory: "ランちゃんが資料を閉じる音だけが響いた。ヴェインはその手に触れたいと思ったが、伸ばしかけた指を止めた。言葉を待つことが、こんなに難しいなんて。",
         nextHook: "翌朝、その違和感は確信に変わる。"
     },
     {
@@ -726,19 +726,19 @@ const scenario = [
                 t: "……声、震えてる。無理して言わなくてもいい。でも俺、ここからいなくならないよ",
                 v: 28,
                 axis: "act",
-                reaction: "ランスロットは木剣を下ろした。しばらく息を整えてから、ヴェインを見た。"
+                reaction: "ランちゃんは木剣を下ろした。しばらく息を整えてから、ヴェインを見た。"
             },
             {
                 t: "避けられるのは、俺だって寂しいんだ。せめてランちゃんの顔を見て話したい",
                 v: 27,
                 axis: "self",
-                reaction: "ランスロットは目を伏せ、やがて一歩だけヴェインに近づいた。"
+                reaction: "ランちゃんは目を伏せ、やがて一歩だけヴェインに近づいた。"
             },
             {
                 t: "よし、気分転換に一本勝負！　勝った方が昼飯奢りな！",
                 v: 8,
                 axis: "listen",
-                reaction: "ランスロットは木剣を置いたまま、申し訳なさそうに首を横に振った。"
+                reaction: "ランちゃんは木剣を置いたまま、申し訳なさそうに首を横に振った。"
             }
         ],
         insightOpts: [
@@ -747,7 +747,7 @@ const scenario = [
                 t: "親友だから守りたいのに、話すのが怖いのか。……怖くても俺はランちゃんの声が聞きたい",
                 v: 30,
                 axis: "listen",
-                reaction: "ランスロットは目を見開き、しばらくして、ゆっくり頷いた。"
+                reaction: "ランちゃんは目を見開き、しばらくして、ゆっくり頷いた。"
             }
         ],
         misreadOpts: [
@@ -761,10 +761,10 @@ const scenario = [
                     guesses: ["嫌だ"]
                 },
                 misreadImpact: true,
-                reaction: "ランスロットははっとして顔を上げ、必死に首を横に振った。"
+                reaction: "ランちゃんははっとして顔を上げ、必死に首を横に振った。"
             }
         ],
-        afterStory: "稽古を終えても、ランスロットはなかなか木剣を棚へ戻さなかった。ヴェインが近づくと少し身を引き、次の瞬間には離れたことを後悔したような顔になる。",
+        afterStory: "稽古を終えても、ランちゃんはなかなか木剣を棚へ戻さなかった。ヴェインが近づくと少し身を引き、次の瞬間には離れたことを後悔したような顔になる。",
         nextHook: "そんな中、ヴェインに新しい任務が入る。"
     },
     {
@@ -796,7 +796,7 @@ const scenario = [
                 axis: "self",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットは荷物の留め具から手を離し、ヴェインの肩にそっと触れた。"
+                reaction: "ランちゃんは荷物の留め具から手を離し、ヴェインの肩にそっと触れた。"
             },
             {
                 id: "s12_misread",
@@ -805,7 +805,7 @@ const scenario = [
                 axis: "act",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは口を閉ざした。心配を責められたように感じたのか、目を伏せた。"
+                reaction: "ランちゃんは口を閉ざした。心配を責められたように感じたのか、目を伏せた。"
             },
             {
                 id: "s12_understood",
@@ -814,7 +814,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットはヴェインを見つめ、何かを言いかけてから静かに頷いた。"
+                reaction: "ランちゃんはヴェインを見つめ、何かを言いかけてから静かに頷いた。"
             }
         ],
         insightOpts: [
@@ -825,7 +825,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは強く頷き、ヴェインの肩へ添えた手に力を込めた。"
+                reaction: "ランちゃんは強く頷き、ヴェインの肩へ添えた手に力を込めた。"
             },
             {
                 id: "s12_insight_twin",
@@ -834,7 +834,7 @@ const scenario = [
                 axis: "act",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットは照れたように微笑み、ヴェインの手を短く握った。"
+                reaction: "ランちゃんは照れたように微笑み、ヴェインの手を短く握った。"
             },
             {
                 id: "s12_insight_glass",
@@ -843,7 +843,7 @@ const scenario = [
                 axis: "self",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは長く息を吐き、ヴェインの判断を受け入れた。"
+                reaction: "ランちゃんは長く息を吐き、ヴェインの判断を受け入れた。"
             }
         ],
         misreadOpts: [
@@ -859,7 +859,7 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは驚いたあと、待つ時間の話ではないと伝えようとした。"
+                reaction: "ランちゃんは驚いたあと、待つ時間の話ではないと伝えようとした。"
             },
             {
                 id: "s12_guess_w14",
@@ -873,10 +873,10 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットは頷きかけて止まった。求めていた返事は別にあったらしい。"
+                reaction: "ランちゃんは頷きかけて止まった。求めていた返事は別にあったらしい。"
             }
         ],
-        afterStory: "荷物の金具を確かめるランスロットの手は、何度も同じ場所へ戻った。出発の鐘が鳴っても、ヴェインはすぐに背を向けられない。やっと手を振ると、ランスロットも小さく振り返した。",
+        afterStory: "荷物の金具を確かめるランちゃんの手は、何度も同じ場所へ戻った。出発の鐘が鳴っても、ヴェインはすぐに背を向けられない。やっと手を振ると、ランちゃんも小さく振り返した。",
         nextHook: "任務先で、その嫌な予感は現実になりかける。"
     },
     {
@@ -908,7 +908,7 @@ const scenario = [
                 axis: "act",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットは顔を強張らせた。何も解決しないと伝えたいのに、うまく言葉にならない。"
+                reaction: "ランちゃんは顔を強張らせた。何も解決しないと伝えたいのに、うまく言葉にならない。"
             },
             {
                 id: "s13_misread",
@@ -917,7 +917,7 @@ const scenario = [
                 axis: "bond",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは視線を上げた。炎の向こうで、ようやくヴェインの言葉を受け止めた。"
+                reaction: "ランちゃんは視線を上げた。炎の向こうで、ようやくヴェインの言葉を受け止めた。"
             },
             {
                 id: "s13_understood",
@@ -926,7 +926,7 @@ const scenario = [
                 axis: "self",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは焚き火に目を落とし、途切れがちな声で説明を始めた。"
+                reaction: "ランちゃんは焚き火に目を落とし、途切れがちな声で説明を始めた。"
             }
         ],
         insightOpts: [
@@ -937,7 +937,7 @@ const scenario = [
                 axis: "act",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットは身を乗り出し、ヴェインの顔をじっと見た。"
+                reaction: "ランちゃんは身を乗り出し、ヴェインの顔をじっと見た。"
             },
             {
                 id: "s13_insight_glass",
@@ -946,7 +946,7 @@ const scenario = [
                 axis: "self",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは目を閉じてから頷き、そっとヴェインの手に触れた。"
+                reaction: "ランちゃんは目を閉じてから頷き、そっとヴェインの手に触れた。"
             },
             {
                 id: "s13_insight_resonance",
@@ -955,7 +955,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは息を吐き、言いかけたことをひとつずつ口にした。"
+                reaction: "ランちゃんは息を吐き、言いかけたことをひとつずつ口にした。"
             }
         ],
         misreadOpts: [
@@ -971,7 +971,7 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは面食らって首を横に振った。今は叱りたいわけではないらしい。"
+                reaction: "ランちゃんは面食らって首を横に振った。今は叱りたいわけではないらしい。"
             },
             {
                 id: "s13_guess_w8",
@@ -985,11 +985,11 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットは火を見つめたまま、静かに頷いた。"
+                reaction: "ランちゃんは火を見つめたまま、静かに頷いた。"
             }
         ],
-        afterStory: "焚き火の向こうでは、互いの手が届かない。ヴェインは少し迷ってから回り込み、ランスロットの隣へ腰を下ろした。それだけで、長く張りつめていた肩が少し下がった。",
-        nextHook: "帰還後、ランスロットは以前よりさらにヴェインとの会話を避けるようになる。"
+        afterStory: "焚き火の向こうでは、互いの手が届かない。ヴェインは少し迷ってから回り込み、ランちゃんの隣へ腰を下ろした。それだけで、長く張りつめていた肩が少し下がった。",
+        nextHook: "帰還後、ランちゃんは以前よりさらにヴェインとの会話を避けるようになる。"
     },
     {
         id: 14,
@@ -1022,7 +1022,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは扉の前で足を止め、振り返った。うまく説明できない自分を責めるような顔だった。"
+                reaction: "ランちゃんは扉の前で足を止め、振り返った。うまく説明できない自分を責めるような顔だった。"
             },
             {
                 id: "s14_misread",
@@ -1031,7 +1031,7 @@ const scenario = [
                 axis: "self",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは静かに目を伏せた。立ち去りかけて、結局そこから動けなかった。"
+                reaction: "ランちゃんは静かに目を伏せた。立ち去りかけて、結局そこから動けなかった。"
             },
             {
                 id: "s14_understood",
@@ -1040,7 +1040,7 @@ const scenario = [
                 axis: "bond",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットは扉から手を離した。ヴェインの声に縋るように、ゆっくり振り向いた。"
+                reaction: "ランちゃんは扉から手を離した。ヴェインの声に縋るように、ゆっくり振り向いた。"
             }
         ],
         insightOpts: [
@@ -1051,7 +1051,7 @@ const scenario = [
                 axis: "self",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは息を呑み、ヴェインへ向き直った。"
+                reaction: "ランちゃんは息を呑み、ヴェインへ向き直った。"
             },
             {
                 id: "s14_insight_twin",
@@ -1060,7 +1060,7 @@ const scenario = [
                 axis: "act",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットは頷きかけ、こらえきれないように目を伏せた。"
+                reaction: "ランちゃんは頷きかけ、こらえきれないように目を伏せた。"
             },
             {
                 id: "s14_insight_resonance",
@@ -1069,7 +1069,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは目を見開き、震える息を整えてからもう一度口を開いた。"
+                reaction: "ランちゃんは目を見開き、震える息を整えてからもう一度口を開いた。"
             }
         ],
         misreadOpts: [
@@ -1085,7 +1085,7 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは痛そうに顔を歪めた。伝えたいことが違うらしい。"
+                reaction: "ランちゃんは痛そうに顔を歪めた。伝えたいことが違うらしい。"
             },
             {
                 id: "s14_guess_w11",
@@ -1099,11 +1099,11 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは驚き、必死にヴェインへ手を伸ばした。"
+                reaction: "ランちゃんは驚き、必死にヴェインへ手を伸ばした。"
             }
         ],
-        afterStory: "廊下に足音がひとつ響いて、止まった。ヴェインはランスロットの背中を見つめる。その言葉の向こうに、ずっと知りたかった答えがある気がしてならなかった。",
-        nextHook: "翌朝。今度はヴェインの方から、ランスロットを探しに行く。"
+        afterStory: "廊下に足音がひとつ響いて、止まった。ヴェインはランちゃんの背中を見つめる。その言葉の向こうに、ずっと知りたかった答えがある気がしてならなかった。",
+        nextHook: "翌朝。今度はヴェインの方から、ランちゃんを探しに行く。"
     },
 
     // =========================================================
@@ -1141,7 +1141,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットは強張った顔で首を振った。任せきりにしたいわけではないようだった。"
+                reaction: "ランちゃんは強張った顔で首を振った。任せきりにしたいわけではないようだった。"
             },
             {
                 id: "s15_misread",
@@ -1150,7 +1150,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは手すりから手を離し、ヴェインの目を見て頷いた。"
+                reaction: "ランちゃんは手すりから手を離し、ヴェインの目を見て頷いた。"
             },
             {
                 id: "s15_understood",
@@ -1159,7 +1159,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは小さく息を吐き、ようやくヴェインをまっすぐ見た。"
+                reaction: "ランちゃんは小さく息を吐き、ようやくヴェインをまっすぐ見た。"
             }
         ],
         insightOpts: [
@@ -1170,7 +1170,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットの表情が崩れ、何度も頷いた。"
+                reaction: "ランちゃんの表情が崩れ、何度も頷いた。"
             },
             {
                 id: "s15_insight_twin",
@@ -1179,7 +1179,7 @@ const scenario = [
                 axis: "act",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットはヴェインの隣に並び、静かに頷いた。"
+                reaction: "ランちゃんはヴェインの隣に並び、静かに頷いた。"
             },
             {
                 id: "s15_insight_glass",
@@ -1188,7 +1188,7 @@ const scenario = [
                 axis: "self",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは反論せず、ヴェインの返事を待った。"
+                reaction: "ランちゃんは反論せず、ヴェインの返事を待った。"
             }
         ],
         misreadOpts: [
@@ -1204,7 +1204,7 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは驚いて首を振った。時間の話だけではないらしい。"
+                reaction: "ランちゃんは驚いて首を振った。時間の話だけではないらしい。"
             },
             {
                 id: "s15_guess_w5",
@@ -1218,10 +1218,10 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは苦しそうに眉を寄せ、違うと首を振った。"
+                reaction: "ランちゃんは苦しそうに眉を寄せ、違うと首を振った。"
             }
         ],
-        afterStory: "甲板の風は冷たいのに、隣に立つランスロットの体温だけ妙にはっきり意識してしまう。ヴェインはノートを閉じた。今度は文字だけでなく、その顔を見ていたかった。",
+        afterStory: "甲板の風は冷たいのに、隣に立つランちゃんの体温だけ妙にはっきり意識してしまう。ヴェインはノートを閉じた。今度は文字だけでなく、その顔を見ていたかった。",
         nextHook: "今度は途中で口を閉ざさず、胸の内を最後まで話そうとしている。"
     },
     {
@@ -1259,7 +1259,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットはゆっくり頷いた。逃げずに理由を話そうとする、その声はまだ少し震えていた。"
+                reaction: "ランちゃんはゆっくり頷いた。逃げずに理由を話そうとする、その声はまだ少し震えていた。"
             },
             {
                 id: "s16_misread",
@@ -1268,7 +1268,7 @@ const scenario = [
                 axis: "self",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットはヴェインを見つめ、握り締めた手をゆっくり開いた。"
+                reaction: "ランちゃんはヴェインを見つめ、握り締めた手をゆっくり開いた。"
             },
             {
                 id: "s16_understood",
@@ -1277,7 +1277,7 @@ const scenario = [
                 axis: "bond",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは傷ついた顔で首を振った。伝わらなかった言葉の向こうで、もう一度すれ違いそうになった。"
+                reaction: "ランちゃんは傷ついた顔で首を振った。伝わらなかった言葉の向こうで、もう一度すれ違いそうになった。"
             }
         ],
         insightOpts: [
@@ -1288,7 +1288,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは息を呑み、何度もヴェインの顔を確かめた。"
+                reaction: "ランちゃんは息を呑み、何度もヴェインの顔を確かめた。"
             },
             {
                 id: "s16_insight_twin",
@@ -1297,7 +1297,7 @@ const scenario = [
                 axis: "act",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットはそっとヴェインの隣へ寄った。"
+                reaction: "ランちゃんはそっとヴェインの隣へ寄った。"
             },
             {
                 id: "s16_insight_glass",
@@ -1306,7 +1306,7 @@ const scenario = [
                 axis: "self",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットはまっすぐヴェインを見つめ、静かに頷いた。"
+                reaction: "ランちゃんはまっすぐヴェインを見つめ、静かに頷いた。"
             }
         ],
         misreadOpts: [
@@ -1322,7 +1322,7 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは口を結び、否定しきれないように目を伏せた。"
+                reaction: "ランちゃんは口を結び、否定しきれないように目を伏せた。"
             },
             {
                 id: "s16_guess_w9",
@@ -1336,10 +1336,10 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは必死に首を振り、ヴェインの方へ手を伸ばした。"
+                reaction: "ランちゃんは必死に首を振り、ヴェインの方へ手を伸ばした。"
             }
         ],
-        afterStory: "何度も聞いた音が重なり、ヴェインの胸の中まで騒がしくする。それでも以前と違うのは、ランスロットが逃げずに目を合わせてくれることだった。",
+        afterStory: "何度も聞いた音が重なり、ヴェインの胸の中まで騒がしくする。それでも以前と違うのは、ランちゃんが逃げずに目を合わせてくれることだった。",
         nextHook: "まだ輪郭の掴めない音は残っている。それでも、もう会話は止まらない。"
     },
     {
@@ -1377,7 +1377,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットは椅子を近づけ、言葉を区切りながらもう一度話し始めた。"
+                reaction: "ランちゃんは椅子を近づけ、言葉を区切りながらもう一度話し始めた。"
             },
             {
                 id: "s17_misread",
@@ -1386,7 +1386,7 @@ const scenario = [
                 axis: "self",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは姿勢を正し、ヴェインの目を見つめた。"
+                reaction: "ランちゃんは姿勢を正し、ヴェインの目を見つめた。"
             },
             {
                 id: "s17_understood",
@@ -1395,7 +1395,7 @@ const scenario = [
                 axis: "act",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは手を伸ばしかけて止めた。今の言葉が届かない寂しさが表情に滲んだ。"
+                reaction: "ランちゃんは手を伸ばしかけて止めた。今の言葉が届かない寂しさが表情に滲んだ。"
             }
         ],
         insightOpts: [
@@ -1406,7 +1406,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは息を止めた。しばらくして、泣きそうに笑った。"
+                reaction: "ランちゃんは息を止めた。しばらくして、泣きそうに笑った。"
             },
             {
                 id: "s17_insight_twin",
@@ -1415,7 +1415,7 @@ const scenario = [
                 axis: "act",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットはヴェインの肩に触れ、離れる前にもう一度握った。"
+                reaction: "ランちゃんはヴェインの肩に触れ、離れる前にもう一度握った。"
             },
             {
                 id: "s17_insight_glass",
@@ -1424,7 +1424,7 @@ const scenario = [
                 axis: "self",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは頬を赤くし、ヴェインの言葉を待った。"
+                reaction: "ランちゃんは頬を赤くし、ヴェインの言葉を待った。"
             }
         ],
         misreadOpts: [
@@ -1440,7 +1440,7 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは驚いて首を振った。真意を伝え直す方法を探していた。"
+                reaction: "ランちゃんは驚いて首を振った。真意を伝え直す方法を探していた。"
             },
             {
                 id: "s17_guess_w11",
@@ -1454,10 +1454,10 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットは照れたように微笑んだが、肝心な言葉だけが届かないもどかしさを隠せなかった。"
+                reaction: "ランちゃんは照れたように微笑んだが、肝心な言葉だけが届かないもどかしさを隠せなかった。"
             }
         ],
-        afterStory: "ランスロットの声が途中で途切れるたび、ヴェインは逃げずに待った。向かいの椅子との距離は近い。けれど触れられない一歩が、まだ残っていた。",
+        afterStory: "ランちゃんの声が途中で途切れるたび、ヴェインは逃げずに待った。向かいの椅子との距離は近い。けれど触れられない一歩が、まだ残っていた。",
         nextHook: "二人は、呪いを受けた場所へ戻ることを決める。"
     },
     {
@@ -1492,19 +1492,19 @@ const scenario = [
                 t: "二人で帰るんだろ？　だったら、俺を置いて先に行くなよ",
                 v: 27,
                 axis: "act",
-                reaction: "ランスロットは笑い、歩幅を合わせてヴェインの隣に並んだ。"
+                reaction: "ランちゃんは笑い、歩幅を合わせてヴェインの隣に並んだ。"
             },
             {
                 t: "もしまた危なくなったら、俺の意見も聞いてくれよ。ランちゃんだけに無理はさせない",
                 v: 28,
                 axis: "self",
-                reaction: "ランスロットは頷き、差し出された手を一度だけ握った。"
+                reaction: "ランちゃんは頷き、差し出された手を一度だけ握った。"
             },
             {
                 t: "よし、俺が先に走って全部片づけてくる！　ランちゃんはここにいてな",
                 v: 9,
                 axis: "listen",
-                reaction: "ランスロットは慌てて呼び止めた。二人で帰るという言葉を、もう一度ゆっくり言った。"
+                reaction: "ランちゃんは慌てて呼び止めた。二人で帰るという言葉を、もう一度ゆっくり言った。"
             }
         ],
         insightOpts: [
@@ -1513,7 +1513,7 @@ const scenario = [
                 t: "ずっと一緒にいる約束だな。……うん。俺も、その約束をずっと守りたい",
                 v: 30,
                 axis: "act",
-                reaction: "ランスロットは照れくさそうに笑い、ヴェインの手を取った。"
+                reaction: "ランちゃんは照れくさそうに笑い、ヴェインの手を取った。"
             }
         ],
         misreadOpts: [
@@ -1527,10 +1527,10 @@ const scenario = [
                     guesses: ["今日", "今夜"]
                 },
                 misreadImpact: true,
-                reaction: "ランスロットは驚いてヴェインを見つめ、それから笑って頷いた。"
+                reaction: "ランちゃんは驚いてヴェインを見つめ、それから笑って頷いた。"
             }
         ],
-        afterStory: "狭い道では自然と肩が触れた。以前なら笑って済ませていた距離が、今は少し照れくさい。それでもヴェインは、ランスロットの隣から離れなかった。",
+        afterStory: "狭い道では自然と肩が触れた。以前なら笑って済ませていた距離が、今は少し照れくさい。それでもヴェインは、ランちゃんの隣から離れなかった。",
         nextHook: "夜が明ける頃、二人は呪いが始まった場所へ辿り着く。"
     },
     {
@@ -1580,7 +1580,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットは小さく頷き、ヴェインと向き合った。逃げずに待つことを選んだ顔だった。"
+                reaction: "ランちゃんは小さく頷き、ヴェインと向き合った。逃げずに待つことを選んだ顔だった。"
             },
             {
                 id: "s19_misread",
@@ -1589,7 +1589,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは息を呑んだ。やがてヴェインへ向き直り、その返事を待った。"
+                reaction: "ランちゃんは息を呑んだ。やがてヴェインへ向き直り、その返事を待った。"
             },
             {
                 id: "s19_understood",
@@ -1598,7 +1598,7 @@ const scenario = [
                 axis: "self",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは息を呑み、ゆっくり頷いた。もう一度、目をそらさずに言葉を紡いだ。"
+                reaction: "ランちゃんは息を呑み、ゆっくり頷いた。もう一度、目をそらさずに言葉を紡いだ。"
             }
         ],
         insightOpts: [
@@ -1609,7 +1609,7 @@ const scenario = [
                 axis: "listen",
                 endingImpact: true,
                 route: "resonance",
-                reaction: "ランスロットは息を止め、やがて泣きそうな顔でヴェインの手を握った。"
+                reaction: "ランちゃんは息を止め、やがて泣きそうな顔でヴェインの手を握った。"
             },
             {
                 id: "s19_insight_twin",
@@ -1618,7 +1618,7 @@ const scenario = [
                 axis: "act",
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットは一歩近づき、ヴェインと肩を並べた。"
+                reaction: "ランちゃんは一歩近づき、ヴェインと肩を並べた。"
             },
             {
                 id: "s19_insight_glass",
@@ -1627,7 +1627,7 @@ const scenario = [
                 axis: "self",
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットはヴェインの目を見つめ、何度も頷いた。"
+                reaction: "ランちゃんはヴェインの目を見つめ、何度も頷いた。"
             }
         ],
         misreadOpts: [
@@ -1643,7 +1643,7 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "twin",
-                reaction: "ランスロットは戸惑い、伝えたかった言葉を飲み込んだ。"
+                reaction: "ランちゃんは戸惑い、伝えたかった言葉を飲み込んだ。"
             },
             {
                 id: "s19_guess_w8",
@@ -1657,10 +1657,10 @@ const scenario = [
                 misreadImpact: true,
                 endingImpact: true,
                 route: "glass",
-                reaction: "ランスロットは一度目を伏せ、それから静かに頷いた。"
+                reaction: "ランちゃんは一度目を伏せ、それから静かに頷いた。"
             }
         ],
-        afterStory: "ランスロットは最後まで目を逸らさなかった。ヴェインも逃げなかった。ノートの頁に触れた指が震えている。恋心を言葉にするのは、呪いがなくてもこんなに難しかったのだ。",
+        afterStory: "ランちゃんは最後まで目を逸らさなかった。ヴェインも逃げなかった。ノートの頁に触れた指が震えている。恋心を言葉にするのは、呪いがなくてもこんなに難しかったのだ。",
         nextHook: "二人が選んできた向き合い方の先に、それぞれの未来が続いていく。"
     }
 ];
