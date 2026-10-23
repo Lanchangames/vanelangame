@@ -2,7 +2,7 @@
 const RECOLLECTION_STORAGE_KEY = "vane_recollection_v4";
 const RECOLLECTION_SCHEMA_VERSION = 8;
 
-let runMode = "story"; // "story" | "recollection"
+let runMode = "story"; 
 let recollectionBaseEndingId = null;
 
 const CONTINUATION_SCENE_INDICES = Object.freeze([0, 10, 19]);
