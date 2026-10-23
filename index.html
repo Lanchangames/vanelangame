@@ -799,13 +799,13 @@ function checkNotebookGuess(key){
     if(!guess){
         message="まだ推測を書いていない。";
     }else if(isAcceptedGuess(key,guess)){
-        message="正解。この推測で合っている。理解の演出は物語が進んだ時に起こる。";
+        message="この推測は正しいみたいだ。";
     }else if((wordBank[key].nearMisses||[]).some(value=>
         normalizeGuess(value)===normalizeGuess(guess)
     )){
-        message="惜しい！ 方向は近いけれど、少し意味が違うようだ。";
+        message="少し意味が違うようだ。";
     }else{
-        message="不正解。この言葉は別の意味のようだ。";
+        message="この言葉は別の意味のようだ。";
     }
     notebookChecks[key]={guess,message};
     renderActiveDictEntry();
