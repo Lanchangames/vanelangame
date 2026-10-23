@@ -1,20 +1,3 @@
-/*
-    声を聴かせて、ランスロット！ / recollection.js
-
-    2周目以降の「つづきから」は index.html の画面から利用する。
-    再開地点は SCENE 01 / 11 / 20 の3箇所だけ。
-
-    このファイルの役割:
-    ・旧セーブの安全な移行
-    ・各ENDの基準snapshotと直近周回snapshotの保存
-    ・返答時点のsceneChoiceRecordsの復元
-    ・理解状態と返答傾向を分離した通常END判定
-    ・END7の解放判定と専用入口
-
-    ストレージキーは変更しない。
-    以前の欠片・任意シーン解放データは削除せず保持するが、
-    新しい「つづきから」画面では使用しない。
-*/
 
 const RECOLLECTION_STORAGE_KEY = "vane_recollection_v4";
 const RECOLLECTION_SCHEMA_VERSION = 8;
@@ -22,13 +5,7 @@ const RECOLLECTION_SCHEMA_VERSION = 8;
 let runMode = "story"; // "story" | "recollection"
 let recollectionBaseEndingId = null;
 
-// END名は endings.js の ENDING_TITLES が唯一の定義。
-
 const CONTINUATION_SCENE_INDICES = Object.freeze([0, 10, 19]);
-
-// ---------------------------------------------------------
-// 選択肢とID
-// ---------------------------------------------------------
 
 function isValidNormalEndingId(value) {
     const id = Number(value);
@@ -67,10 +44,6 @@ function normalizeSavedAnswer(optionValue, sceneIndex) {
     return option ? option.id : null;
 }
 
-/*
-    過去の実際の返答記録だけを正規化する。
-    旧データに存在しない誤読イベントを、選択肢IDから補完しない。
-*/
 function normalizeSceneChoiceRecord(raw, sceneIndex, savedOptionId) {
     const scene = scenario[sceneIndex];
     if (!scene || !raw || typeof raw !== "object" || !savedOptionId) return null;
@@ -115,10 +88,6 @@ function normalizeSceneChoiceRecord(raw, sceneIndex, savedOptionId) {
         ...(rawNotebook ? { notebookGuesses } : {})
     };
 }
-
-// ---------------------------------------------------------
-// スナップショットの保存と正規化
-// ---------------------------------------------------------
 
 function normalizeEndingSnapshot(raw) {
     if (!raw || typeof raw !== "object") return null;
@@ -192,22 +161,17 @@ function getCurrentMasteredWordCount() {
     return masteredWords instanceof Set ? masteredWords.size : 0;
 }
 
-// ---------------------------------------------------------
-// 進行セーブと旧版からの移行
-// ---------------------------------------------------------
-
 function getDefaultRecollectionProgress() {
     return {
         version: RECOLLECTION_SCHEMA_VERSION,
         gameCleared: false,
-        // 旧欠片制度の互換フィールド。新UIでは不使用。
         voiceKeys: 0,
         recollectionUnlimited: false,
         unlockedBranches: [],
         collectedNormalEndings: [],
-        endingSnapshots: {}, // ENDごと、初到達時の基準記録
-        latestRunEndingId: null, // 直近にクリアしたEND
-        latestRunSnapshot: null, // 直近の周回を再開するための記録
+        endingSnapshots: {}, 
+        latestRunEndingId: null,
+        latestRunSnapshot: null, 
         finalRecollectionUnlocked: false
     };
 }
@@ -236,7 +200,6 @@ function normalizeRecollectionProgress(raw) {
         }
     }
 
-    // 旧任意シーン解放は利用しないが、獲得済みの値を消さない。
     const branches = new Set(
         (Array.isArray(src.unlockedBranches) ? src.unlockedBranches : [])
             .filter(value => typeof value === "string")
@@ -265,8 +228,6 @@ function normalizeRecollectionProgress(raw) {
     let latestRunEndingId = isValidNormalEndingId(src.latestRunEndingId)
         ? Number(src.latestRunEndingId) : null;
 
-    // v6/v7は直近保存欄を持たない。既存の基準snapshotから代替を選ぶ。
-    // その後のクリアで本当の直近周回が保存される。
     if (!latestRunSnapshot) {
         const candidates = Object.entries(endingSnapshots)
             .map(([endingId, snapshot]) => ({ endingId: Number(endingId), snapshot }))
@@ -361,11 +322,9 @@ function recordEndingProgress(endingId) {
     if (isFirstClear) recollectionProgress.voiceKeys += 3; // 旧データ互換のみ
     if (isNewEnding) recollectionProgress.collectedNormalEndings.push(id);
 
-    // ENDごとの基準記憶は上書きしない。
     if (!recollectionProgress.endingSnapshots[id]) {
         recollectionProgress.endingSnapshots[id] = snapshot;
     }
-    // 「つづきから」は毎回、本当に直近の周回を引き継ぐ。
     recollectionProgress.latestRunEndingId = id;
     recollectionProgress.latestRunSnapshot = snapshot;
 
@@ -381,22 +340,12 @@ function recordEndingProgress(endingId) {
     return {
         isFirstClear,
         isNewEnding,
-        // 欠片はUI上廃止。「3個獲得」と表示しない。
         keysGained: 0,
         recollectionUnlimitedUnlockedNow,
         finalRecollectionUnlockedNow
     };
 }
 
-// ---------------------------------------------------------
-// 過去のノートを復元するための任意ヘルパー
-// ---------------------------------------------------------
-
-/*
-    保存時点のノート全体ではなく、開始地点より前に実際に
-    選んだ返答の guesses を時系列で再生する。
-    白紙モードでは推測を引き継がない。
-*/
 function restoreNotebookGuessesBeforeScene(snapshot, startIndex, mode = "memory") {
     if (mode === "zero" || !snapshot) return;
     const records = Array.isArray(snapshot.sceneChoiceRecords)
@@ -404,8 +353,6 @@ function restoreNotebookGuessesBeforeScene(snapshot, startIndex, mode = "memory"
     for (let i = 0; i < startIndex; i++) {
         const record = records[i];
         if (!record) continue;
-        // 新形式は場面確定時点のノート全体を復元する。
-        // 旧形式はそのシーンで使用した単語の推測だけを補完する。
         const guesses = record.notebookGuesses || record.guesses;
         if (!guesses || typeof guesses !== "object") continue;
         for (const [key, guess] of Object.entries(guesses)) {
@@ -419,18 +366,6 @@ function restoreNotebookGuessesBeforeScene(snapshot, startIndex, mode = "memory"
     if (typeof renderWordList === "function") renderWordList();
 }
 
-// ---------------------------------------------------------
-// 通常END1〜6の判定
-// ---------------------------------------------------------
-
-/*
-    通常判定の優先順位:
-    1) 全15語理解 -> END1
-    2) 理解確定0〜3語 -> END4
-    3) それ以外 -> route最多の END2 / END3 / END6
-    END5は異なる誤答が3語以上残る場合、最後の任意選択からのみ到達。
-    END7は通常判定では返さない。
-*/
 const ENDING_RULES = Object.freeze({
     notebookWrongGuessesForPudding: 3,
     maximumUnderstoodForSilence: 3,
@@ -447,7 +382,6 @@ function getLatestTiedRoute(tiedRoutes) {
     return "twin";
 }
 
-// 現在のノートに残る「異なる単語ID」の誤答数。履歴や特殊返答とは無関係。
 function countNotebookWrongGuesses(){
     return Object.keys(wordBank).filter(key=>{
         if(vaneKnownWords.has(key)) return false;
@@ -482,23 +416,10 @@ function determineNormalEndingId() {
     return winner === "glass" ? 3 : winner === "resonance" ? 6 : 2;
 }
 
-// ---------------------------------------------------------
-// 「つづきから」と最後の追憶
-// ---------------------------------------------------------
-
-/*
-    互換用の入口。
-    旧版のEND×任意SCENE選択パネルは作らない。
-    index.html末尾の openContinueSetup() へ接続する。
-*/
 function openRecollection() {
     if (typeof openContinueSetup === "function") openContinueSetup();
 }
 
-/*
-    END7専用入口。
-    END7は通常END判定ではなく、解放後の「つづきから」に現れる。
-*/
 function startFinalRecollectionFromUI() {
     recollectionProgress = loadRecollectionProgress();
     if (!recollectionProgress.finalRecollectionUnlocked) return false;
