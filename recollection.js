@@ -1,11 +1,9 @@
 
 const RECOLLECTION_STORAGE_KEY = "vane_recollection_v4";
-const RECOLLECTION_SCHEMA_VERSION = 8;
+const RECOLLECTION_SCHEMA_VERSION = 9;
+const ENDING_UNLOCK_COST = 2;
 
 let runMode = "story";
-let recollectionBaseEndingId = null;
-
-const CONTINUATION_SCENE_INDICES = Object.freeze([0, 10, 19]);
 
 function isValidNormalEndingId(value) {
     const id = Number(value);
@@ -165,20 +163,14 @@ function getDefaultRecollectionProgress() {
         version: RECOLLECTION_SCHEMA_VERSION,
         gameCleared: false,
         voiceKeys: 0,
+        purchasedEndingIds: [],
         recollectionUnlimited: false,
-        unlockedBranches: [],
         collectedNormalEndings: [],
         endingSnapshots: {},
         latestRunEndingId: null,
         latestRunSnapshot: null,
         finalRecollectionUnlocked: false
     };
-}
-
-function getLegacyImportantSceneIds() {
-    return scenario.filter(scene => getRecollectionOptions(scene).some(option =>
-        option.endingImpact === true
-    )).map(scene => scene.id);
 }
 
 function normalizeRecollectionProgress(raw) {
@@ -199,26 +191,14 @@ function normalizeRecollectionProgress(raw) {
         }
     }
 
-    const branches = new Set(
-        (Array.isArray(src.unlockedBranches) ? src.unlockedBranches : [])
-            .filter(value => typeof value === "string")
-    );
-    const legacyScenes = new Set(getLegacyImportantSceneIds());
-    const oldUnlockedScenes = Array.isArray(src.unlockedSceneIds) ? src.unlockedSceneIds : [];
-    for (const sceneIdRaw of oldUnlockedScenes) {
-        const sceneId = Number(sceneIdRaw);
-        if (!legacyScenes.has(sceneId)) continue;
-        for (const endingId of new Set([
-            ...collectedNormalEndings,
-            ...Object.keys(endingSnapshots).map(Number)
-        ])) {
-            branches.add(`end${endingId}_scene${sceneId}`);
-        }
-    }
-
     const voiceKeysRaw = Number(src.voiceKeys);
     const voiceKeys = Number.isFinite(voiceKeysRaw)
         ? Math.max(0, Math.floor(voiceKeysRaw)) : 0;
+    const purchasedEndingIds = [...new Set(
+        (Array.isArray(src.purchasedEndingIds) ? src.purchasedEndingIds : [])
+            .map(Number)
+            .filter(id => Number.isInteger(id) && id >= 1 && id <= 7)
+    )];
     const finalRecollectionUnlocked =
         collectedNormalEndings.length >= 3
         && getCurrentMasteredWordCount() === Object.keys(wordBank).length;
@@ -245,8 +225,8 @@ function normalizeRecollectionProgress(raw) {
         version: RECOLLECTION_SCHEMA_VERSION,
         gameCleared: !!src.gameCleared || collectedNormalEndings.length > 0,
         voiceKeys,
+        purchasedEndingIds,
         recollectionUnlimited: !!src.recollectionUnlimited,
-        unlockedBranches: [...branches],
         collectedNormalEndings,
         endingSnapshots,
         latestRunEndingId,
@@ -264,22 +244,7 @@ function loadRecollectionProgress() {
     }
 
     if (!saved || typeof saved !== "object") {
-        const legacy = getDefaultRecollectionProgress();
-        let oldCollection = [];
-        try {
-            oldCollection = JSON.parse(localStorage.getItem("vane_collection_v3") || "[]");
-        } catch (error) {
-            oldCollection = [];
-        }
-        legacy.collectedNormalEndings = [...new Set(
-            (Array.isArray(oldCollection) ? oldCollection : [])
-                .map(Number).filter(isValidNormalEndingId)
-        )];
-        if (legacy.collectedNormalEndings.length) {
-            legacy.gameCleared = true;
-            legacy.voiceKeys = 3;
-        }
-        saved = legacy;
+        saved = getDefaultRecollectionProgress();
     }
 
     const normalized = normalizeRecollectionProgress(saved);
@@ -292,6 +257,20 @@ let recollectionProgress = loadRecollectionProgress();
 function saveRecollectionProgress() {
     recollectionProgress = normalizeRecollectionProgress(recollectionProgress);
     localStorage.setItem(RECOLLECTION_STORAGE_KEY, JSON.stringify(recollectionProgress));
+}
+
+function spendEndingUnlockKeys(value) {
+    const id = Number(value);
+    if (!Number.isInteger(id) || id < 1 || id > 7) return { ok: false, reason: "invalid" };
+    if (!recollectionProgress.gameCleared) return { ok: false, reason: "not-cleared" };
+    if (getEndingGalleryAvailableIds().has(id)) return { ok: false, reason: "already-open" };
+    if (recollectionProgress.voiceKeys < ENDING_UNLOCK_COST) {
+        return { ok: false, reason: "not-enough-keys" };
+    }
+    recollectionProgress.voiceKeys -= ENDING_UNLOCK_COST;
+    recollectionProgress.purchasedEndingIds.push(id);
+    saveRecollectionProgress();
+    return { ok: true, spent: ENDING_UNLOCK_COST, balance: recollectionProgress.voiceKeys };
 }
 
 function updateFinalRecollectionUnlock() {
@@ -318,7 +297,8 @@ function recordEndingProgress(endingId) {
     const snapshot = snapshotCurrentRun();
 
     recollectionProgress.gameCleared = true;
-    if (isFirstClear) recollectionProgress.voiceKeys += 3;
+    const keysGained = 2;
+    recollectionProgress.voiceKeys += keysGained;
     if (isNewEnding) recollectionProgress.collectedNormalEndings.push(id);
 
     if (!recollectionProgress.endingSnapshots[id]) {
@@ -339,7 +319,7 @@ function recordEndingProgress(endingId) {
     return {
         isFirstClear,
         isNewEnding,
-        keysGained: 0,
+        keysGained,
         recollectionUnlimitedUnlockedNow,
         finalRecollectionUnlockedNow
     };
@@ -413,10 +393,6 @@ function determineNormalEndingId() {
     ));
     const winner = getLatestTiedRoute(tied);
     return winner === "glass" ? 3 : winner === "resonance" ? 6 : 2;
-}
-
-function openRecollection() {
-    if (typeof openContinueSetup === "function") openContinueSetup();
 }
 
 function startFinalRecollectionFromUI() {
