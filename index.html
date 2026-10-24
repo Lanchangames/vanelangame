@@ -20,7 +20,6 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 #progress-bar{height:34px;min-height:34px;flex:0 0 34px;background:var(--surface-soft);color:var(--muted);display:flex;justify-content:center;align-items:center;font-size:.72em;letter-spacing:.14em;border-bottom:1px solid var(--line);box-sizing:border-box}
 #progress-current{color:var(--main-dark);font-weight:700}
 .status-bar{height:42px;min-height:42px;flex:0 0 42px;box-sizing:border-box;padding:0 18px;background:var(--surface);color:var(--text-soft);display:flex;align-items:center;justify-content:center;font-size:.72em;letter-spacing:.08em;border-bottom:1px solid var(--line)}
-#legacy-state{display:none}
 .ending-collection,.ending-badge-row{display:flex;align-items:center;justify-content:center}
 .ending-collection{gap:10px}.ending-badge-row{gap:7px}
 .ending-collection-label{color:var(--muted);font-size:.72rem;font-weight:700;letter-spacing:.13em;white-space:nowrap}
@@ -91,7 +90,7 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 .word-status{white-space:nowrap;font-size:.66em;color:var(--muted)}.word-status.guessing{color:var(--note-text)}.word-status.understood{color:var(--main-dark);font-weight:700}
 #understanding-flash{position:fixed;inset:0;z-index:160;display:flex;align-items:center;justify-content:center;background:rgba(239,245,246,.92);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease,visibility .22s ease}#understanding-flash.visible{opacity:1;visibility:visible;pointer-events:auto}
 .understanding-flash-inner{min-width:320px;max-width:70vw;text-align:center;padding:34px 48px;box-sizing:border-box}.understanding-flash-label{margin-bottom:24px;color:var(--muted);font-size:.7em;font-weight:700;letter-spacing:.18em}.understanding-flash-row{display:flex;align-items:center;justify-content:center;gap:22px;margin:12px 0}.understanding-flash-symbol{min-width:100px;color:var(--main-dark);font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-size:1.65em;font-weight:700;letter-spacing:.12em}.understanding-flash-arrow{color:var(--muted-light);font-size:1.2em}.understanding-flash-word{min-width:100px;color:var(--main-dark);font-size:1.65em;font-weight:700;letter-spacing:.05em}.understanding-flash-copy{margin-top:24px;color:var(--text-soft);font-size:.92em}
-.badge-container,.badge{display:none}.hint-text{font-size:.9em;color:var(--text-soft);margin-top:15px;border-top:1px dashed var(--line-strong);padding-top:10px}
+.hint-text{font-size:.9em;color:var(--text-soft);margin-top:15px;border-top:1px dashed var(--line-strong);padding-top:10px}
 .btn-style{padding:14px 44px;cursor:pointer;border:1px solid transparent;font-family:inherit;font-size:1em;font-weight:700;border-radius:8px;margin:10px;transition:.2s}.btn-style:hover{transform:translateY(-1px);filter:brightness(.98)}
 .reply-guide{margin:3px 0 12px;color:var(--text-soft);font-size:.82rem;line-height:1.7}
 .reply-start-button{border-left-color:var(--main);text-align:center;background:#eaf1f4;font-weight:700}
@@ -147,15 +146,33 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 #ending-gallery-overlay{position:fixed;inset:0;z-index:225;display:none;justify-content:center;align-items:center;padding:20px;box-sizing:border-box;background:rgba(237,243,245,.98)}
 #ending-gallery-panel{width:min(800px,96vw);max-height:92vh;overflow-y:auto;background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;padding:28px 36px;box-sizing:border-box;box-shadow:0 20px 65px rgba(68,91,101,.12)}
 #ending-gallery-panel h2{color:var(--main-dark);margin:0 0 10px;text-align:center}
+#ending-gallery-title:focus{outline:none}
 #ending-gallery-panel .gallery-help{color:var(--text-soft);font-size:.85rem;line-height:1.7;text-align:center}
+.gallery-key-balance{font-size:.92rem;font-weight:700;text-align:center;color:var(--main-dark);padding:8px 0}
+.gallery-unlock-feedback{color:var(--main-dark);font-size:.83rem;line-height:1.6;text-align:center;min-height:1.5em}
+.ending-gallery-item{display:flex;flex-direction:column;gap:7px}
+#ending-gallery-list .ending-gallery-unlock{background:var(--main-soft);color:var(--main-dark);text-align:center;padding:8px;font-weight:700}
+#ending-gallery-list .ending-gallery-open{height:100%}
 #ending-gallery-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:23px 0}
 #ending-gallery-list button{font-family:inherit;font-size:.86rem;line-height:1.6;padding:13px;text-align:left;border:1px solid var(--line-strong);border-radius:7px;background:var(--surface-soft);color:var(--text);cursor:pointer}
 #ending-gallery-list button:hover:not(:disabled){background:var(--main-soft);border-color:var(--main)}
 #ending-gallery-list button:disabled{cursor:default;color:var(--muted-light);opacity:.65}
-#ending-gallery-story{line-height:2.15;font-size:.96rem;color:var(--text);padding:12px 5px 20px}
 .gallery-footer{text-align:center;margin-top:18px}
 .gallery-footer .btn-style{font-size:.9rem;padding:12px 20px;background:var(--main);color:#fff}
 @media(max-width:700px){#ending-gallery-list{grid-template-columns:1fr}#ending-gallery-panel{padding:20px}}
+
+#ending-reader-overlay{position:fixed;inset:0;z-index:230;display:none;overflow-y:auto;overscroll-behavior:contain;background:var(--main-pale);box-sizing:border-box}
+.ending-reader-page{width:min(920px,100%);min-height:100vh;min-height:100dvh;margin:0 auto;padding:clamp(16px,4vw,44px);box-sizing:border-box}
+.ending-reader-paper{min-height:calc(100vh - 88px);min-height:calc(100dvh - 88px);box-sizing:border-box;padding:clamp(24px,5vw,64px);background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 44px rgba(68,91,101,.09)}
+.ending-reader-number{font-size:.74rem;letter-spacing:.22em;color:var(--muted);text-align:center;font-weight:700}
+#ending-reader-title:focus{outline:none}
+#ending-reader-title{font-size:clamp(1.35rem,2.8vw,1.85rem);line-height:1.5;color:var(--main-dark);text-align:center;margin:14px 0 23px}
+.ending-reader-rule{height:1px;width:84px;background:var(--line-strong);margin:0 auto 40px}
+#ending-reader-body{color:var(--text);font-size:1.02rem;line-height:2.25;text-align:left;overflow-wrap:anywhere}
+#ending-reader-notes{margin-top:36px;font-size:.94rem;line-height:1.9}
+.ending-reader-actions{text-align:center;margin-top:36px;padding-top:28px;border-top:1px solid var(--line)}
+.ending-reader-actions .btn-style{background:var(--main);color:#fff;margin:0}
+@media(max-width:700px){.ending-reader-page{padding:0}.ending-reader-paper{min-height:100vh;min-height:100dvh;border:0;border-radius:0;padding:28px 22px 44px;box-shadow:none}.ending-reader-rule{margin-bottom:28px}#ending-reader-body{font-size:.97rem;line-height:2.1}}
 </style>
 </head>
 <body>
@@ -186,11 +203,11 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 <div id="ending-gallery-overlay" role="dialog" aria-modal="true" aria-labelledby="ending-gallery-title" aria-hidden="true">
   <section id="ending-gallery-panel">
     <h2 id="ending-gallery-title" tabindex="-1">エンディング回想</h2>
-    <p class="gallery-help">一度到達したエンディングを見返すことができます。</p>
+    <p class="gallery-help">到達したエンディングを読み返せます。未解放の結末はカギ2個で解放できます（読んだだけではクリア扱いになりません）。</p>
+    <p id="ending-gallery-keys" class="gallery-key-balance" aria-live="polite"></p>
+    <p id="ending-gallery-status" class="gallery-unlock-feedback" role="status" aria-live="polite"></p>
     <div id="ending-gallery-list"></div>
-    <article id="ending-gallery-story" style="display:none"></article>
     <div class="gallery-footer">
-      <button type="button" class="btn-style" id="ending-gallery-back" style="display:none" onclick="showEndingGalleryList()">一覧へ戻る</button>
       <button type="button" class="btn-style" onclick="closeEndingGallery()">タイトルへ戻る</button>
     </div>
   </section>
@@ -295,13 +312,7 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 <span class="ending-progress-badge" data-ending-id="5">END 05</span>
 <span class="ending-progress-badge gold" data-ending-id="7">END 07</span>
 </div><span class="ending-count" data-ending-count>0 / 7</span></div>
-<div id="legacy-state"><span id="intel-val">0%</span><span id="col-val">0%</span>
-<div class="badge-container" id="badge-area">
-<div class="badge" id="b-1"></div><div class="badge" id="b-6"></div>
-<div class="badge" id="b-2"></div><div class="badge" id="b-3"></div>
-<div class="badge" id="b-4"></div><div class="badge" id="b-5"></div>
-<div class="badge gold" id="b-7"></div>
-</div></div></div>
+</div>
 <div id="main-view-tabs"><button type="button" id="play-view-tab" class="main-view-tab active" onclick="switchMainView('play')">会話</button><button type="button" id="log-view-tab" class="main-view-tab" onclick="switchMainView('log')">過去LOG</button></div>
 <div id="play-view">
 <div id="display">
@@ -319,6 +330,20 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 <div id="dict-editor-section"><div id="dict-editor-label">選択中の言葉</div><div id="dict-list"></div></div>
 <div id="word-list-section"><div id="word-list-header">言葉一覧</div><div id="word-list-panel"><div id="word-list"></div></div></div>
 </div>
+</div>
+<div id="ending-reader-overlay" role="dialog" aria-modal="true" aria-labelledby="ending-reader-title" aria-hidden="true">
+  <main class="ending-reader-page">
+    <article class="ending-reader-paper">
+      <div class="ending-reader-number" id="ending-reader-number"></div>
+      <h1 id="ending-reader-title" tabindex="-1"></h1>
+      <div class="ending-reader-rule" aria-hidden="true"></div>
+      <div id="ending-reader-body"></div>
+      <div id="ending-reader-notes"></div>
+      <div class="ending-reader-actions">
+        <button type="button" id="ending-reader-return" class="btn-style" onclick="returnFromEndingReader()">タイトルへ</button>
+      </div>
+    </article>
+  </main>
 </div>
 <script src="game.js"></script>
 <script>
@@ -1340,7 +1365,7 @@ window.onload = () => {
 
     updateColUI();
     const galleryEntry = document.getElementById("ending-gallery-entry-btn");
-    if (galleryEntry && getEndingGalleryCollectedIds().size > 0) {
+    if (galleryEntry && getEndingGalleryAvailableIds().size > 0) {
         galleryEntry.style.display = "inline-block";
     }
     initDict({});
@@ -1367,10 +1392,6 @@ function startGame(inherit) {
 
     if (typeof runMode !== "undefined") {
         runMode = "story";
-    }
-
-    if (typeof recollectionBaseEndingId !== "undefined") {
-        recollectionBaseEndingId = null;
     }
 
     selectedAnswers =
@@ -1430,7 +1451,6 @@ function initDict(initialWords) {
     }
 
     renderDictPlaceholder();
-    updateIntelUI();
     renderWordList();
 }
 
@@ -1545,7 +1565,6 @@ function resolveWord(key, guessOverride) {
     }
 
     renderDictEntryState(key);
-    updateIntelUI();
     renderPastLog();
     renderWordList();
 
@@ -1596,20 +1615,6 @@ function evaluateUnderstanding(scene, lockedGuesses) {
     });
 
     return resolvedNow;
-}
-
-function updateIntelUI() {
-    const total = Object.keys(wordBank).length;
-
-    const value = total
-        ? Math.floor(vaneKnownWords.size / total * 100)
-        : 0;
-
-    const el = document.getElementById("intel-val");
-
-    if (el) {
-        el.innerText = value + "%";
-    }
 }
 
 function getReactionText(option) {
@@ -1881,7 +1886,6 @@ function updateUI(redo = true) {
         return;
     }
 
-    updateIntelUI();
 
     const isCurrent = viewingStep === currentStep;
 
@@ -2145,25 +2149,6 @@ function updateColUI() {
 
     const count = collected.size;
 
-    const colVal = document.getElementById(
-        "col-val"
-    );
-
-    if (colVal) {
-        colVal.innerText =
-            Math.floor(count / 7 * 100) + "%";
-    }
-
-    for (const id of colSet) {
-        const badge = document.getElementById(
-            `b-${id}`
-        );
-
-        if (badge) {
-            badge.classList.add("unlocked");
-        }
-    }
-
     document.querySelectorAll(
         "[data-ending-id]"
     ).forEach(element => {
@@ -2195,10 +2180,6 @@ function syncEndingTitleUI() {
     document.querySelectorAll("[data-ending-id]").forEach(element => {
         element.title = getEndingTitle(element.dataset.endingId);
     });
-    for (let id = 1; id <= 7; id++) {
-        const badge = document.getElementById(`b-${id}`);
-        if (badge) badge.title = getEndingTitle(id);
-    }
 }
 syncEndingTitleUI();
 
@@ -2246,17 +2227,8 @@ function getContinuationKnownKeys(mode, index, source) {
     if (mode === "all") return [...getMasteredWordSet()];
     if (mode !== "memory" || !source) return [];
     const snapshot = source.snapshot;
-    if (typeof getSnapshotKnowledgeBeforeScene === "function") {
-        return getSnapshotKnowledgeBeforeScene(snapshot, index)
-            .filter(key => getMasteredWordSet().has(key));
-    }
-    const understoodAt = snapshot.vaneUnderstoodAt || {};
-    const mastered = getMasteredWordSet();
-    return Object.keys(wordBank).filter(key =>
-        mastered.has(key) &&
-        Number.isFinite(Number(understoodAt[key])) &&
-        Number(understoodAt[key]) < index
-    );
+    return getSnapshotKnowledgeBeforeScene(snapshot, index)
+        .filter(key => getMasteredWordSet().has(key));
 }
 
 function openContinueSetup() {
@@ -2381,7 +2353,6 @@ function startChosenContinuation() {
         startGame(false);
         applyContinuationKnowledge(knowledge, snapshot, index);
         runMode = "recollection";
-        recollectionBaseEndingId = source ? source.endingId : null;
         for (const id of ["device-check-overlay", "intro-overlay", "tutorial-overlay", "load-overlay"]) {
             const element = document.getElementById(id);
             if (element) element.style.display = "none";
@@ -2413,7 +2384,6 @@ function startChosenContinuation() {
     }
 
     runMode = "recollection";
-    recollectionBaseEndingId = source ? source.endingId : null;
     currentStep = index;
     viewingStep = index;
     interactionPhase = "conversation";
@@ -2468,7 +2438,6 @@ function applyContinuationKnowledge(keys, snapshot, startIndex) {
         userDict[key] = wordBank[key].canonical;
     }
     renderDictPlaceholder();
-    updateIntelUI();
     renderPastLog();
     renderWordList();
 }
@@ -2480,8 +2449,6 @@ function openFinalContinuation() {
         startFinalRecollectionFromUI();
     }
 }
-
-window.openRecollection = openContinueSetup;
 
 function getEndingGalleryCollectedIds() {
     const ids = new Set();
@@ -2502,8 +2469,15 @@ function getEndingGalleryCollectedIds() {
     }
     return ids;
 }
+function getEndingGalleryAvailableIds() {
+    const ids = getEndingGalleryCollectedIds();
+    if (typeof recollectionProgress !== "undefined") {
+        for (const id of recollectionProgress.purchasedEndingIds || []) ids.add(Number(id));
+    }
+    return ids;
+}
 function openEndingGallery() {
-    if (!getEndingGalleryCollectedIds().size) return;
+    if (!getEndingGalleryAvailableIds().size) return;
     const overlay = document.getElementById("ending-gallery-overlay");
     if (!overlay) return;
     overlay.style.display = "flex";
@@ -2512,37 +2486,60 @@ function openEndingGallery() {
     document.getElementById("ending-gallery-title")?.focus();
 }
 function showEndingGalleryList() {
-    const unlocked = getEndingGalleryCollectedIds();
+    const reached = getEndingGalleryCollectedIds();
+    const available = getEndingGalleryAvailableIds();
     const list = document.getElementById("ending-gallery-list");
-    const story = document.getElementById("ending-gallery-story");
-    const back = document.getElementById("ending-gallery-back");
-    if (!list || !story || !back) return;
-    list.innerHTML = "";
+    const balance = document.getElementById("ending-gallery-keys");
+    if (!list || !balance) return;
+    const keys = recollectionProgress.voiceKeys;
+    balance.textContent = `所持カギ：${keys}個 ／ 解放に必要なカギ：${ENDING_UNLOCK_COST}個`;
+    list.replaceChildren();
     for (let id = 1; id <= 7; id++) {
+        const item = document.createElement("div");
+        item.className = "ending-gallery-item";
         const button = document.createElement("button");
         button.type = "button";
-        button.disabled = !unlocked.has(id);
-        button.textContent = `END ${String(id).padStart(2, "0")}｜${unlocked.has(id) ? endingsData[id].title : "？？？（未回収）"}`;
-        if (!button.disabled) button.onclick = () => readEndingFromGallery(id);
-        list.appendChild(button);
+        button.className = "ending-gallery-open";
+        button.dataset.endingOpen = String(id);
+        const isAvailable = available.has(id);
+        button.disabled = !isAvailable;
+        const state = reached.has(id) ? "到達済み" : "カギで解放済み";
+        button.textContent = `END ${String(id).padStart(2, "0")}｜${isAvailable ? `${endingsData[id].title}（${state}）` : "？？？（未解放）"}`;
+        if (isAvailable) button.onclick = () => readEndingFromGallery(id);
+        item.appendChild(button);
+        if (!isAvailable) {
+            const unlock = document.createElement("button");
+            unlock.type = "button";
+            unlock.className = "ending-gallery-unlock";
+            unlock.dataset.endingUnlock = String(id);
+            unlock.textContent = `カギ${ENDING_UNLOCK_COST}個で解放`;
+            unlock.disabled = keys < ENDING_UNLOCK_COST;
+            unlock.onclick = () => unlockEndingFromGallery(id);
+            item.appendChild(unlock);
+        }
+        list.appendChild(item);
     }
     list.style.display = "grid";
-    story.style.display = "none";
-    story.innerHTML = "";
-    back.style.display = "none";
     document.getElementById("ending-gallery-panel").scrollTop = 0;
 }
+function unlockEndingFromGallery(id) {
+    if (!Number.isInteger(id) || id < 1 || id > 7) return;
+    if (!window.confirm(`END ${String(id).padStart(2, "0")}をカギ${ENDING_UNLOCK_COST}個で解放しますか？`)) return;
+    const result = spendEndingUnlockKeys(id);
+    const status = document.getElementById("ending-gallery-status");
+    if (!result.ok) {
+        if (status) status.textContent = result.reason === "not-enough-keys"
+            ? "カギが足りません。" : "このエンディングは解放できません。";
+        showEndingGalleryList();
+        return;
+    }
+    showEndingGalleryList();
+    if (status) status.textContent = `END ${String(id).padStart(2, "0")}を解放しました。カギを${result.spent}個消費しました。`;
+    document.querySelector(`[data-ending-open="${id}"]`)?.focus();
+}
 function readEndingFromGallery(id) {
-    if (!getEndingGalleryCollectedIds().has(id) || !endingsData[id] || typeof endingBodies[id] !== "string") return;
-    const list = document.getElementById("ending-gallery-list");
-    const story = document.getElementById("ending-gallery-story");
-    const back = document.getElementById("ending-gallery-back");
-    if (!list || !story || !back) return;
-    list.style.display = "none";
-    story.innerHTML = `<h3 style="color:var(--main-dark);text-align:center">END ${String(id).padStart(2, "0")}　${escapeHtml(endingsData[id].title)}</h3><div>${endingBodies[id]}</div>`;
-    story.style.display = "block";
-    back.style.display = "inline-block";
-    document.getElementById("ending-gallery-panel").scrollTop = 0;
+    if (!getEndingGalleryAvailableIds().has(id) || !endingsData[id] || typeof endingBodies[id] !== "string") return;
+    renderEndingScreen(id, null, true);
 }
 function closeEndingGallery() {
     const overlay = document.getElementById("ending-gallery-overlay");
