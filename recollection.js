@@ -1,424 +1,341 @@
 
-const RECOLLECTION_STORAGE_KEY = "vane_recollection_v4";
-const RECOLLECTION_SCHEMA_VERSION = 9;
-const ENDING_UNLOCK_COST = 1;
-
-let runMode = "story";
-
-function isValidNormalEndingId(value) {
-    const id = Number(value);
-    return Number.isInteger(id) && id >= 1 && id <= 6;
-}
-
-function getRecollectionOptions(scene) {
-    if (!scene) return [];
-    return [
-        ...(scene.opts || []),
-        ...(scene.insightOpts || []),
-        ...(scene.misreadOpts || [])
-    ];
-}
-
-function getRecollectionOption(scene, optionId) {
-    return getRecollectionOptions(scene).find(option => option.id === optionId) || null;
-}
-
-function getRecollectionOptionKind(scene, optionId) {
-    if ((scene?.misreadOpts || []).some(option => option.id === optionId)) return "misread";
-    if ((scene?.insightOpts || []).some(option => option.id === optionId)) return "insight";
-    if ((scene?.opts || []).some(option => option.id === optionId)) return "base";
-    return null;
-}
-
-function normalizeSavedAnswer(optionValue, sceneIndex) {
-    const scene = scenario[sceneIndex];
-    if (!scene || !optionValue) return null;
-    const value = typeof optionValue === "object"
-        ? (optionValue.id || optionValue.t)
-        : optionValue;
-    const options = getRecollectionOptions(scene);
-    const option = options.find(item => item.id === value)
-        || options.find(item => item.t === value);
-    return option ? option.id : null;
-}
-
-function normalizeSceneChoiceRecord(raw, sceneIndex, savedOptionId) {
-    const scene = scenario[sceneIndex];
-    if (!scene || !raw || typeof raw !== "object" || !savedOptionId) return null;
-    if (raw.optionId !== savedOptionId) return null;
-
-    const option = getRecollectionOption(scene, savedOptionId);
-    const kind = getRecollectionOptionKind(scene, savedOptionId);
-    if (!option || !kind || raw.kind !== kind) return null;
-
-    const rawStates = raw.wordStates && typeof raw.wordStates === "object"
-        ? raw.wordStates : {};
-    const rawGuesses = raw.guesses && typeof raw.guesses === "object"
-        ? raw.guesses : {};
-    const rawNotebook = raw.notebookGuesses && typeof raw.notebookGuesses === "object"
-        ? raw.notebookGuesses : null;
-    const wordStates = {};
-    const guesses = {};
-    const notebookGuesses = {};
-
-    for (const { key } of scene.words || []) {
-        if (!wordBank[key]) continue;
-        if (["correct", "wrong", "blank"].includes(rawStates[key])) {
-            wordStates[key] = rawStates[key];
-        }
-        if (typeof rawGuesses[key] === "string") guesses[key] = rawGuesses[key];
-    }
-
-    if (rawNotebook) {
-        for (const [key, value] of Object.entries(rawNotebook)) {
-            if (wordBank[key] && typeof value === "string") notebookGuesses[key] = value;
-        }
-    }
-
-    return {
-        sceneId: scene.id,
-        wordStates,
-        optionId: savedOptionId,
-        kind,
-        misreadKey: kind === "misread" ? (raw.misreadKey || null) : null,
-        route: option.route || null,
-        guesses,
-        ...(rawNotebook ? { notebookGuesses } : {})
-    };
-}
-
-function normalizeEndingSnapshot(raw) {
-    if (!raw || typeof raw !== "object") return null;
-    const rawAnswers = Array.isArray(raw.selectedAnswers) ? raw.selectedAnswers : [];
-    const selectedAnswersNormalized = scenario.map((_, i) =>
-        normalizeSavedAnswer(rawAnswers[i], i)
-    );
-    const rawRecords = Array.isArray(raw.sceneChoiceRecords) ? raw.sceneChoiceRecords : [];
-    const sceneChoiceRecordsNormalized = scenario.map((_, i) =>
-        normalizeSceneChoiceRecord(rawRecords[i], i, selectedAnswersNormalized[i])
-    );
-    const understoodAt = {};
-    if (raw.vaneUnderstoodAt && typeof raw.vaneUnderstoodAt === "object") {
-        for (const [key, at] of Object.entries(raw.vaneUnderstoodAt)) {
-            if (wordBank[key] && Number.isFinite(Number(at))) {
-                understoodAt[key] = Number(at);
-            }
-        }
-    }
-    return {
-        selectedAnswers: selectedAnswersNormalized,
-        sceneChoiceRecords: sceneChoiceRecordsNormalized,
-        vaneKnownWords: [...new Set(
-            (Array.isArray(raw.vaneKnownWords) ? raw.vaneKnownWords : [])
-                .filter(key => !!wordBank[key])
-        )],
-        vaneUnderstoodAt: understoodAt,
-        userDict: raw.userDict && typeof raw.userDict === "object"
-            ? Object.fromEntries(Object.entries(raw.userDict).filter(([key, value]) =>
-                !!wordBank[key] && typeof value === "string"
-            )) : {},
-        clearedAt: Number.isFinite(Number(raw.clearedAt))
-            ? Number(raw.clearedAt) : null
-    };
-}
-
-function snapshotCurrentRun() {
-    const selected = scenario.map((_, i) =>
-        normalizeSavedAnswer(selectedAnswers[i], i)
-    );
-    const records = scenario.map((_, i) =>
-        normalizeSceneChoiceRecord(
-            Array.isArray(sceneChoiceRecords) ? sceneChoiceRecords[i] : null,
-            i,
-            selected[i]
-        )
-    );
-    return {
-        selectedAnswers: selected,
-        sceneChoiceRecords: records,
-        vaneKnownWords: [...vaneKnownWords].filter(key => !!wordBank[key]),
-        vaneUnderstoodAt: { ...vaneUnderstoodAt },
-        userDict: { ...userDict },
-        clearedAt: Date.now()
-    };
-}
-
-function getSnapshotKnowledgeBeforeScene(snapshot, startIndex) {
-    if (!snapshot) return [];
-    const understoodAt = snapshot.vaneUnderstoodAt || {};
-    return Object.keys(wordBank).filter(key =>
-        Object.prototype.hasOwnProperty.call(understoodAt, key)
-        && Number.isFinite(Number(understoodAt[key]))
-        && Number(understoodAt[key]) < startIndex
-    );
-}
-
-function areAllNormalEndingsUnlocked(collectedIds, purchasedIds) {
-    const available = new Set([...collectedIds, ...purchasedIds]);
-    return [1, 2, 3, 4, 5, 6].every(id => available.has(id));
-}
-
-function getDefaultRecollectionProgress() {
-    return {
-        version: RECOLLECTION_SCHEMA_VERSION,
-        gameCleared: false,
-        voiceKeys: 0,
-        purchasedEndingIds: [],
-        recollectionUnlimited: false,
-        collectedNormalEndings: [],
-        endingSnapshots: {},
-        latestRunEndingId: null,
-        latestRunSnapshot: null,
-        finalRecollectionUnlocked: false
-    };
-}
-
-function normalizeRecollectionProgress(raw) {
-    const src = raw && typeof raw === "object" ? raw : {};
-    const defaults = getDefaultRecollectionProgress();
-
-    const collectedNormalEndings = [...new Set(
-        (Array.isArray(src.collectedNormalEndings) ? src.collectedNormalEndings : [])
-            .map(Number)
-            .filter(isValidNormalEndingId)
-    )];
-    const endingSnapshots = {};
-    if (src.endingSnapshots && typeof src.endingSnapshots === "object") {
-        for (const [key, value] of Object.entries(src.endingSnapshots)) {
-            if (!isValidNormalEndingId(key)) continue;
-            const snapshot = normalizeEndingSnapshot(value);
-            if (snapshot) endingSnapshots[Number(key)] = snapshot;
-        }
-    }
-
-    const voiceKeysRaw = Number(src.voiceKeys);
-    const voiceKeys = Number.isFinite(voiceKeysRaw)
-        ? Math.max(0, Math.floor(voiceKeysRaw)) : 0;
-    const purchasedEndingIds = [...new Set(
-        (Array.isArray(src.purchasedEndingIds) ? src.purchasedEndingIds : [])
-            .map(Number)
-            .filter(id => Number.isInteger(id) && id >= 1 && id <= 7)
-    )];
-    const finalRecollectionUnlocked =
-        areAllNormalEndingsUnlocked(collectedNormalEndings, purchasedEndingIds);
-
-    let latestRunSnapshot = normalizeEndingSnapshot(src.latestRunSnapshot);
-    let latestRunEndingId = isValidNormalEndingId(src.latestRunEndingId)
-        ? Number(src.latestRunEndingId) : null;
-
-    if (!latestRunSnapshot) {
-        const candidates = Object.entries(endingSnapshots)
-            .map(([endingId, snapshot]) => ({ endingId: Number(endingId), snapshot }))
-            .sort((a, b) =>
-                (b.snapshot.clearedAt || 0) - (a.snapshot.clearedAt || 0)
-            );
-        if (candidates.length) {
-            latestRunSnapshot = candidates[0].snapshot;
-            latestRunEndingId = candidates[0].endingId;
-        }
-    }
-    if (!latestRunSnapshot) latestRunEndingId = null;
-
-    return {
-        ...defaults,
-        version: RECOLLECTION_SCHEMA_VERSION,
-        gameCleared: !!src.gameCleared || collectedNormalEndings.length > 0,
-        voiceKeys,
-        purchasedEndingIds,
-        recollectionUnlimited: !!src.recollectionUnlimited,
-        collectedNormalEndings,
-        endingSnapshots,
-        latestRunEndingId,
-        latestRunSnapshot,
-        finalRecollectionUnlocked
-    };
-}
-
-function loadRecollectionProgress() {
-    let saved = null;
-    try {
-        saved = JSON.parse(localStorage.getItem(RECOLLECTION_STORAGE_KEY) || "null");
-    } catch (error) {
-        saved = null;
-    }
-
-    if (!saved || typeof saved !== "object") {
-        saved = getDefaultRecollectionProgress();
-    }
-
-    const normalized = normalizeRecollectionProgress(saved);
-    localStorage.setItem(RECOLLECTION_STORAGE_KEY, JSON.stringify(normalized));
-    return normalized;
-}
-
-let recollectionProgress = loadRecollectionProgress();
-
-function saveRecollectionProgress() {
-    recollectionProgress = normalizeRecollectionProgress(recollectionProgress);
-    localStorage.setItem(RECOLLECTION_STORAGE_KEY, JSON.stringify(recollectionProgress));
-}
-
-function spendEndingUnlockKeys(value) {
-    const id = Number(value);
-    if (!Number.isInteger(id) || id < 1 || id > 7) return { ok: false, reason: "invalid" };
-    if (!recollectionProgress.gameCleared) return { ok: false, reason: "not-cleared" };
-    if (id === 7 && !recollectionProgress.finalRecollectionUnlocked) {
-        return { ok: false, reason: "normal-endings-locked" };
-    }
-    if (getEndingGalleryAvailableIds().has(id)) return { ok: false, reason: "already-open" };
-    if (recollectionProgress.voiceKeys < ENDING_UNLOCK_COST) {
-        return { ok: false, reason: "not-enough-keys" };
-    }
-    recollectionProgress.voiceKeys -= ENDING_UNLOCK_COST;
-    recollectionProgress.purchasedEndingIds.push(id);
-    const finalRecollectionUnlockedNow = updateFinalRecollectionUnlock();
-    saveRecollectionProgress();
-    return {
-        ok: true,
-        spent: ENDING_UNLOCK_COST,
-        balance: recollectionProgress.voiceKeys,
-        finalRecollectionUnlockedNow
-    };
-}
-
-function updateFinalRecollectionUnlock() {
-    const before = recollectionProgress.finalRecollectionUnlocked;
-    recollectionProgress.finalRecollectionUnlocked = areAllNormalEndingsUnlocked(
-        recollectionProgress.collectedNormalEndings,
-        recollectionProgress.purchasedEndingIds
-    );
-    return !before && recollectionProgress.finalRecollectionUnlocked;
-}
-
-function recordEndingProgress(endingId) {
-    const id = Number(endingId);
-    const empty = {
-        isFirstClear: false,
-        isNewEnding: false,
-        keysGained: 0,
-        recollectionUnlimitedUnlockedNow: false,
-        finalRecollectionUnlockedNow: false
-    };
-    if (!isValidNormalEndingId(id)) return empty;
-
-    const isFirstClear = !recollectionProgress.gameCleared;
-    const isNewEnding = !recollectionProgress.collectedNormalEndings.includes(id);
-    const snapshot = snapshotCurrentRun();
-
-    recollectionProgress.gameCleared = true;
-    const keysGained = 2;
-    recollectionProgress.voiceKeys += keysGained;
-    if (isNewEnding) recollectionProgress.collectedNormalEndings.push(id);
-
-    if (!recollectionProgress.endingSnapshots[id]) {
-        recollectionProgress.endingSnapshots[id] = snapshot;
-    }
-    recollectionProgress.latestRunEndingId = id;
-    recollectionProgress.latestRunSnapshot = snapshot;
-
-    const recollectionUnlimitedUnlockedNow =
-        !isFirstClear && runMode === "recollection"
-        && !recollectionProgress.recollectionUnlimited;
-    if (recollectionUnlimitedUnlockedNow) {
-        recollectionProgress.recollectionUnlimited = true;
-    }
-
-    const finalRecollectionUnlockedNow = updateFinalRecollectionUnlock();
-    saveRecollectionProgress();
-    return {
-        isFirstClear,
-        isNewEnding,
-        keysGained,
-        recollectionUnlimitedUnlockedNow,
-        finalRecollectionUnlockedNow
-    };
-}
-
-function restoreNotebookGuessesBeforeScene(snapshot, startIndex, mode = "memory") {
-    if (mode === "zero" || !snapshot) return;
-    const records = Array.isArray(snapshot.sceneChoiceRecords)
-        ? snapshot.sceneChoiceRecords : [];
-    for (let i = 0; i < startIndex; i++) {
-        const record = records[i];
-        if (!record) continue;
-        const guesses = record.notebookGuesses || record.guesses;
-        if (!guesses || typeof guesses !== "object") continue;
-        for (const [key, guess] of Object.entries(guesses)) {
-            if (wordBank[key] && !vaneKnownWords.has(key) && typeof guess === "string") {
-                userDict[key] = guess;
-            }
-        }
-    }
-    for (const key of vaneKnownWords) userDict[key] = wordBank[key].canonical;
-    if (typeof renderActiveDictEntry === "function") renderActiveDictEntry();
-    if (typeof renderWordList === "function") renderWordList();
-}
-
-const ENDING_RULES = Object.freeze({
-    notebookWrongGuessesForPudding: 3,
-    maximumUnderstoodForSilence: 3,
-    minimumUnresolvedForSilence: 12
+const ENDING_TITLES = Object.freeze({
+    1: "呪いになんて負けない",
+    2: "ランちゃんの隣で",
+    3: "歩幅を合わせて",
+    4: "声が戻るまで",
+    5: "プリンと遠回りの恋",
+    6: "その声をたよりに",
+    7: "何度目かの初恋",
 });
 
-function getLatestTiedRoute(tiedRoutes) {
-    for (let i = scenario.length - 1; i >= 0; i--) {
-        const option = getRecollectionOption(scenario[i], selectedAnswers[i]);
-        if (option?.endingImpact && option.route && tiedRoutes.has(option.route)) {
-            return option.route;
-        }
+
+const endingsData = {
+    1: {
+        title: ENDING_TITLES[1],
+        hint: "聞こえなかった言葉の意味を全て理解したうえで、ランスロットと会話をしてください。"
+    },
+    2: {
+        title: ENDING_TITLES[2],
+        hint: "言葉の意味が完全に理解できなくても、ランスロットに背中を預け、２人で生きていきましょう。"
+    },
+    3: {
+        title: ENDING_TITLES[3],
+        hint: "ランスロットとヴェイン、それぞれの意思を尊重する会話が道を開きます。"
+    },
+    4: {
+        title: ENDING_TITLES[4],
+        hint: "ほとんどの言葉を理解できないままでも、２人が言葉を交わすことを諦めなければ、たどり着ける結末があります。"
+    },
+    5: {
+        title: ENDING_TITLES[5],
+        hint: "言葉を誤って推測しつづけたうえで、少しずれた回答をしてみましょう。"
+    },
+    6: {
+        title: ENDING_TITLES[6],
+        hint: "ノートを全て埋めなくても、ヴェインとランスロットの間には表情だけで伝わる何かがあるようです。"
+    },
+    7: {
+        title: ENDING_TITLES[7],
+        hint: "通常エンディングEND 01〜06をすべて解放してください。ゲームでの到達と、カギでの解放のどちらでも構いません。"
     }
-    return "twin";
-}
+};
 
-function countNotebookWrongGuesses() {
-    return Object.keys(wordBank).filter(key => {
-        if (vaneKnownWords.has(key)) return false;
-        const guess = String(userDict[key] || "").trim();
-        return !!normalizeGuess(guess) && !isAcceptedGuess(key, guess);
-    }).length;
-}
-function canChoosePuddingEnding() {
-    return countNotebookWrongGuesses() >= ENDING_RULES.notebookWrongGuessesForPudding &&
-        [...vaneKnownWords].filter(key => wordBank[key]).length < Object.keys(wordBank).length;
-}
+const endingBodies = {
 
-function determineNormalEndingId() {
-    rebuildRunState();
-    const total = Object.keys(wordBank).length;
-    const understood = [...vaneKnownWords].filter(key => !!wordBank[key]).length;
-    const unresolved = total - understood;
+    1: `柔らかい朝の陽ざしが、草花におりた露を光らせている。その美しい光景を眺めながら、ヴェインはノートの最後の頁を閉じた。呪いのせいで一度は失ってしまったランスロットの言葉を、今はひとつ残らず理解できる。取り戻したのはヴェイン自身だ。ランスロットの気持ちも痛いほど伝わった。誰よりも大切な幼馴染。絶対に失いたくない。ずっと一緒にいたい。愛している……。生まれてきてからずっと、心の中で反芻してきた大切な気持ち。<br><br>
 
-    if (understood === total) return 1;
-    if (understood <= ENDING_RULES.maximumUnderstoodForSilence
-        && unresolved >= ENDING_RULES.minimumUnresolvedForSilence) return 4;
+    「……ランちゃん。全部聞こえたよ」<br><br>
 
-    const max = Math.max(
-        routeCounts.twin || 0,
-        routeCounts.glass || 0,
-        routeCounts.resonance || 0
-    );
-    const tied = new Set(["twin", "glass", "resonance"].filter(route =>
-        (routeCounts[route] || 0) === max
+    安堵とは程遠い苦しそうな表情で、ランスロットは「すまなかった」と呟いた。あの日、ヴェインにかばわれたこと。呪いを解けない自分への苛立ち。怖くなってヴェインを遠ざけようとしたこと。ランスロットは自分の間違いを責めるように視線を落とす。ヴェインはとっさにランスロットの両手を取った。剣だこで硬くなった指は、思っていたより冷たい。<br><br>
+
+    「俺、ランちゃんの言葉が分からなくて、ずっと寂しかった。でもさ、一番寂しかったのは、ランちゃんが俺の顔を見てくれなくなった時だったよ」<br><br>
+
+    ランスロットが顔を上げる。ヴェインは照れくさくなってはにかんだが、握った手は決して離さなかった。<br><br>
+
+    「俺も、ランちゃんを愛してる」<br><br>
+
+    ランちゃんの隣を誰かに譲る気はない。幼い頃に抱いたその気持ちを裏切ることなく、ヴェインは今日まで歩き続けてきた。<br><br>
+
+    ふいにランスロットがヴェインの腰に手を回し、そのまま強く抱き締めた。縋るような腕だった。ヴェインはおそるおそる背中を抱き返す。……この時間がずっと続けばいいのに。肩口に触れる息が震えている。ヴェインはランスロットの髪をそっと撫でた。<br><br>
+
+    ヴェインが手のひらをゆっくりと滑らせてランスロットの頬に触れると、ランスロットは瞬きをしてそっと瞼を閉じた。唇が触れる。初めての口づけは短かったけれど、想像よりもずっと甘かった。<br><br>
+
+    呪いになんて、もう負けない。`,
+
+    2: `夜明け前の道を２人で進む。ランスロットは先を歩こうとしたが、ヴェインが呼ぶと素直に足を止めて待ってくれた。歩調を緩めたランスロットの横顔には隠しきれない疲れがあった。もっとも、ランスロット本人は隠しおおせているつもりらしかった。ヴェインのノートは鞄の底にある。まだ聞き取れない言葉は残ったままだが、それを取り出すことはもうない。ヴェインはランスロットの肩からずり落ちかけた外套を直した。<br><br>
+
+「ランちゃん。俺のことで心配かけてごめんな。でも、絶対に大丈夫だから。そのために俺、強くなったんだよ」<br><br>
+
+ランスロットは何か言いかけてまた口をつぐんだ。自分なら平気だとでも言いたいのだろうか。最近はこんなふうに飲み込んだ言葉がいくつもあるのだろう。やがてランスロットはあの日呪いを受けて倒れ込んだヴェインの姿が脳裏を離れないと語った。ランスロットの歩みが遅くなる。ヴェインも急がずに隣を歩いた。<br><br>
+
+「俺だって、怪我をして目が覚めた時、ランちゃんがどんな顔してたか覚えてる。あんな顔、もうさせたくない。……だからさ、一緒に解決しようよ。きっとできるからさ」<br><br>
+
+しばらくして、ランスロットは前を向いたまま「ああ」と答えた。かすれてはいたが、聞き違えようのない返事だった。<br><br>
+
+翌週、ヴェインとランスロットは久しぶりに同じ任務に就いた。前衛隊からの合図に、ランスロットは即座に前に出る。いつもの背中を眺めながら自然と体が後方へ動き、ヴェインは胸が熱くなった。やっぱり、俺とランちゃんは心で繋がっている。<br><br>
+
+その夜、ランスロットはヴェインの部屋を訪ねてきた。報告書の訂正かと机を片づけようとすると、ランスロットは首を振った。腰を下ろしたきり話し始めないので、ヴェインは彼が好む甘くて熱い茶を淹れた。湯気が薄くなる頃、ランスロットは「ひとりで平気なつもりだった」とようやくこぼし始めた。ランスロットの言葉にはやはり奇妙な音が混じっていたが、それでも今は遮りたくなくて、静かに耳を傾ける。どちらかともなく身を寄せ合い、気づくと膝が触れるほど近くにいた。<br><br>
+
+「ランちゃん。俺、お前のことが好きなんだよ。昔から、ずっと。だからこうして側にいてくれるだけで嬉しいんだ。ずっとここにいてくれてもいいんだぜ、なんて……」<br><br>
+
+ランスロットは熱い茶をひと口飲み、長く息をついた。それからヴェインの言葉を確かめるように、ヴェインの名を呼んだ。ヴェインが額に口づけると、ランスロットは目を閉じて受け入れた。夜が更ける。茶がすっかり冷めきっても、２人はずっと離れずに語り合っていた。`,
+
+    3: `朝の風に乱れた前髪の下で青い瞳が伏せられている。言葉はまだ聞き取れないことが多い。それでも、ランスロットの悲しみだけは見て取れて、見過ごすことができなかった。<br><br>
+
+「……ランちゃん。俺、ランちゃんに避けられているのがわかって怖かった。でも、ランちゃんの怖さもわかるんだ。……なあ、今はどうしたい？　俺は、ランちゃんが本当にしたいことを聞いてみたいな」<br><br>
+
+ランスロットはすぐには答えなかった。困らせてしまったかとヴェインが声をかけようとすると、幼馴染は小さく首を振った。考えているのだ。返すべき言葉ではなく、自分が望んでいることを。そうして長い沈黙のあとに聞こえてきたのは、ヴェインを傷つけたくなかったという後悔と、ずっと隣にいたいという願いだった。ところどころ聞き取れなかったが、ヴェインは最後まで耳を傾けた。<br><br>
+
+いかにもランスロットらしい答えだった。もっと欲張ってくれてもいいのに。誰かのために自分の気持ちを抑え込んで苦しむことを選んでしまう幼馴染の優しさを、ヴェインは昔から知っている。ただ、その優しさのためにランスロット自身が寂しい思いをするのは嫌だった。<br><br>
+
+「俺もランちゃんといつだって一緒にいたいよ。……お前のことが好きだから。ずっと親友だと思ってたけど、たぶん、それだけじゃ足りなくなっちゃったんだと思う」<br><br>
+
+言ってしまってから頬が熱くなる。ランスロットはしばらく黙ったままだったが、やがてゆっくりと肩を下ろす。たどたどしく返された声はやっぱり聞き取れなかったけれど、ヴェインがその袖に触れるとランスロットも身体を寄せてきた。鼻先が触れ、それからかすかに唇が触れる。<br><br>
+
+……数日後のこと。ランスロットはヴェインの部屋を訪ねてきた。手には仕事の書類も報告書もない。珍しいなと思いながら椅子を勧めると、彼は座らずに次の休みは空いているかと尋ねた。城下を歩きたいのだという。どこかへ買い物に行くのかと問うと、ランスロットは少し考え、特に用事はない、と答えた。その顔があまりに真面目で、ヴェインは吹き出してしまう。<br><br>
+
+つまりこれはデートということなのだろう。約束の日はよく晴れた。城下町を抜け、川に沿って続く道を歩く。当日まで何となく落ち着かなかったのに、歩き始めるといつもの調子に戻ってはしゃいでしまった。<br><br>
+
+夕方になると川沿いの冷えた風に吹かれた。人通りの少ない坂道でランスロットが外套の襟を直している。その手を握ると、冷たい指がゆっくり掌に収まった。とりとめもなく話し続けていたので、朝からの話題はほとんど思い出せない。でもきっと、お互いまだ帰りたくないと思っている。<br><br>
+
+「……ランちゃん。今日は誘ってくれてありがとな。すごく楽しかったよ。俺も今度、行ってみたいところがあるんだ。……ランちゃんも付き合ってくれる？」<br><br>
+
+ランスロットは満面の笑みで「もちろん」と答えた。ヴェインが立ち止まると、絡めていた指に引っ張られてランスロットもこちらを向いた。触れた唇は冷えていたが、舌を絡め、ようやく離れる頃には体温を持っていた。ヴェインが名残惜しくなってもう一度顔を寄せると、ランスロットは自分から顎を上げてくれた。<br><br>
+
+坂を下り城門の灯りが見えるところまで来ても、手はつないだままだった。ランスロットが何かを話す。聞き取れなかったときは、素直にノートを取り出して尋ねた。生まれた時からずっと、２人の歩幅は変わらないままだ。`,
+
+    4: `ヴェインは空白の残るノートを眺める。ランスロットの声はところどころ意味を失ったままだ。ほんの最近までそれがたまらなく腹立たしかった。ランスロットの言葉を何度も書き留めて、思いつく限りの言葉を当てはめてみた。いつの間にか、苦しそうに自分の名前を呼ぶ理由すら分からなくなっていた。<br><br>
+
+「……ごめんな、ランちゃん。まだ聞こえないんだ。でも、俺の返事を待ってくれるなら、ちゃんと考えたい。聞き取れないまま分かったような顔をして、お前を混乱させるのは嫌だからさ」<br><br>
+
+ランスロットはうつむいた。唇が動き、絞り出された言葉を俺だけが理解できない。ヴェインは初めて、呪いを受けたのが自分であることを悔やんだ。自分が呪いを受けたせいでランスロットはこんなにも苦しんでいる。でも、今ここで背を向けることだけはしたくなかった。ヴェインはノートを閉じてランスロットに向き直る。<br><br>
+
+それから先も、暮らしの不自由さは変わらなかった。仕事の話に支障はなかったが、私的な話になると突然言葉がわからなくなることがある。まるで嫌がらせのような呪いだ。ヴェインが顔を曇らせると、ランスロットはすぐに話題を変えた。<br><br>
+
+気まずい日々が続いたある日、ヴェインはランスロットの執務室を訪ねた。相変わらず散らかった部屋だ。ヴェインは机の周りから片づけ始めた。机の上には開いた書類があり、灯りがつけっぱなしになっていた。ランスロットとどんな話をするつもりか、ヴェインは考えていない。とりあえず椅子を並べて今日の任務の話をした。しばらくすると話題は仕事以外のことにまで及んだ。ランスロットの言葉は相変わらず理解できない部分があったが、話は尽きなかった。<br><br>
+
+やがてランスロットがもう休んだ方がいいと言った。ヴェインは首を振り、ずっと言えずにいた気持ちを告げた。俺はランちゃんが好きだ、と。それは告白というより、長いあいだ心の中にあった言葉をようやく外に出すことに近かった。ランスロットは何かを言いかけたままヴェインの手を取った。ヴェインがその手を胸元に引き寄せると、ランスロットはしばらく迷い、それから額を肩に預けた。返事の言葉は聞き取れなかったが、肩にかかる重みが何よりも雄弁に思えた。<br><br>
+
+翌朝、机の隅には開きかけのノートが置かれていた。ランスロットが書きつけた文字は肝心なところだけインクが滲んで読めない。ランスロットはまだ眠っている。ヴェインは彼に掛けた毛布の端を直し、起こさないよう静かにドアに手をかける。寝台の上でランスロットが身じろぎをする。衣擦れの音にヴェインは振り返る。ヴェインは扉を閉めずに、彼が目覚めるのを待った。`,
+
+    5: `ヴェインは城に帰るなり厨房を借りた。ランスロットの言葉はまだよくわからないままだったが、今はそんなことより、何か温かいものでも食べさせてあげたかった。雪の季節ではないけれど、朝方はやっぱり冷え込む。鍋を火にかけ、卵を割りながら、ヴェインはノートの中身を思い返した。もしかしたら、自分はけっこう見当違いな返事をしてきたかもしれない。それでランスロットに余計な心配をかけたのかも。思い当たる節がいくつかあって悶々とする。気がつくと砂糖を入れすぎていた。<br><br>
+
+ようやく出来上がったプリンを前に、ヴェインはひとり唸る。料理には自信があった。ランスロットのために作る料理は、自分でも上出来だと思うことが多い。その自信はランスロットのことをよく知っているという自負の裏返しでもあったのに、最近は知らない顔ばかり見せられている。首をかしげながら食器を二人分並べ終えたところで、戸口に本人が現れた。ヴェインを探していたらしく、鎧も脱がないままの姿だ。ヴェインもつい背筋が伸びた。<br><br>
+
+「ランちゃん、あのさ。俺、言葉を取り違えてばっかりだったみたいだ。嫌な思いをさせちゃったかも。今だって何が正しいのか分かんないけど、ずっとお前と話したかったのは本当なんだ。だから、もう少しだけ俺につき合ってくれないかな。……とりあえず、これ食べて」<br><br>
+
+ランスロットは机の上のプリンとヴェインを交互に眺めた。真剣な顔でプリンを差し出しているのが可笑しかったのだろう。とうとう笑い出した幼馴染を前に、ヴェインは口をとがらせた。けれどそんな楽しそうな声を聞くのはずいぶん久しぶりだった。椅子に座ったランスロットに匙を渡す。砂糖が多いせいでちょっと焦げてしまったカラメルに気づかれないか、そわそわしながら見守った。<br><br>
+
+ひと口食べたランスロットがしばらく匙を止めた。焦げちゃったところが苦かったのかな。反射的に申し訳なさそうな顔をすると、ランスロットは首を振って言葉を選ぶようにゆっくりと話し始めた。話のほとんどは聞き取れなかったが、表情から読み取ろうとじっと見つめる。話し終わったランスロットは、匙を皿の脇に置いた。何かを待っているような気配にヴェインは気づいた。<br><br>
+
+「なあ、ランちゃん。俺がまた変なこと言ってたら教えてくれ。……俺さ、ランちゃんのこと、好きなんだ。たぶんお前が思ってるよりずっと。」<br><br>
+
+ランスロットはヴェインの手に自分の指を重ねた。ヴェインは立ち上がり、彼の額に口づけた。ランスロットが身じろぎもしなかったので、今度は唇に触れた。<br><br>
+
+ずっと触れたいと思っていた彼の唇は、プリンよりもずっと甘かった。`,
+
+    6: `呪いを受けてからというもの、ランスロットが仕事以外の話をする機会は目に見えて減っていた。以前はとりとめのない話を何時間でも続けられたはずなのに、今ではヴェインが話しかけるたび、言葉を選ぶのに苦労しているようだった。<br><br>
+
+「……ランちゃん。俺、まだ全部は聞き取れないけど、お前の話を聞くのは好きなんだ。昔みたいに何でも話してほしいよ。途中で分からなくなったら、その時はちゃんと聞くから。……黙ったまま遠くに行っちゃうの、寂しいよ」<br><br>
+
+ランスロットは何か言いかけ、言葉を探すように口を閉ざした。ヴェインは返答を待ちながら、あの頃のことを思い出していた。幼い頃、字を読むのが苦手だったヴェインに、ランスロットは物語をよく読み聞かせてくれた。途中で寝てしまっても、次の日には続きを読んでくれた。物語の内容よりもランスロットの声が好きだったことを、今になって思い出す。<br><br>
+
+翌日、ヴェインは書庫で一冊の冒険譚を探し出した。装丁は新しくなっていたが、表紙に描かれた小さな帆船はよく覚えている。それを抱えて執務室へ行くと、ランスロットは書類の山から顔を上げ、懐かしい表紙に目を留めた。<br><br>
+
+「覚えてるだろ、これ。俺、昔はランちゃんに先を読んでもらってばっかりだったよな。久しぶりに聞きたくなっちゃってさ。今日の仕事が終わったら、少し読んでくれない？」<br><br>
+
+その夜、ランスロットは古い長椅子に腰を下ろして頁を開いた。嵐に遭った船が港へ辿り着くまでのくだりを昔と変わらぬ調子で読み進める。船員が言い争い、船が暗礁に乗り上げる。緊迫した場面が続く。ランスロットは昔からこんな冒険譚が好きだった。<br><br>
+
+物語の結末はとうに知っているが、ランスロットの声を聴くのが心地よくて、ヴェインは何度も続きをせがんだ。思った通り、呪いはランスロットがヴェインに向ける言葉にだけ効くようだ。読み聞かせにはなんの雑音も混じらない。ランスロットとこんなに穏やかな時間を過ごすのも久しぶりだ。<br><br>
+
+やがて２人は仕事のない晩に一緒に本を読むようになった。ただ無邪気に本を読みながら、子どもの頃を懐かしむ。素敵な時間だった。ランスロットも楽しんでいるらしく、自分で本を持ってくることもあった。<br><br>
+
+雨の降る夜に、ヴェインの部屋にランスロットが訪れた。本を持ってきてくれたのかと思ったが、どうやら手ぶらのようだった。ヴェインが珍しいなと言うと、ランスロットはしばらく窓の外を見てから、今日は聞いてほしいことがある、と切り出した。<br><br>
+
+いつもの仕事の話ではない。ランスロットは一生懸命に何かを伝えようとしている。ヴェインへ気持ちを告げようとするたびに声が途切れることへの苛立ちと、それでも聞いてほしいという願いがゆっくりと語られた。ヴェインは頷きながら真剣に聞いた。<br><br>
+
+ランスロットの切実な想いはヴェインの心の深くまで届いた。言葉がわからなくても、ランスロットと過ごす時間が何より大事だということも再確認した。ランスロットはひとしきり話し終えた後、すっきりしたような面持ちで、また一緒に本を読もうと笑った。<br><br>
+
+翌朝、執務室の机に何冊かの本が置いてあるのを見つけた。ランスロットが一緒に読もうと見繕ってくれたのだろう。次にランスロットと過ごす夜が楽しみで仕方ない。弾む気持ちを抑えながら、ヴェインは新しい任務へと向かった。`,
+
+    7: `あの日からちょうど１年が経った。呪いはいつの間にか完全に消えていた。最後にあの不快な音を聞いたのがいつだったか、ヴェインはもう思い出せない。どれほど引き離そうとしても離れない２人に呪いの方が根負けしてしまったのだろう。医師は「そんなの聞いたことありませんよ」と笑っていたが、ヴェインは本気でそう思っている。書き込みでいっぱいになったノートは本棚のいちばん上にしまった。今となっては不要なものだが、ランスロットは「お前の努力の証なのだから」とたまに読みたがる。<br><br>
+
+ある晩のこと。２人で住む家にランスロットが帰ってきたのは、夕食の時刻をとうに過ぎてからだった。ランスロットは外套の留め具を外しながら、遅くなってすまないと謝る。聞き慣れた、たおやかな声だ。<br><br>
+
+「ランちゃん、おかえり。……なあ、もう少しこっちに来てくれない？」<br><br>
+
+ランスロットは素直にヴェインの座る長椅子にやってきた。ヴェインが身を寄せると、待っていたように抱きついてくるのが可愛い。ランスロットは時々猫みたいだった。外気の冷たさが残る首元に唇を寄せる。帰宅の挨拶が長くなるのはいつものことだ。そのまま深く唇を重ね、舌を絡める。ランスロットの頬が上気し、息が荒くなってきたのを見て、ヴェインはようやく唇を離した。<br><br>
+
+「今日は俺、ずっとランちゃんに会いたかったんだ。……なあ、今日であの日から１年だぜ」<br><br>
+
+ランスロットは表情を曇らせ、忘れるはずがないだろうと吐き捨てるように言った。ランスロットにとっては、ヴェインが忌々しい呪いにかかってしまった、悪い意味で忘れられない日なのだろう。<br><br>
+
+「俺はさ、もうあの頃のことを忘れたいとは思ってないよ。寂しかったけど、そのおかげで、ランちゃんがどんなに俺を大切に思ってくれてるか知ったんだ」<br><br>
+
+ランスロットはヴェインの胸に顔をうずめ、しばらくそうしていた。自分の望みをあまり口にしないのは、幼いころから変わらない。けれど最近は、仕事のない夜に何をしたいか尋ねるとはっきりと一緒にいたいと言ってくれる。今夜もランスロットは背に回した腕をほどかず、自分からヴェインを求めていた。<br><br>
+
+「……ヴェイン。なあ、今日は……」<br><br>
+
+胸元に埋めた顔を上げずにもじもじと告げられた願いに、つい口角が上がってしまう。心が通じ合っていても、呪いが続いていたら今の言葉は聞こえなかったかもしれない。それは確かにもったいない。ヴェインは何度も聞き返したくなったが、ランスロットが恥ずかしがるのでやめておいた。<br><br>
+
+「もちろんだよ、ランちゃん。今日はしつこくしちゃうかも。……いい？」<br><br>
+
+ランスロットは「いい」と小さく答え、今度は自分から口づけてきた。<br><br>
+
+ヴェインは寝台に上がり、ランスロットの手を引っ張って腕の中に迎え入れた。唇を重ねて襟元の布を緩めると、身じろぎして頬を擦り付けてくれる。いつもは人の前で隙を見せない男が、ヴェインの腕の中では甘えることを覚えた。ヴェインが額に触れると、ランスロットは「愛している」とはっきり告げた。<br><br>
+
+翌朝ヴェインが先に目を覚ますと、ランスロットはまだ眠っていた。朝食を作らなければと思ったが起こすのが惜しい。やがて枕元から「ヴェイン、おはよう」と低い声がした。ヴェインが「おはよう」と返すと、ランスロットは布団の中から腕を伸ばし、彼をもう一度抱き寄せた。朝食は少し遅くなりそうだった。`
+};
+
+function normalizeEndingCollection() {
+    const current = colSet instanceof Set ? [...colSet] : [];
+    colSet = new Set(current.map(Number).filter(id =>
+        Number.isInteger(id) && id >= 1 && id <= 7
     ));
-    const winner = getLatestTiedRoute(tied);
-    return winner === "glass" ? 3 : winner === "resonance" ? 6 : 2;
+    return colSet;
 }
 
-function startFinalRecollectionFromUI() {
-    recollectionProgress = loadRecollectionProgress();
-    if (!recollectionProgress.finalRecollectionUnlocked) return false;
-    if (typeof window.showSpecialEnding !== "function") return false;
+function saveEndingCollection() {
+    normalizeEndingCollection();
+    localStorage.setItem("vane_collection_v3", JSON.stringify([...colSet]));
+    updateColUI();
+}
 
-    [
-        "continue-overlay", "recollection-overlay", "device-check-overlay",
-        "intro-overlay", "tutorial-overlay", "load-overlay"
-    ].forEach(id => {
-        const element = document.getElementById(id);
-        if (element) element.style.display = "none";
-    });
-    const game = document.getElementById("game-container");
-    if (!game) return false;
-    game.style.display = "flex";
-    window.showSpecialEnding(7);
+
+
+function renderEndingScreen(id, progressResult = null, fromGallery = false) {
+    const ending = endingsData[id];
+    const body = endingBodies[id];
+    if (!ending || typeof body !== "string") return false;
+
+    const progressMessages = [];
+
+    if (progressResult?.keysGained > 0) {
+        progressMessages.push(
+            `エンディング解放カギを${progressResult.keysGained}個獲得しました。<br>カギはタイトル画面の『エンディング回想』内のエンディングリストから、未解放のエンディングを解放するために使えます。`
+        );
+    }
+    if (progressResult?.isFirstClear) {
+        progressMessages.push(
+            "『つづきから』が解放されました。<br>次の周回では、物語のはじまり・途中・最後の言葉から再開できます。"
+        );
+    }
+    if (progressResult?.recollectionUnlimitedUnlockedNow) {
+        progressMessages.push(
+            "新しい記憶が、またひとつ重なりました。<br>『つづきから』で別の未来を探せます。"
+        );
+    }
+    if (progressResult?.finalRecollectionUnlockedNow) {
+        progressMessages.push(
+            "『最後の追憶』が開きました。『つづきから』から辿れます。"
+        );
+    }
+
+    const progressHtml = progressMessages.length ? `
+        <div class="hint-text" style="color:var(--correct)">
+            ${progressMessages.join("<br><br>")}
+        </div>` : "";
+
+    normalizeEndingCollection();
+    const uncollectedNormal = [1, 2, 3, 4, 5, 6].filter(normalId =>
+        !colSet.has(normalId)
+    );
+    let hintHtml = "";
+
+    if (colSet.size === 7) {
+        hintHtml = `
+            <div class="hint-text" style="color:var(--correct)">
+                <b>祝福：</b>すべての結末を綴り、二人の物語を見届けた。
+            </div>`;
+    } else if (!colSet.has(7) &&
+        typeof recollectionProgress !== "undefined" &&
+        recollectionProgress.finalRecollectionUnlocked
+    ) {
+        hintHtml = `
+            <div class="hint-text">
+                <b>記憶の導き：</b>『つづきから』に「最後の追憶」が現れています。
+            </div>`;
+    } else if (uncollectedNormal.length) {
+        const hintId = uncollectedNormal[
+            Math.floor(Math.random() * uncollectedNormal.length)
+        ];
+        hintHtml = `
+            <div class="hint-text">
+                <b>記憶の導き：</b>
+                「${endingsData[hintId].title}」へ至るには、
+                ${endingsData[hintId].hint}
+            </div>`;
+    } else {
+        hintHtml = `
+            <div class="hint-text">
+                <b>記憶の導き：</b>${endingsData[7].hint}
+            </div>`;
+    }
+
+    const overlay = document.getElementById("ending-reader-overlay");
+    const number = document.getElementById("ending-reader-number");
+    const title = document.getElementById("ending-reader-title");
+    const story = document.getElementById("ending-reader-body");
+    const notes = document.getElementById("ending-reader-notes");
+    const returnButton = document.getElementById("ending-reader-return");
+    if (!overlay || !number || !title || !story || !notes || !returnButton) return false;
+
+    number.textContent = `END ${String(id).padStart(2, "0")}`;
+    title.textContent = ending.title;
+    story.innerHTML = body;
+    notes.innerHTML = fromGallery ? "" : progressHtml + hintHtml;
+    returnButton.textContent = fromGallery ? "一覧へ戻る" : "タイトルへ";
+    overlay.dataset.fromGallery = fromGallery ? "true" : "false";
+    if (fromGallery) {
+        document.getElementById("ending-gallery-overlay")?.setAttribute("aria-hidden", "true");
+    }
+    overlay.style.display = "block";
+    overlay.setAttribute("aria-hidden", "false");
+    overlay.scrollTop = 0;
+    title.focus();
     return true;
 }
+
+function returnFromEndingReader() {
+    const overlay = document.getElementById("ending-reader-overlay");
+    if (!overlay || overlay.dataset.fromGallery !== "true") {
+        location.reload();
+        return;
+    }
+    overlay.style.display = "none";
+    overlay.setAttribute("aria-hidden", "true");
+    document.getElementById("ending-gallery-overlay")?.setAttribute("aria-hidden", "false");
+    showEndingGalleryList();
+    document.getElementById("ending-gallery-title")?.focus();
+}
+
+
+
+function showEnd(requestedId = null) {
+    const id = requestedId === 5 && canChoosePuddingEnding()
+        ? 5 : determineNormalEndingId();
+    if (!Number.isInteger(id) || id < 1 || id > 6) return false;
+
+    const progressResult = recordEndingProgress(id);
+    normalizeEndingCollection();
+    colSet.add(id);
+    saveEndingCollection();
+    return renderEndingScreen(id, progressResult);
+}
+
+
+
+window.showSpecialEnding = function(id) {
+    if (Number(id) !== 7) return false;
+    if (typeof recollectionProgress === "undefined" ||
+        !recollectionProgress.finalRecollectionUnlocked) return false;
+
+    document.documentElement.style.setProperty("--love-light", "90%");
+    document.documentElement.style.setProperty("--love-hue", "45");
+
+    normalizeEndingCollection();
+    colSet.add(7);
+    saveEndingCollection();
+    return renderEndingScreen(7, null);
+};
