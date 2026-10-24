@@ -1,7 +1,7 @@
 
 const RECOLLECTION_STORAGE_KEY = "vane_recollection_v4";
 const RECOLLECTION_SCHEMA_VERSION = 9;
-const ENDING_UNLOCK_COST = 2;
+const ENDING_UNLOCK_COST = 1;
 
 let runMode = "story";
 
@@ -153,9 +153,9 @@ function getSnapshotKnowledgeBeforeScene(snapshot, startIndex) {
     );
 }
 
-function getCurrentMasteredWordCount() {
-    if (typeof getMasteredWordSet === "function") return getMasteredWordSet().size;
-    return masteredWords instanceof Set ? masteredWords.size : 0;
+function areAllNormalEndingsUnlocked(collectedIds, purchasedIds) {
+    const available = new Set([...collectedIds, ...purchasedIds]);
+    return [1, 2, 3, 4, 5, 6].every(id => available.has(id));
 }
 
 function getDefaultRecollectionProgress() {
@@ -200,8 +200,7 @@ function normalizeRecollectionProgress(raw) {
             .filter(id => Number.isInteger(id) && id >= 1 && id <= 7)
     )];
     const finalRecollectionUnlocked =
-        collectedNormalEndings.length >= 3
-        && getCurrentMasteredWordCount() === Object.keys(wordBank).length;
+        areAllNormalEndingsUnlocked(collectedNormalEndings, purchasedEndingIds);
 
     let latestRunSnapshot = normalizeEndingSnapshot(src.latestRunSnapshot);
     let latestRunEndingId = isValidNormalEndingId(src.latestRunEndingId)
@@ -263,21 +262,31 @@ function spendEndingUnlockKeys(value) {
     const id = Number(value);
     if (!Number.isInteger(id) || id < 1 || id > 7) return { ok: false, reason: "invalid" };
     if (!recollectionProgress.gameCleared) return { ok: false, reason: "not-cleared" };
+    if (id === 7 && !recollectionProgress.finalRecollectionUnlocked) {
+        return { ok: false, reason: "normal-endings-locked" };
+    }
     if (getEndingGalleryAvailableIds().has(id)) return { ok: false, reason: "already-open" };
     if (recollectionProgress.voiceKeys < ENDING_UNLOCK_COST) {
         return { ok: false, reason: "not-enough-keys" };
     }
     recollectionProgress.voiceKeys -= ENDING_UNLOCK_COST;
     recollectionProgress.purchasedEndingIds.push(id);
+    const finalRecollectionUnlockedNow = updateFinalRecollectionUnlock();
     saveRecollectionProgress();
-    return { ok: true, spent: ENDING_UNLOCK_COST, balance: recollectionProgress.voiceKeys };
+    return {
+        ok: true,
+        spent: ENDING_UNLOCK_COST,
+        balance: recollectionProgress.voiceKeys,
+        finalRecollectionUnlockedNow
+    };
 }
 
 function updateFinalRecollectionUnlock() {
     const before = recollectionProgress.finalRecollectionUnlocked;
-    recollectionProgress.finalRecollectionUnlocked =
-        recollectionProgress.collectedNormalEndings.length >= 3
-        && getCurrentMasteredWordCount() === Object.keys(wordBank).length;
+    recollectionProgress.finalRecollectionUnlocked = areAllNormalEndingsUnlocked(
+        recollectionProgress.collectedNormalEndings,
+        recollectionProgress.purchasedEndingIds
+    );
     return !before && recollectionProgress.finalRecollectionUnlocked;
 }
 
