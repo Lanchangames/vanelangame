@@ -228,7 +228,7 @@ function renderEndingScreen(id, progressResult = null, fromGallery = false) {
     }
     if (progressResult?.finalRecollectionUnlockedNow) {
         progressMessages.push(
-            "『最後の追憶』が開きました。『つづきから』から辿れます。"
+            "「1年後」が解放されました。タイトル画面の「つづきから」の下から読めます。"
         );
     }
 
@@ -243,7 +243,8 @@ function renderEndingScreen(id, progressResult = null, fromGallery = false) {
     );
     let hintHtml = "";
 
-    if (colSet.size === 7) {
+    if (colSet.size === 7 ||
+        (id === 7 && recollectionProgress?.finalRecollectionUnlocked)) {
         hintHtml = `
             <div class="hint-text" style="color:var(--correct)">
                 <b>祝福：</b>すべての結末を綴り、二人の物語を見届けた。
@@ -254,7 +255,7 @@ function renderEndingScreen(id, progressResult = null, fromGallery = false) {
     ) {
         hintHtml = `
             <div class="hint-text">
-                <b>記憶の導き：</b>『つづきから』に「最後の追憶」が現れています。
+                <b>記憶の導き：</b>タイトル画面に「1年後」が現れています。
             </div>`;
     } else if (uncollectedNormal.length) {
         const hintId = uncollectedNormal[
@@ -287,6 +288,7 @@ function renderEndingScreen(id, progressResult = null, fromGallery = false) {
     notes.innerHTML = fromGallery ? "" : progressHtml + hintHtml;
     returnButton.textContent = fromGallery ? "一覧へ戻る" : "タイトルへ";
     overlay.dataset.fromGallery = fromGallery ? "true" : "false";
+    overlay.classList.toggle("ending-final", id === 7);
     if (fromGallery) {
         document.getElementById("ending-gallery-overlay")?.setAttribute("aria-hidden", "true");
     }
@@ -321,7 +323,11 @@ function showEnd(requestedId = null) {
     normalizeEndingCollection();
     colSet.add(id);
     saveEndingCollection();
-    return renderEndingScreen(id, progressResult);
+    if (typeof syncOneYearUnlockUI === "function") syncOneYearUnlockUI();
+    const rendered = renderEndingScreen(id, progressResult);
+    if (rendered && progressResult.finalRecollectionUnlockedNow &&
+        typeof announceOneYearUnlock === "function") announceOneYearUnlock();
+    return rendered;
 }
 
 

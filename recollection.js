@@ -260,11 +260,8 @@ function saveRecollectionProgress() {
 
 function spendEndingUnlockKeys(value) {
     const id = Number(value);
-    if (!Number.isInteger(id) || id < 1 || id > 7) return { ok: false, reason: "invalid" };
+    if (!Number.isInteger(id) || id < 1 || id > 6) return { ok: false, reason: "invalid" };
     if (!recollectionProgress.gameCleared) return { ok: false, reason: "not-cleared" };
-    if (id === 7 && !recollectionProgress.finalRecollectionUnlocked) {
-        return { ok: false, reason: "normal-endings-locked" };
-    }
     if (getEndingGalleryAvailableIds().has(id)) return { ok: false, reason: "already-open" };
     if (recollectionProgress.voiceKeys < ENDING_UNLOCK_COST) {
         return { ok: false, reason: "not-enough-keys" };
