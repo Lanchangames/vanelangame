@@ -247,7 +247,7 @@ function renderEndingScreen(id, progressResult = null, fromGallery = false) {
         (id === 7 && recollectionProgress?.finalRecollectionUnlocked)) {
         hintHtml = `
             <div class="hint-text" style="color:var(--correct)">
-                <b>祝福：</b>すべての結末を綴り、二人の物語を見届けた。
+                <b>全エンディング到達：</b>すべての結末を綴り、二人の物語を見届けた。
             </div>`;
     } else if (!colSet.has(7) &&
         typeof recollectionProgress !== "undefined" &&
@@ -255,7 +255,7 @@ function renderEndingScreen(id, progressResult = null, fromGallery = false) {
     ) {
         hintHtml = `
             <div class="hint-text">
-                <b>記憶の導き：</b>タイトル画面に「1年後」が現れています。
+                <b>おしらせ：</b>タイトル画面に「1年後」が現れています。
             </div>`;
     } else if (uncollectedNormal.length) {
         const hintId = uncollectedNormal[
@@ -263,14 +263,14 @@ function renderEndingScreen(id, progressResult = null, fromGallery = false) {
         ];
         hintHtml = `
             <div class="hint-text">
-                <b>記憶の導き：</b>
+                <b>ヒント：</b>
                 「${endingsData[hintId].title}」へ至るには、
                 ${endingsData[hintId].hint}
             </div>`;
     } else {
         hintHtml = `
             <div class="hint-text">
-                <b>記憶の導き：</b>${endingsData[7].hint}
+                <b>ヒント：</b>${endingsData[7].hint}
             </div>`;
     }
 
