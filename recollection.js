@@ -2,7 +2,7 @@
 const RECOLLECTION_STORAGE_KEY = "vane_recollection_v4";
 const RECOLLECTION_SCHEMA_VERSION = 8;
 
-let runMode = "story"; 
+let runMode = "story";
 let recollectionBaseEndingId = null;
 
 const CONTINUATION_SCENE_INDICES = Object.freeze([0, 10, 19]);
@@ -115,7 +115,6 @@ function normalizeEndingSnapshot(raw) {
                 .filter(key => !!wordBank[key])
         )],
         vaneUnderstoodAt: understoodAt,
-        // 終了時点の推測。途中からの再開に丸ごとコピーしない。
         userDict: raw.userDict && typeof raw.userDict === "object"
             ? Object.fromEntries(Object.entries(raw.userDict).filter(([key, value]) =>
                 !!wordBank[key] && typeof value === "string"
@@ -169,9 +168,9 @@ function getDefaultRecollectionProgress() {
         recollectionUnlimited: false,
         unlockedBranches: [],
         collectedNormalEndings: [],
-        endingSnapshots: {}, 
+        endingSnapshots: {},
         latestRunEndingId: null,
-        latestRunSnapshot: null, 
+        latestRunSnapshot: null,
         finalRecollectionUnlocked: false
     };
 }
@@ -278,7 +277,7 @@ function loadRecollectionProgress() {
         )];
         if (legacy.collectedNormalEndings.length) {
             legacy.gameCleared = true;
-            legacy.voiceKeys = 3; // 旧データ互換のみ
+            legacy.voiceKeys = 3;
         }
         saved = legacy;
     }
@@ -319,7 +318,7 @@ function recordEndingProgress(endingId) {
     const snapshot = snapshotCurrentRun();
 
     recollectionProgress.gameCleared = true;
-    if (isFirstClear) recollectionProgress.voiceKeys += 3; // 旧データ互換のみ
+    if (isFirstClear) recollectionProgress.voiceKeys += 3;
     if (isNewEnding) recollectionProgress.collectedNormalEndings.push(id);
 
     if (!recollectionProgress.endingSnapshots[id]) {
@@ -382,16 +381,16 @@ function getLatestTiedRoute(tiedRoutes) {
     return "twin";
 }
 
-function countNotebookWrongGuesses(){
-    return Object.keys(wordBank).filter(key=>{
-        if(vaneKnownWords.has(key)) return false;
-        const guess=String(userDict[key]||"").trim();
-        return !!normalizeGuess(guess) && !isAcceptedGuess(key,guess);
+function countNotebookWrongGuesses() {
+    return Object.keys(wordBank).filter(key => {
+        if (vaneKnownWords.has(key)) return false;
+        const guess = String(userDict[key] || "").trim();
+        return !!normalizeGuess(guess) && !isAcceptedGuess(key, guess);
     }).length;
 }
-function canChoosePuddingEnding(){
-    return countNotebookWrongGuesses()>=ENDING_RULES.notebookWrongGuessesForPudding &&
-        [...vaneKnownWords].filter(key=>wordBank[key]).length<Object.keys(wordBank).length;
+function canChoosePuddingEnding() {
+    return countNotebookWrongGuesses() >= ENDING_RULES.notebookWrongGuessesForPudding &&
+        [...vaneKnownWords].filter(key => wordBank[key]).length < Object.keys(wordBank).length;
 }
 
 function determineNormalEndingId() {
