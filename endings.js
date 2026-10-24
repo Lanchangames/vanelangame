@@ -189,7 +189,6 @@ const endingBodies = {
 };
 
 function normalizeEndingCollection() {
-    // 旧版に数値IDと文字列IDが混在していても二重計上しない。
     const current = colSet instanceof Set ? [...colSet] : [];
     colSet = new Set(current.map(Number).filter(id =>
         Number.isInteger(id) && id >= 1 && id <= 7
@@ -203,9 +202,7 @@ function saveEndingCollection() {
     updateColUI();
 }
 
-// =========================================================
-// 共通END表示
-// =========================================================
+
 
 function renderEndingScreen(id, progressResult = null) {
     const ending = endingsData[id];
@@ -274,8 +271,6 @@ function renderEndingScreen(id, progressResult = null) {
     const display = document.getElementById("display");
     const actionArea = document.getElementById("action-area");
     if (!display || !actionArea) return false;
-
-    // クリア後に解放する周回ボタン。初回プレイ中には出現しない。
     const canContinue = typeof recollectionProgress !== "undefined" &&
         recollectionProgress.gameCleared;
     const continueButton = canContinue ? `
@@ -303,13 +298,10 @@ function renderEndingScreen(id, progressResult = null) {
     return true;
 }
 
-// =========================================================
-// 通常END1〜6
-// =========================================================
+
 
 function showEnd(requestedId = null) {
-    // END5だけは最後の選択で明示的に進める。通常の判定優先順位は維持。
-    const id = requestedId===5 && canChoosePuddingEnding()
+    const id = requestedId === 5 && canChoosePuddingEnding()
         ? 5 : determineNormalEndingId();
     if (!Number.isInteger(id) || id < 1 || id > 6) return false;
 
@@ -320,13 +312,10 @@ function showEnd(requestedId = null) {
     return renderEndingScreen(id, progressResult);
 }
 
-// =========================================================
-// END7：最後の追憶専用
-// =========================================================
+
 
 window.showSpecialEnding = function(id) {
     if (Number(id) !== 7) return false;
-    // 解放条件は回収した通常END3種類以上 ＋ 全15語の解読実績。
     if (typeof recollectionProgress === "undefined" ||
         !recollectionProgress.finalRecollectionUnlocked) return false;
 
