@@ -37,7 +37,7 @@ const endingsData = {
     },
     7: {
         title: ENDING_TITLES[7],
-        hint: "異なる通常エンディングを３種類以上見届け、ノートに全ての言葉の意味を書き記してください。"
+        hint: "通常エンディングEND 01〜06をすべて解放してください。ゲームでの到達と、カギでの解放のどちらでも構いません。"
     }
 };
 
@@ -243,15 +243,10 @@ function renderEndingScreen(id, progressResult = null, fromGallery = false) {
     );
     let hintHtml = "";
 
-    if (uncollectedNormal.length) {
-        const hintId = uncollectedNormal[
-            Math.floor(Math.random() * uncollectedNormal.length)
-        ];
+    if (colSet.size === 7) {
         hintHtml = `
-            <div class="hint-text">
-                <b>記憶の導き：</b>
-                「${endingsData[hintId].title}」へ至るには、
-                ${endingsData[hintId].hint}
+            <div class="hint-text" style="color:var(--correct)">
+                <b>祝福：</b>すべての結末を綴り、二人の物語を見届けた。
             </div>`;
     } else if (!colSet.has(7) &&
         typeof recollectionProgress !== "undefined" &&
@@ -261,10 +256,15 @@ function renderEndingScreen(id, progressResult = null, fromGallery = false) {
             <div class="hint-text">
                 <b>記憶の導き：</b>『つづきから』に「最後の追憶」が現れています。
             </div>`;
-    } else if (colSet.size === 7) {
+    } else if (uncollectedNormal.length) {
+        const hintId = uncollectedNormal[
+            Math.floor(Math.random() * uncollectedNormal.length)
+        ];
         hintHtml = `
-            <div class="hint-text" style="color:var(--correct)">
-                <b>祝福：</b>すべての結末を綴り、二人の物語を見届けた。
+            <div class="hint-text">
+                <b>記憶の導き：</b>
+                「${endingsData[hintId].title}」へ至るには、
+                ${endingsData[hintId].hint}
             </div>`;
     } else {
         hintHtml = `
