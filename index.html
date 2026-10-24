@@ -96,7 +96,7 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 .reply-guide{margin:3px 0 12px;color:var(--text-soft);font-size:.82rem;line-height:1.7}
 .reply-start-button{border-left-color:var(--main);text-align:center;background:#eaf1f4;font-weight:700}
 
-/* 周回用の3つのチェックポイント */
+
 #continue-overlay{position:fixed;inset:0;z-index:220;background:rgba(237,243,245,.98);display:none;justify-content:center;align-items:center;padding:20px;box-sizing:border-box}
 #continue-panel{width:min(790px,96vw);max-height:94vh;overflow-y:auto;background:#fff;border:1px solid var(--line-strong);border-radius:16px;box-shadow:0 22px 70px rgba(68,91,101,.15);padding:32px;box-sizing:border-box;text-align:left}
 .continue-eyebrow{font-size:.7rem;color:var(--muted);font-weight:700;letter-spacing:.15em;margin:0 0 6px}
@@ -121,7 +121,7 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 .continue-final .btn-style{margin:0;padding:10px 24px;background:var(--main-soft);color:var(--main-dark);border-color:var(--line)}
 @media(max-width:700px){.continue-grid{grid-template-columns:1fr}.continue-choice{min-height:75px}}
 
-/* タイトル画面のおしらせ（ゲーム本体のスタイルに影響しない） */
+
 #notice-overlay{position:fixed;inset:0;z-index:210;display:none;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;background:rgba(237,243,245,.98)}
 #notice-panel{width:min(580px,96vw);max-height:90vh;overflow-y:auto;box-sizing:border-box;padding:32px;background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;text-align:left;box-shadow:0 18px 55px rgba(68,91,101,.1)}
 #notice-panel h2{margin:0 0 20px;font-size:1.4rem;color:var(--main-dark)}
@@ -131,7 +131,7 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 #notice-panel .notice-footer{margin-top:26px;text-align:center}
 #notice-panel .notice-footer .btn-style{background:var(--main);color:#fff;margin:0}
 
-/* ノート内の任意ヒント・答え合わせ、最後の確認（既存レイアウトの変更なし） */
+
 .notebook-tools{margin-top:13px;border-top:1px solid var(--note-line);padding-top:12px}
 .notebook-tool-actions{display:flex;flex-wrap:wrap;gap:7px}
 .notebook-tool-button{padding:8px 11px;border:1px solid var(--note-line);border-radius:5px;background:var(--note-surface);color:var(--note-text);font:inherit;font-size:.75rem;cursor:pointer}
@@ -143,7 +143,7 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 .final-notebook-summary{font-size:.79rem;color:var(--text-soft);line-height:1.6;margin-bottom:8px}
 .final-notebook-word{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0;font-size:.78rem;border-bottom:1px solid var(--line)}
 .final-notebook-word button{font:inherit;color:var(--main-dark);background:var(--surface-soft);border:1px solid var(--line);border-radius:4px;padding:4px 10px;cursor:pointer}
-/* エンディング回想（タイトル専用。ゲーム中の画面には影響しない） */
+
 #ending-gallery-overlay{position:fixed;inset:0;z-index:225;display:none;justify-content:center;align-items:center;padding:20px;box-sizing:border-box;background:rgba(237,243,245,.98)}
 #ending-gallery-panel{width:min(800px,96vw);max-height:92vh;overflow-y:auto;background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;padding:28px 36px;box-sizing:border-box;box-shadow:0 20px 65px rgba(68,91,101,.12)}
 #ending-gallery-panel h2{color:var(--main-dark);margin:0 0 10px;text-align:center}
@@ -324,21 +324,21 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 <script>
 
 const wordBank = {
-    W1:{q:"θωε",canonical:"心配する",variants:["しんぱい","心配","心配する","しんぱいする"],synonyms:["気がかり","気掛かり","懸念"],nearMisses:["怖い","不安","気になる","案じる"],meaning:"ヴェインの状態・安全・心情などを気にかけること",boundary:"「怖い」はランスロット自身の恐怖。「心配」はヴェインへ向く感情。",appearances:[1,5,13],difficulty:"easy",finalRole:"物語の入口。後に「大切」「失う」「怖い」へ繋がる気遣い。",minClues:2},
-    W2:{q:"ΣΦμ",canonical:"一緒",variants:["いっしょ"],synonyms:["共に","ともに"],nearMisses:["そば","傍","隣","ずっと","同行"],meaning:"二人で行動する、二人として何かを共有すること",boundary:"「ずっと」は時間的継続。「一緒」は誰と・どのような状態であるか。",appearances:[4,8,17],difficulty:"easy-medium",finalRole:"二人がこの先も共にあることを示す未来語。",minClues:2},
-    W3:{q:"αβγδε",canonical:"ありがとう",variants:["ありがと","有難う","有り難う"],synonyms:["感謝","感謝する","お礼"],nearMisses:["嬉しい","助かった","ごめん","すまない"],meaning:"ヴェイン本人がしてくれたことへの感謝",boundary:"謝罪や一般的な礼儀ではなく、ヴェインとの関係に意味を持つ感謝。",appearances:[3,9,18],difficulty:"easy",finalRole:"最後まで理解しようとしてくれたヴェインへの感謝。",minClues:2},
-    W4:{q:"λησ",canonical:"親友",variants:["しんゆう"],synonyms:["ベストフレンド"],nearMisses:["友達","友人","相棒","仲間","幼馴染"],meaning:"現在の二人の関係を定義する言葉",boundary:"「親友」は関係名。「愛している」は感情。",appearances:[7,12,17],difficulty:"easy-medium",finalRole:"「親友だからだけではない」と関係を一段深めるための基準点。",minClues:2},
-    W5:{q:"ψζβ",canonical:"大切",variants:["たいせつ"],synonyms:["大事","だいじ"],nearMisses:["特別","重要","好き","大好き","愛している","かけがえのない"],meaning:"ヴェインという存在そのものに高い価値を置いていること",boundary:"「大切」は恋愛に限定されない存在価値。「愛している」は最終的な愛情。",appearances:[6,10,16],difficulty:"medium",finalRole:"心配・守る・失う・怖いを結ぶ理由。",minClues:2},
-    W6:{q:"ΘΞΦ",canonical:"守る",variants:["まもる","護る"],synonyms:["保護する","守護する"],nearMisses:["助ける","救う","庇う","かばう","支える"],meaning:"ヴェイン個人を守ろうとする行動・意志・誓い",boundary:"一般的な職務としての「城を守る」「国を守る」は暗号化しない。",appearances:[6,12,19],difficulty:"medium",finalRole:"一方的に守ろうとする関係から、互いに支え合う関係への変化。",minClues:2},
-    W7:{q:"κμνρ",canonical:"忘れる",variants:["わすれる"],synonyms:["忘却","忘却する"],nearMisses:["捨てる","手放す","失う","離れる","消す"],meaning:"記憶・言葉・関係などを意図的に手放そうとすること",boundary:"「忘れる」は本人の意思を伴う。「失う」は望まない喪失。",appearances:[11,15,16],difficulty:"medium",finalRole:"ランスロットが関係を断とうとした誤った選択と、その撤回。",minClues:2},
-    W8:{q:"Ωβδ",canonical:"失う",variants:["うしなう","喪う"],synonyms:["失くす","なくす","喪失","喪失する"],nearMisses:["離れる","別れる","忘れる","死ぬ","手放す"],meaning:"大切な相手や関係を、本人の望みに反して喪失すること",boundary:"「忘れる」は意図的。「失う」は望まない喪失。",appearances:[10,14,17],difficulty:"medium-hard",finalRole:"ランスロットが距離を取った根本原因である喪失への恐れ。",minClues:3},
-    W9:{q:"ξΔφ",canonical:"怖い",variants:["こわい","恐い"],synonyms:["恐れる","恐怖","恐ろしい"],nearMisses:["心配","不安","怯える","おびえる","つらい"],meaning:"ランスロット自身が恐怖を感じること",boundary:"「心配」はヴェインを気にかけること。「怖い」はランスロット自身の内側の感情。",appearances:[12,15,17],difficulty:"medium-hard",finalRole:"ランスロットが自分の弱さを認めるための核心語。",minClues:3},
-    W10:{q:"∞∅θ",canonical:"ずっと",variants:["ズット","ずーっと"],synonyms:["いつまでも","末永く","末ながく"],nearMisses:["いつも","永遠","これからも","長く","一緒"],meaning:"二人の関係や感情が時間的に継続すること",boundary:"「一緒」は二人である状態。「ずっと」はその状態がいつまで続くか。",appearances:[13,16,19],difficulty:"medium",finalRole:"過去から未来へ関係が続いていくことを示す。",minClues:2},
-    W11:{q:"πρστυφ",canonical:"愛している",variants:["あいしている","愛してる","あいしてる"],synonyms:["愛する","愛"],nearMisses:["好き","大好き","恋している","恋する","大切","愛情"],meaning:"「親友」「大切」だけでは説明できない最終的な愛情",boundary:"「大切」と完全同義にしない。本作の最終解読語。",appearances:[15,18,20],difficulty:"hardest",finalRole:"最後の告白で意味が確定する最重要語。",minClues:3},
-    W12:{q:"ϕχψζ",canonical:"信じる",variants:["しんじる"],synonyms:["信頼","信頼する"],nearMisses:["頼る","信用","信用する","任せる","期待する"],meaning:"ヴェインの判断・言葉・存在を信頼し、確信すること",boundary:"「信じる」は認識・信頼。「頼る」は実際に自分の負担を相手へ預けること。",appearances:[5,11,18],difficulty:"medium",finalRole:"言葉が完全に分からなくても成立する二人の信頼。",minClues:2},
-    W13:{q:"℧ΞΛ",canonical:"頼る",variants:["たよる"],synonyms:["頼りにする","頼みにする"],nearMisses:["信じる","任せる","甘える","助けを求める","依存する","すがる"],meaning:"自分の弱さや負担をヴェインへ預け、支えを求めること",boundary:"相手を信じていても、実際には頼らない状態は成立する。",appearances:[9,14,18],difficulty:"medium",finalRole:"一人で抱え込まず、互いに支え合う関係への変化。",minClues:2},
-    W14:{q:"ΓΔ",canonical:"約束",variants:["やくそく","約束する"],synonyms:[],nearMisses:["誓う","誓い","誓約","保証","決める","契約"],meaning:"二人の間で未来についての意志を言葉として確定すること",boundary:"「一緒」は望む状態。「ずっと」は時間。「約束」はその未来を二人で確認する行為。",appearances:[8,13,19],difficulty:"medium",finalRole:"「ずっと」「一緒」など複数の既知語を未来へ結びつける。",minClues:2},
-    W15:{q:"ΨΩ",canonical:"伝える",variants:["つたえる"],synonyms:["届ける"],nearMisses:["言う","話す","知らせる","伝達する","分かってほしい","聞いて"],meaning:"自分の本心・感情・願いを言葉としてヴェインへ届けること",boundary:"「愛している」などは伝える内容。「伝える」は届けようとする行為。",appearances:[2,11,20],difficulty:"medium",finalRole:"「言葉が届かない」というゲームそのもののテーマを回収する。",minClues:2}
+    W1: { q: "θωε", canonical: "心配する", variants: ["しんぱい", "心配", "心配する", "しんぱいする"], synonyms: ["気がかり", "気掛かり", "懸念"], nearMisses: ["怖い", "不安", "気になる", "案じる"], meaning: "ヴェインの状態・安全・心情などを気にかけること", boundary: "「怖い」はランスロット自身の恐怖。「心配」はヴェインへ向く感情。", appearances: [1, 5, 13], difficulty: "easy", finalRole: "物語の入口。後に「大切」「失う」「怖い」へ繋がる気遣い。", minClues: 2 },
+    W2: { q: "ΣΦμ", canonical: "一緒", variants: ["いっしょ"], synonyms: ["共に", "ともに"], nearMisses: ["そば", "傍", "隣", "ずっと", "同行"], meaning: "二人で行動する、二人として何かを共有すること", boundary: "「ずっと」は時間的継続。「一緒」は誰と・どのような状態であるか。", appearances: [4, 8, 17, 19, 20], difficulty: "easy-medium", finalRole: "二人がこの先も共にあることを示す未来語。", minClues: 2 },
+    W3: { q: "αβγδε", canonical: "ありがとう", variants: ["ありがと", "有難う", "有り難う"], synonyms: ["感謝", "感謝する", "お礼"], nearMisses: ["嬉しい", "助かった", "ごめん", "すまない"], meaning: "ヴェイン本人がしてくれたことへの感謝", boundary: "謝罪や一般的な礼儀ではなく、ヴェインとの関係に意味を持つ感謝。", appearances: [3, 9, 18], difficulty: "easy", finalRole: "最後まで理解しようとしてくれたヴェインへの感謝。", minClues: 2 },
+    W4: { q: "λησ", canonical: "親友", variants: ["しんゆう"], synonyms: ["ベストフレンド"], nearMisses: ["友達", "友人", "相棒", "仲間", "幼馴染"], meaning: "現在の二人の関係を定義する言葉", boundary: "「親友」は関係名。「愛している」は感情。", appearances: [7, 12, 17], difficulty: "easy-medium", finalRole: "「親友だからだけではない」と関係を一段深めるための基準点。", minClues: 2 },
+    W5: { q: "ψζβ", canonical: "大切", variants: ["たいせつ"], synonyms: ["大事", "だいじ"], nearMisses: ["特別", "重要", "好き", "大好き", "愛している", "かけがえのない"], meaning: "ヴェインという存在そのものに高い価値を置いていること", boundary: "「大切」は恋愛に限定されない存在価値。「愛している」は最終的な愛情。", appearances: [6, 10, 16, 20], difficulty: "medium", finalRole: "心配・守る・失う・怖いを結ぶ理由。", minClues: 2 },
+    W6: { q: "ΘΞΦ", canonical: "守る", variants: ["まもる", "護る"], synonyms: ["保護する", "守護する"], nearMisses: ["助ける", "救う", "庇う", "かばう", "支える"], meaning: "ヴェイン個人を守ろうとする行動・意志・誓い", boundary: "一般的な職務としての「城を守る」「国を守る」は暗号化しない。", appearances: [6, 12, 19], difficulty: "medium", finalRole: "一方的に守ろうとする関係から、互いに支え合う関係への変化。", minClues: 2 },
+    W7: { q: "κμνρ", canonical: "忘れる", variants: ["わすれる"], synonyms: ["忘却", "忘却する"], nearMisses: ["捨てる", "手放す", "失う", "離れる", "消す"], meaning: "記憶・言葉・関係などを意図的に手放そうとすること", boundary: "「忘れる」は本人の意思を伴う。「失う」は望まない喪失。", appearances: [11, 15, 16], difficulty: "medium", finalRole: "ランスロットが関係を断とうとした誤った選択と、その撤回。", minClues: 2 },
+    W8: { q: "Ωβδ", canonical: "失う", variants: ["うしなう", "喪う"], synonyms: ["失くす", "なくす", "喪失", "喪失する"], nearMisses: ["離れる", "別れる", "忘れる", "死ぬ", "手放す"], meaning: "大切な相手や関係を、本人の望みに反して喪失すること", boundary: "「忘れる」は意図的。「失う」は望まない喪失。", appearances: [10, 14, 17, 20], difficulty: "medium-hard", finalRole: "ランスロットが距離を取った根本原因である喪失への恐れ。", minClues: 3 },
+    W9: { q: "ξΔφ", canonical: "怖い", variants: ["こわい", "恐い"], synonyms: ["恐れる", "恐怖", "恐ろしい"], nearMisses: ["心配", "不安", "怯える", "おびえる", "つらい"], meaning: "ランスロット自身が恐怖を感じること", boundary: "「心配」はヴェインを気にかけること。「怖い」はランスロット自身の内側の感情。", appearances: [12, 15, 17, 20], difficulty: "medium-hard", finalRole: "ランスロットが自分の弱さを認めるための核心語。", minClues: 3 },
+    W10: { q: "∞∅θ", canonical: "ずっと", variants: ["ズット", "ずーっと"], synonyms: ["いつまでも", "末永く", "末ながく"], nearMisses: ["いつも", "永遠", "これからも", "長く", "一緒"], meaning: "二人の関係や感情が時間的に継続すること", boundary: "「一緒」は二人である状態。「ずっと」はその状態がいつまで続くか。", appearances: [13, 16, 19, 20], difficulty: "medium", finalRole: "過去から未来へ関係が続いていくことを示す。", minClues: 2 },
+    W11: { q: "πρστυφ", canonical: "愛している", variants: ["あいしている", "愛してる", "あいしてる"], synonyms: ["愛する", "愛"], nearMisses: ["好き", "大好き", "恋している", "恋する", "大切", "愛情"], meaning: "「親友」「大切」だけでは説明できない最終的な愛情", boundary: "「大切」と完全同義にしない。本作の最終解読語。", appearances: [15, 18, 20], difficulty: "hardest", finalRole: "最後の告白で意味が確定する最重要語。", minClues: 3 },
+    W12: { q: "ϕχψζ", canonical: "信じる", variants: ["しんじる"], synonyms: ["信頼", "信頼する"], nearMisses: ["頼る", "信用", "信用する", "任せる", "期待する"], meaning: "ヴェインの判断・言葉・存在を信頼し、確信すること", boundary: "「信じる」は認識・信頼。「頼る」は実際に自分の負担を相手へ預けること。", appearances: [5, 11, 18, 20], difficulty: "medium", finalRole: "言葉が完全に分からなくても成立する二人の信頼。", minClues: 2 },
+    W13: { q: "℧ΞΛ", canonical: "頼る", variants: ["たよる"], synonyms: ["頼りにする", "頼みにする"], nearMisses: ["信じる", "任せる", "甘える", "助けを求める", "依存する", "すがる"], meaning: "自分の弱さや負担をヴェインへ預け、支えを求めること", boundary: "相手を信じていても、実際には頼らない状態は成立する。", appearances: [9, 14, 18, 20], difficulty: "medium", finalRole: "一人で抱え込まず、互いに支え合う関係への変化。", minClues: 2 },
+    W14: { q: "ΓΔ", canonical: "約束", variants: ["やくそく", "約束する"], synonyms: [], nearMisses: ["誓う", "誓い", "誓約", "保証", "決める", "契約"], meaning: "二人の間で未来についての意志を言葉として確定すること", boundary: "「一緒」は望む状態。「ずっと」は時間。「約束」はその未来を二人で確認する行為。", appearances: [8, 13, 19, 20], difficulty: "medium", finalRole: "「ずっと」「一緒」など複数の既知語を未来へ結びつける。", minClues: 2 },
+    W15: { q: "ΨΩ", canonical: "伝える", variants: ["つたえる"], synonyms: ["届ける"], nearMisses: ["言う", "話す", "知らせる", "伝達する", "分かってほしい", "聞いて"], meaning: "自分の本心・感情・願いを言葉としてヴェインへ届けること", boundary: "「愛している」などは伝える内容。「伝える」は届けようとする行為。", appearances: [2, 11, 20], difficulty: "medium", finalRole: "「言葉が届かない」というゲームそのもののテーマを回収する。", minClues: 2 }
 };
 
 const wordHints = {
@@ -418,203 +418,203 @@ const wordHints = {
         "気持ちの中身ではなく、それを相手に届けること。"
     ]
 };
-let notebookChecks={};       
-let notebookHintLevels={};   
-let finalReviewOpen=false;
+let notebookChecks = {};
+let notebookHintLevels = {};
+let finalReviewOpen = false;
 
-let currentStep=0,viewingStep=0,lovePoints=0,userDict={},colSet=new Set();
-let selectedAnswers=[];
-let sceneChoiceRecords=[];
-let masteredWords=new Set(),vaneKnownWords=new Set(),vaneUnderstoodAt={};
-let wordSeenCounts={},seenSceneIds=new Set();
-let interactionPhase="conversation",pendingOption=null,pendingResolvedKeys=[],pendingFinalLine="";
-let pendingChoiceContext=null;
-let activeDictKey=null,mainViewMode="play";
-let interpretationCounts={unknown:0,misread:0,understood:0};
-let axisCounts={listen:0,act:0,bond:0,self:0,daily:0};
-let routeCounts={twin:0,glass:0,resonance:0};
-let understandingFlashTimer=null;
+let currentStep = 0, viewingStep = 0, lovePoints = 0, userDict = {}, colSet = new Set();
+let selectedAnswers = [];
+let sceneChoiceRecords = [];
+let masteredWords = new Set(), vaneKnownWords = new Set(), vaneUnderstoodAt = {};
+let wordSeenCounts = {}, seenSceneIds = new Set();
+let interactionPhase = "conversation", pendingOption = null, pendingResolvedKeys = [], pendingFinalLine = "";
+let pendingChoiceContext = null;
+let activeDictKey = null, mainViewMode = "play";
+let interpretationCounts = { unknown: 0, misread: 0, understood: 0 };
+let axisCounts = { listen: 0, act: 0, bond: 0, self: 0, daily: 0 };
+let routeCounts = { twin: 0, glass: 0, resonance: 0 };
+let understandingFlashTimer = null;
 
-scenario.forEach(scene=>{
-    ["opts","insightOpts","misreadOpts"].forEach((group,groupIndex)=>{
-        const prefix=["o","i","m"][groupIndex];
-        (scene[group]||[]).forEach((option,index)=>{
-            if(!option.id) option.id=`s${String(scene.id).padStart(2,"0")}_${prefix}${index+1}`;
+scenario.forEach(scene => {
+    ["opts", "insightOpts", "misreadOpts"].forEach((group, groupIndex) => {
+        const prefix = ["o", "i", "m"][groupIndex];
+        (scene[group] || []).forEach((option, index) => {
+            if (!option.id) option.id = `s${String(scene.id).padStart(2, "0")}_${prefix}${index + 1}`;
         });
     });
 });
 
-const maxLove=450;
+const maxLove = 450;
 
-function getAllSceneOptions(scene){
-    if(!scene) return [];
-    return [...(scene.opts||[]),...(scene.insightOpts||[]),...(scene.misreadOpts||[])];
+function getAllSceneOptions(scene) {
+    if (!scene) return [];
+    return [...(scene.opts || []), ...(scene.insightOpts || []), ...(scene.misreadOpts || [])];
 }
 
-function findSceneOption(scene,id){
-    return getAllSceneOptions(scene).find(o=>o.id===id)||null;
+function findSceneOption(scene, id) {
+    return getAllSceneOptions(scene).find(o => o.id === id) || null;
 }
 
-function escapeHtml(value){
-    return String(value??"").replace(/[&<>"']/g,c=>({
-        "&":"&amp;",
-        "<":"&lt;",
-        ">":"&gt;",
-        "\"":"&quot;",
-        "'":"&#39;"
+function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>"']/g, c => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
     }[c]));
 }
 
-function switchMainView(mode){
-    if(mode!=="play"&&mode!=="log") return;
-    mainViewMode=mode;
+function switchMainView(mode) {
+    if (mode !== "play" && mode !== "log") return;
+    mainViewMode = mode;
 
-    const playView=document.getElementById("play-view");
-    const logSection=document.getElementById("log-section");
-    const playTab=document.getElementById("play-view-tab");
-    const logTab=document.getElementById("log-view-tab");
+    const playView = document.getElementById("play-view");
+    const logSection = document.getElementById("log-section");
+    const playTab = document.getElementById("play-view-tab");
+    const logTab = document.getElementById("log-view-tab");
 
-    if(!playView||!logSection||!playTab||!logTab) return;
+    if (!playView || !logSection || !playTab || !logTab) return;
 
-    if(mode==="log"){
-        playView.style.display="none";
-        logSection.style.display="flex";
+    if (mode === "log") {
+        playView.style.display = "none";
+        logSection.style.display = "flex";
         playTab.classList.remove("active");
         logTab.classList.add("active");
         renderPastLog();
-    }else{
-        playView.style.display="flex";
-        logSection.style.display="none";
+    } else {
+        playView.style.display = "flex";
+        logSection.style.display = "none";
         logTab.classList.remove("active");
         playTab.classList.add("active");
     }
 }
 
-function rebuildRunState(){
-    lovePoints=0;
-    interpretationCounts={unknown:0,misread:0,understood:0};
+function rebuildRunState() {
+    lovePoints = 0;
+    interpretationCounts = { unknown: 0, misread: 0, understood: 0 };
 
-    sceneChoiceRecords=sceneChoiceRecords.map((record,index)=>
-        selectedAnswers[index]&&record?.optionId===selectedAnswers[index]
-            ?record
-            :null
+    sceneChoiceRecords = sceneChoiceRecords.map((record, index) =>
+        selectedAnswers[index] && record?.optionId === selectedAnswers[index]
+            ? record
+            : null
     );
 
-    axisCounts={listen:0,act:0,bond:0,self:0,daily:0};
-    routeCounts={twin:0,glass:0,resonance:0};
+    axisCounts = { listen: 0, act: 0, bond: 0, self: 0, daily: 0 };
+    routeCounts = { twin: 0, glass: 0, resonance: 0 };
 
-    selectedAnswers.forEach((optionId,sceneIndex)=>{
-        if(!optionId) return;
+    selectedAnswers.forEach((optionId, sceneIndex) => {
+        if (!optionId) return;
 
-        const scene=scenario[sceneIndex];
-        const option=findSceneOption(scene,optionId);
+        const scene = scenario[sceneIndex];
+        const option = findSceneOption(scene, optionId);
 
-        if(!option) return;
+        if (!option) return;
 
-        lovePoints+=Number(option.v)||0;
+        lovePoints += Number(option.v) || 0;
 
-        if(!option.endingImpact) return;
+        if (!option.endingImpact) return;
 
-        if(Object.prototype.hasOwnProperty.call(axisCounts,option.axis)){
+        if (Object.prototype.hasOwnProperty.call(axisCounts, option.axis)) {
             axisCounts[option.axis]++;
         }
 
-        if(Object.prototype.hasOwnProperty.call(routeCounts,option.route)){
+        if (Object.prototype.hasOwnProperty.call(routeCounts, option.route)) {
             routeCounts[option.route]++;
         }
     });
 }
 
-function normalizeGuess(value){
-    return String(value??"").normalize("NFKC").replace(/\s+/g,"").trim();
+function normalizeGuess(value) {
+    return String(value ?? "").normalize("NFKC").replace(/\s+/g, "").trim();
 }
 
-function isAcceptedGuess(key,value){
-    if(!wordBank[key]) return false;
+function isAcceptedGuess(key, value) {
+    if (!wordBank[key]) return false;
 
-    const input=normalizeGuess(value);
-    if(!input) return false;
+    const input = normalizeGuess(value);
+    if (!input) return false;
 
-    const accepted=[
+    const accepted = [
         wordBank[key].canonical,
-        ...(wordBank[key].variants||[]),
-        ...(wordBank[key].synonyms||[])
+        ...(wordBank[key].variants || []),
+        ...(wordBank[key].synonyms || [])
     ];
 
-    return accepted.some(candidate=>normalizeGuess(candidate)===input);
+    return accepted.some(candidate => normalizeGuess(candidate) === input);
 }
 
-function getSceneWordStates(scene){
-    const wordStates={};
-    const guesses={};
+function getSceneWordStates(scene) {
+    const wordStates = {};
+    const guesses = {};
 
-    const keys=[
+    const keys = [
         ...new Set(
-            (scene.words||[])
-                .map(item=>item.key)
-                .filter(key=>wordBank[key])
+            (scene.words || [])
+                .map(item => item.key)
+                .filter(key => wordBank[key])
         )
     ];
 
-    keys.forEach(key=>{
-        const guess=String(userDict[key]||"").trim();
+    keys.forEach(key => {
+        const guess = String(userDict[key] || "").trim();
 
-        guesses[key]=guess;
-        wordStates[key]=
-            vaneKnownWords.has(key)||isAcceptedGuess(key,guess)
-                ?"correct"
-                :(guess?"wrong":"blank");
+        guesses[key] = guess;
+        wordStates[key] =
+            vaneKnownWords.has(key) || isAcceptedGuess(key, guess)
+                ? "correct"
+                : (guess ? "wrong" : "blank");
     });
 
     return {
         wordStates,
         guesses,
-        allCorrect:keys.every(key=>wordStates[key]==="correct")
+        allCorrect: keys.every(key => wordStates[key] === "correct")
     };
 }
 
-function matchesMisreadTrigger(option,wordStates,guesses){
-    const trigger=option.trigger;
+function matchesMisreadTrigger(option, wordStates, guesses) {
+    const trigger = option.trigger;
 
-    if(
-        !trigger||
-        !wordBank[trigger.key]||
-        wordStates[trigger.key]!=="wrong"
-    ){
+    if (
+        !trigger ||
+        !wordBank[trigger.key] ||
+        wordStates[trigger.key] !== "wrong"
+    ) {
         return false;
     }
 
-    const actual=normalizeGuess(guesses[trigger.key]);
+    const actual = normalizeGuess(guesses[trigger.key]);
 
-    if(!actual||isAcceptedGuess(trigger.key,actual)){
+    if (!actual || isAcceptedGuess(trigger.key, actual)) {
         return false;
     }
 
-    return Array.isArray(trigger.guesses)&&
+    return Array.isArray(trigger.guesses) &&
         trigger.guesses.some(
-            guess=>normalizeGuess(guess)===actual
+            guess => normalizeGuess(guess) === actual
         );
 }
 
-function buildChoicesForScene(scene,states){
-    const choices=(scene.opts||[]).map(
-        option=>({option,kind:"base"})
+function buildChoicesForScene(scene, states) {
+    const choices = (scene.opts || []).map(
+        option => ({ option, kind: "base" })
     );
 
-    if(states.allCorrect){
-        (scene.insightOpts||[]).forEach(
-            option=>choices.push({option,kind:"insight"})
+    if (states.allCorrect) {
+        (scene.insightOpts || []).forEach(
+            option => choices.push({ option, kind: "insight" })
         );
-    }else{
-        (scene.misreadOpts||[]).forEach(option=>{
-            if(
+    } else {
+        (scene.misreadOpts || []).forEach(option => {
+            if (
                 matchesMisreadTrigger(
                     option,
                     states.wordStates,
                     states.guesses
                 )
-            ){
-                choices.push({option,kind:"misread"});
+            ) {
+                choices.push({ option, kind: "misread" });
             }
         });
     }
@@ -622,89 +622,89 @@ function buildChoicesForScene(scene,states){
     return shuffle(choices);
 }
 
-function lockChoicesForCurrentScene(){
-    if(
-        interactionPhase!=="conversation"||
-        currentStep>=scenario.length
-    ){
+function lockChoicesForCurrentScene() {
+    if (
+        interactionPhase !== "conversation" ||
+        currentStep >= scenario.length
+    ) {
         return;
     }
 
-    pendingChoiceContext=null;
+    pendingChoiceContext = null;
 
-    const scene=scenario[currentStep];
-    const states=getSceneWordStates(scene);
+    const scene = scenario[currentStep];
+    const states = getSceneWordStates(scene);
 
-    pendingChoiceContext={
-        sceneIndex:currentStep,
-        wordStates:Object.freeze({...states.wordStates}),
-        guesses:Object.freeze({...states.guesses}),
-        allGuesses:Object.freeze({...userDict}),
-        options:Object.freeze(buildChoicesForScene(scene,states))
+    pendingChoiceContext = {
+        sceneIndex: currentStep,
+        wordStates: Object.freeze({ ...states.wordStates }),
+        guesses: Object.freeze({ ...states.guesses }),
+        allGuesses: Object.freeze({ ...userDict }),
+        options: Object.freeze(buildChoicesForScene(scene, states))
     };
 
-    interactionPhase="choice";
+    interactionPhase = "choice";
     updateUI(true);
 }
 
-function chooseReply(choice){
-    if(
-        interactionPhase!=="choice"||
-        !pendingChoiceContext||
-        pendingChoiceContext.sceneIndex!==currentStep
-    ){
+function chooseReply(choice) {
+    if (
+        interactionPhase !== "choice" ||
+        !pendingChoiceContext ||
+        pendingChoiceContext.sceneIndex !== currentStep
+    ) {
         return;
     }
 
-    if(!pendingChoiceContext.options.includes(choice)){
+    if (!pendingChoiceContext.options.includes(choice)) {
         return;
     }
 
-    const scene=scenario[currentStep];
-    const {option,kind}=choice;
+    const scene = scenario[currentStep];
+    const { option, kind } = choice;
 
-    selectedAnswers[currentStep]=option.id;
+    selectedAnswers[currentStep] = option.id;
 
-    sceneChoiceRecords[currentStep]={
-        sceneId:scene.id,
-        wordStates:{...pendingChoiceContext.wordStates},
-        optionId:option.id,
+    sceneChoiceRecords[currentStep] = {
+        sceneId: scene.id,
+        wordStates: { ...pendingChoiceContext.wordStates },
+        optionId: option.id,
         kind,
         misreadKey:
-            kind==="misread"
-                ?(option.trigger?.key||null)
-                :null,
-        route:option.route||null,
-        guesses:{...pendingChoiceContext.guesses},
-        notebookGuesses:{...pendingChoiceContext.allGuesses}
+            kind === "misread"
+                ? (option.trigger?.key || null)
+                : null,
+        route: option.route || null,
+        guesses: { ...pendingChoiceContext.guesses },
+        notebookGuesses: { ...pendingChoiceContext.allGuesses }
     };
 
     rebuildRunState();
 
-    pendingOption=option;
-    interactionPhase="reaction";
+    pendingOption = option;
+    interactionPhase = "reaction";
     updateUI(true);
 
-    const display=document.getElementById("display");
-    if(display) display.scrollTop=0;
+    const display = document.getElementById("display");
+    if (display) display.scrollTop = 0;
 }
 
-function getSavedWords(){
-    try{
+function getSavedWords() {
+    try {
         return JSON.parse(
-            localStorage.getItem("vane_solved_words")||"{}"
+            localStorage.getItem("vane_solved_words") || "{}"
         );
-    }catch(e){
+    } catch (e) {
         return {};
     }
 }
 
-function getMasteredWordSet(){
-    const saved=getSavedWords();
-    const result=new Set();
+function getMasteredWordSet() {
+    const saved = getSavedWords();
+    const result = new Set();
 
-    Object.keys(wordBank).forEach(key=>{
-        if(saved[key]&&isAcceptedGuess(key,saved[key])){
+    Object.keys(wordBank).forEach(key => {
+        if (saved[key] && isAcceptedGuess(key, saved[key])) {
             result.add(key);
         }
     });
@@ -712,12 +712,12 @@ function getMasteredWordSet(){
     return result;
 }
 
-function persistMasteredWord(key){
-    if(!wordBank[key]) return;
+function persistMasteredWord(key) {
+    if (!wordBank[key]) return;
 
-    const solved=getSavedWords();
+    const solved = getSavedWords();
 
-    solved[key]=wordBank[key].canonical;
+    solved[key] = wordBank[key].canonical;
 
     localStorage.setItem(
         "vane_solved_words",
@@ -725,203 +725,203 @@ function persistMasteredWord(key){
     );
 }
 
-function hasCompatibleSavedWords(){
-    return getMasteredWordSet().size>0;
+function hasCompatibleSavedWords() {
+    return getMasteredWordSet().size > 0;
 }
 
-function sceneContainsWord(text,key){
-    return new RegExp("\\[\\["+key+"(?:\\||\\]\\])").test(text);
+function sceneContainsWord(text, key) {
+    return new RegExp("\\[\\[" + key + "(?:\\||\\]\\])").test(text);
 }
 
-const wordTotalClueScenes={};
+const wordTotalClueScenes = {};
 
-Object.keys(wordBank).forEach(key=>{
-    wordTotalClueScenes[key]=scenario.filter(
-        scene=>sceneContainsWord(scene.q,key)
+Object.keys(wordBank).forEach(key => {
+    wordTotalClueScenes[key] = scenario.filter(
+        scene => sceneContainsWord(scene.q, key)
     ).length;
 });
 
-function checkEnvironment(){
-    const isMobile=
-        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||
-        window.innerWidth<800;
+function checkEnvironment() {
+    const isMobile =
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+        window.innerWidth < 800;
 
-    const title=document.getElementById("check-title");
-    const entryBtn=document.getElementById("entry-btn");
-    const errorMsg=document.getElementById("error-msg");
+    const title = document.getElementById("check-title");
+    const entryBtn = document.getElementById("entry-btn");
+    const errorMsg = document.getElementById("error-msg");
 
-    if(isMobile){
-        title.innerText="ACCESS DENIED";
-        errorMsg.style.display="block";
-    }else{
-        title.innerText="ATTENTION";
-        entryBtn.style.display="inline-block";
+    if (isMobile) {
+        title.innerText = "ACCESS DENIED";
+        errorMsg.style.display = "block";
+    } else {
+        title.innerText = "ATTENTION";
+        entryBtn.style.display = "inline-block";
     }
 }
 
-function shuffle(array){
-    const arr=array.slice();
-    let n=arr.length;
+function shuffle(array) {
+    const arr = array.slice();
+    let n = arr.length;
 
-    while(n){
-        const i=Math.floor(Math.random()*n--);
-        [arr[n],arr[i]]=[arr[i],arr[n]];
+    while (n) {
+        const i = Math.floor(Math.random() * n--);
+        [arr[n], arr[i]] = [arr[i], arr[n]];
     }
 
     return arr;
 }
 
-function canCheckNotebookWord(key){
-    if(!wordBank[key] || !getEncounteredScenesForWord(key).length) return false;
-    return scenario.some((scene,index)=>
-        index<=currentStep && (
-            (scene.resolveChecks||[]).includes(key) ||
-            scene.finalResolve?.key===key
+function canCheckNotebookWord(key) {
+    if (!wordBank[key] || !getEncounteredScenesForWord(key).length) return false;
+    return scenario.some((scene, index) =>
+        index <= currentStep && (
+            (scene.resolveChecks || []).includes(key) ||
+            scene.finalResolve?.key === key
         )
     );
 }
-function availableNotebookHintLevel(key){
-    const seen=getEncounteredScenesForWord(key).length;
-    if(!seen) return 0;
-    if(currentStep===scenario.length-1 || seen>=3) return 3;
-    if(canCheckNotebookWord(key)) return 2;
+function availableNotebookHintLevel(key) {
+    const seen = getEncounteredScenesForWord(key).length;
+    if (!seen) return 0;
+    if (currentStep === scenario.length - 1 || seen >= 3) return 3;
+    if (canCheckNotebookWord(key)) return 2;
     return 1;
 }
-function checkNotebookGuess(key){
-    if(!canCheckNotebookWord(key) || vaneKnownWords.has(key)) return;
-    const guess=String(userDict[key]||"").trim();
+function checkNotebookGuess(key) {
+    if (!canCheckNotebookWord(key) || vaneKnownWords.has(key)) return;
+    const guess = String(userDict[key] || "").trim();
     let message;
-    if(!guess){
-        message="まだ推測を書いていない。";
-    }else if(isAcceptedGuess(key,guess)){
-        message="この推測は正しいみたいだ。";
-    }else if((wordBank[key].nearMisses||[]).some(value=>
-        normalizeGuess(value)===normalizeGuess(guess)
-    )){
-        message="少し意味が違うようだ。";
-    }else{
-        message="この言葉は別の意味のようだ。";
+    if (!guess) {
+        message = "まだ推測を書いていない。";
+    } else if (isAcceptedGuess(key, guess)) {
+        message = "この推測は正しいみたいだ。";
+    } else if ((wordBank[key].nearMisses || []).some(value =>
+        normalizeGuess(value) === normalizeGuess(guess)
+    )) {
+        message = "少し意味が違うようだ。";
+    } else {
+        message = "この言葉は別の意味のようだ。";
     }
-    notebookChecks[key]={guess,message};
+    notebookChecks[key] = { guess, message };
     renderActiveDictEntry();
 }
-function revealNotebookHint(key){
-    const available=availableNotebookHintLevel(key);
-    const current=notebookHintLevels[key]||0;
-    if(available<=current) return;
-    notebookHintLevels[key]=current+1;
+function revealNotebookHint(key) {
+    const available = availableNotebookHintLevel(key);
+    const current = notebookHintLevels[key] || 0;
+    if (available <= current) return;
+    notebookHintLevels[key] = current + 1;
     renderActiveDictEntry();
 }
-function toggleFinalNotebookReview(){
-    if(currentStep!==scenario.length-1 || interactionPhase!=="conversation") return;
-    finalReviewOpen=!finalReviewOpen;
+function toggleFinalNotebookReview() {
+    if (currentStep !== scenario.length - 1 || interactionPhase !== "conversation") return;
+    finalReviewOpen = !finalReviewOpen;
     updateUI(true);
 }
-function refreshFinalNotebookRow(key){
-    if(!finalReviewOpen || currentStep!==scenario.length-1) return;
-    const row=document.querySelector(`[data-final-word-key="${key}"] .final-notebook-status`);
-    if(!row) return;
-    row.innerText=vaneKnownWords.has(key)?"理解済み"
-        :String(userDict[key]||"").trim()?"推測あり":"未推測";
+function refreshFinalNotebookRow(key) {
+    if (!finalReviewOpen || currentStep !== scenario.length - 1) return;
+    const row = document.querySelector(`[data-final-word-key="${key}"] .final-notebook-status`);
+    if (!row) return;
+    row.innerText = vaneKnownWords.has(key) ? "理解済み"
+        : String(userDict[key] || "").trim() ? "推測あり" : "未推測";
 }
 
-function getEncounteredScenesForWord(key){
-    return scenario.reduce((result,scene,index)=>{
-        if(
-            seenSceneIds.has(index)&&
-            sceneContainsWord(scene.q,key)
-        ){
+function getEncounteredScenesForWord(key) {
+    return scenario.reduce((result, scene, index) => {
+        if (
+            seenSceneIds.has(index) &&
+            sceneContainsWord(scene.q, key)
+        ) {
             result.push(index);
         }
         return result;
-    },[]);
+    }, []);
 }
 
-function getVaneNotebookMemo(key){
-    if(vaneKnownWords.has(key)){
+function getVaneNotebookMemo(key) {
+    if (vaneKnownWords.has(key)) {
         return "……うん。もう、この言葉は分かる。";
     }
 
-    const count=getEncounteredScenesForWord(key).length;
+    const count = getEncounteredScenesForWord(key).length;
 
-    if(count<=1){
+    if (count <= 1) {
         return "初めて聞いた音だ。ノートに書いておこうかな。";
     }
 
-    if(count===2){
+    if (count === 2) {
         return "前にも聞いたな。同じ意味のはずだ。";
     }
 
     return "ランちゃんの言葉を思い出せば、何かわかるかも。";
 }
 
-function renderNotebookRecordText(text,focusKey){
-    let rendered=escapeHtml(text||"");
+function renderNotebookRecordText(text, focusKey) {
+    let rendered = escapeHtml(text || "");
 
-    for(const key of Object.keys(wordBank)){
-        const reg=new RegExp(
-            "\\[\\["+key+"(?:\\|([^\\]]+))?\\]\\]",
+    for (const key of Object.keys(wordBank)) {
+        const reg = new RegExp(
+            "\\[\\[" + key + "(?:\\|([^\\]]+))?\\]\\]",
             "g"
         );
 
-        rendered=rendered.replace(reg,(match,surfaceForm)=>{
-            const display=vaneKnownWords.has(key)
-                ?(surfaceForm||wordBank[key].canonical)
-                :wordBank[key].q;
+        rendered = rendered.replace(reg, (match, surfaceForm) => {
+            const display = vaneKnownWords.has(key)
+                ? (surfaceForm || wordBank[key].canonical)
+                : wordBank[key].q;
 
-            return `<span class="dict-record-word${key===focusKey?" focus":""}">${escapeHtml(display)}</span>`;
+            return `<span class="dict-record-word${key === focusKey ? " focus" : ""}">${escapeHtml(display)}</span>`;
         });
     }
 
-    return rendered.replace(/\n/g,"<br>");
+    return rendered.replace(/\n/g, "<br>");
 }
 
-function handleGuessBlur(key){
-    if(
-        vaneKnownWords.has(key)||
-        !String(userDict[key]||"").trim()
-    ){
+function handleGuessBlur(key) {
+    if (
+        vaneKnownWords.has(key) ||
+        !String(userDict[key] || "").trim()
+    ) {
         return;
     }
 
-    const feedback=document.getElementById(
+    const feedback = document.getElementById(
         `dict-feedback-${key}`
     );
 
-    if(!feedback) return;
+    if (!feedback) return;
 
-    feedback.innerText="……とりあえず、書き留めておこう。";
+    feedback.innerText = "……とりあえず、書き留めておこう。";
     feedback.classList.add("show");
 
-    setTimeout(()=>{
-        const element=document.getElementById(
+    setTimeout(() => {
+        const element = document.getElementById(
             `dict-feedback-${key}`
         );
 
-        if(element){
+        if (element) {
             element.classList.remove("show");
         }
-    },1800);
+    }, 1800);
 }
 
-function playUnderstandingFlash(keys){
-    const unique=[...new Set(keys)].filter(
-        key=>wordBank[key]
+function playUnderstandingFlash(keys) {
+    const unique = [...new Set(keys)].filter(
+        key => wordBank[key]
     );
 
-    if(!unique.length) return;
+    if (!unique.length) return;
 
-    const overlay=document.getElementById(
+    const overlay = document.getElementById(
         "understanding-flash"
     );
 
-    const words=document.getElementById(
+    const words = document.getElementById(
         "understanding-flash-words"
     );
 
-    if(!overlay||!words) return;
+    if (!overlay || !words) return;
 
-    words.innerHTML=unique.map(key=>`
+    words.innerHTML = unique.map(key => `
         <div class="understanding-flash-row">
             <span class="understanding-flash-symbol">${wordBank[key].q}</span>
             <span class="understanding-flash-arrow">→</span>
@@ -934,74 +934,74 @@ function playUnderstandingFlash(keys){
     overlay.classList.remove("visible");
     void overlay.offsetWidth;
     overlay.classList.add("visible");
-    overlay.setAttribute("aria-hidden","false");
+    overlay.setAttribute("aria-hidden", "false");
 
-    understandingFlashTimer=setTimeout(()=>{
+    understandingFlashTimer = setTimeout(() => {
         overlay.classList.remove("visible");
-        overlay.setAttribute("aria-hidden","true");
-    },1300);
+        overlay.setAttribute("aria-hidden", "true");
+    }, 1300);
 }
 
-function jumpToLogScene(sceneIndex,key){
-    if(key&&wordBank[key]){
-        activeDictKey=key;
+function jumpToLogScene(sceneIndex, key) {
+    if (key && wordBank[key]) {
+        activeDictKey = key;
     }
 
     switchMainView("log");
     renderPastLog();
 
-    requestAnimationFrame(()=>{
-        const target=document.getElementById(
+    requestAnimationFrame(() => {
+        const target = document.getElementById(
             `log-scene-${sceneIndex}`
         );
 
-        if(!target) return;
+        if (!target) return;
 
         target.scrollIntoView({
-            behavior:"smooth",
-            block:"center"
+            behavior: "smooth",
+            block: "center"
         });
 
         target.classList.remove("log-focus");
         void target.offsetWidth;
         target.classList.add("log-focus");
 
-        setTimeout(()=>{
+        setTimeout(() => {
             target.classList.remove("log-focus");
-        },1200);
+        }, 1200);
     });
 }
 
-function jumpToDict(key){
-    if(!wordBank[key]) return;
+function jumpToDict(key) {
+    if (!wordBank[key]) return;
 
-    if(
-        !getEncounteredScenesForWord(key).length&&
+    if (
+        !getEncounteredScenesForWord(key).length &&
         !vaneKnownWords.has(key)
-    ){
+    ) {
         return;
     }
 
-    activeDictKey=key;
+    activeDictKey = key;
 
     renderActiveDictEntry();
     renderPastLog();
     renderWordList();
 
-    const input=document.getElementById(
+    const input = document.getElementById(
         `input-${key}`
     );
 
-    if(input&&!input.disabled){
+    if (input && !input.disabled) {
         input.focus();
     }
 }
 
-function renderDictPlaceholder(){
-    const list=document.getElementById("dict-list");
-    if(!list) return;
+function renderDictPlaceholder() {
+    const list = document.getElementById("dict-list");
+    if (!list) return;
 
-    list.innerHTML=`
+    list.innerHTML = `
         <div class="dict-placeholder">
             <div class="dict-placeholder-symbol">―――</div>
             ランスロットの言葉の一部が聞き取れない……。<br>
@@ -1010,44 +1010,44 @@ function renderDictPlaceholder(){
     `;
 }
 
-function renderActiveDictEntry(){
-    const list=document.getElementById("dict-list");
+function renderActiveDictEntry() {
+    const list = document.getElementById("dict-list");
 
-    if(!list) return;
+    if (!list) return;
 
-    if(!activeDictKey||!wordBank[activeDictKey]){
+    if (!activeDictKey || !wordBank[activeDictKey]) {
         renderDictPlaceholder();
         return;
     }
 
-    const key=activeDictKey;
-    const encountered=getEncounteredScenesForWord(key);
+    const key = activeDictKey;
+    const encountered = getEncounteredScenesForWord(key);
 
-    const recordButtons=encountered.length
-        ?encountered.map(index=>`
+    const recordButtons = encountered.length
+        ? encountered.map(index => `
             <button
                 type="button"
                 class="dict-record-item"
                 onclick="jumpToLogScene(${index},'${key}')"
             >
                 <span class="dict-record-scene">
-                    SCENE ${String(index+1).padStart(2,"0")}
+                    SCENE ${String(index + 1).padStart(2, "0")}
                 </span>
                 <span class="dict-record-text">
-                    ${renderNotebookRecordText(scenario[index].q,key)}
+                    ${renderNotebookRecordText(scenario[index].q, key)}
                 </span>
             </button>
         `).join("")
-        :`<span class="dict-record-empty">記録がありません。</span>`;
+        : `<span class="dict-record-empty">記録がありません。</span>`;
 
-    list.innerHTML="";
+    list.innerHTML = "";
 
-    const div=document.createElement("div");
+    const div = document.createElement("div");
 
-    div.className="dict-entry";
-    div.id=`entry-${key}`;
+    div.className = "dict-entry";
+    div.id = `entry-${key}`;
 
-    div.innerHTML=`
+    div.innerHTML = `
         <label class="dict-symbol-label">
             ${wordBank[key].q}
         </label>
@@ -1077,10 +1077,10 @@ function renderActiveDictEntry(){
             <div class="notebook-tool-actions">
                 <button type="button" class="notebook-tool-button"
                     onclick="checkNotebookGuess('${key}')"
-                    ${canCheckNotebookWord(key)&&!vaneKnownWords.has(key)?"":"disabled"}>答え合わせ</button>
+                    ${canCheckNotebookWord(key) && !vaneKnownWords.has(key) ? "" : "disabled"}>答え合わせ</button>
                 <button type="button" class="notebook-tool-button"
                     onclick="revealNotebookHint('${key}')"
-                    ${availableNotebookHintLevel(key)>(notebookHintLevels[key]||0)?"":"disabled"}>ヒントをひとつ見る</button>
+                    ${availableNotebookHintLevel(key) > (notebookHintLevels[key] || 0) ? "" : "disabled"}>ヒントをひとつ見る</button>
             </div>
             <div class="notebook-tool-caption">答え合わせは会話の手掛かりが揃うと解放されます。初回は正誤を表示しません。</div>
             <div class="notebook-check-result" id="notebook-check-result-${key}" aria-live="polite"></div>
@@ -1101,60 +1101,60 @@ function renderActiveDictEntry(){
 
     list.appendChild(div);
     renderDictEntryState(key);
-    const checkElement=document.getElementById(`notebook-check-result-${key}`);
-    const currentGuess=String(userDict[key]||"").trim();
-    if(checkElement){
-        const check=notebookChecks[key];
-        checkElement.innerText=check && check.guess===currentGuess
-            ?check.message : "";
+    const checkElement = document.getElementById(`notebook-check-result-${key}`);
+    const currentGuess = String(userDict[key] || "").trim();
+    if (checkElement) {
+        const check = notebookChecks[key];
+        checkElement.innerText = check && check.guess === currentGuess
+            ? check.message : "";
     }
-    const hintsElement=document.getElementById(`notebook-hints-${key}`);
-    if(hintsElement){
-        const n=notebookHintLevels[key]||0;
-        hintsElement.innerHTML=(wordHints[key]||[]).slice(0,n)
-            .map((hint,i)=>`<p class="notebook-hint-row"><b>ヒント ${i+1}</b>　${escapeHtml(hint)}</p>`).join("");
+    const hintsElement = document.getElementById(`notebook-hints-${key}`);
+    if (hintsElement) {
+        const n = notebookHintLevels[key] || 0;
+        hintsElement.innerHTML = (wordHints[key] || []).slice(0, n)
+            .map((hint, i) => `<p class="notebook-hint-row"><b>ヒント ${i + 1}</b>　${escapeHtml(hint)}</p>`).join("");
     }
 }
 
-function renderLogDialogueText(text){
-    let rendered=escapeHtml(text||"");
+function renderLogDialogueText(text) {
+    let rendered = escapeHtml(text || "");
 
-    for(const key of Object.keys(wordBank)){
-        const reg=new RegExp(
-            "\\[\\["+key+"(?:\\|([^\\]]+))?\\]\\]",
+    for (const key of Object.keys(wordBank)) {
+        const reg = new RegExp(
+            "\\[\\[" + key + "(?:\\|([^\\]]+))?\\]\\]",
             "g"
         );
 
-        rendered=rendered.replace(reg,(match,surfaceForm)=>{
-            const resolved=vaneKnownWords.has(key);
-            const cls=resolved?"resolved":"symbol";
-            const active=key===activeDictKey
-                ?" log-symbol-active"
-                :"";
+        rendered = rendered.replace(reg, (match, surfaceForm) => {
+            const resolved = vaneKnownWords.has(key);
+            const cls = resolved ? "resolved" : "symbol";
+            const active = key === activeDictKey
+                ? " log-symbol-active"
+                : "";
 
-            const value=resolved
-                ?(surfaceForm||wordBank[key].canonical)
-                :wordBank[key].q;
+            const value = resolved
+                ? (surfaceForm || wordBank[key].canonical)
+                : wordBank[key].q;
 
             return `<span class="${cls}${active}" onclick="jumpToDict('${key}')">${escapeHtml(value)}</span>`;
         });
     }
 
-    return rendered.replace(/\n/g,"<br>");
+    return rendered.replace(/\n/g, "<br>");
 }
 
-function renderPastLog(){
-    const panel=document.getElementById("log-panel");
-    if(!panel) return;
+function renderPastLog() {
+    const panel = document.getElementById("log-panel");
+    if (!panel) return;
 
-    const scroll=panel.scrollTop;
-    const maxIndex=Math.min(
+    const scroll = panel.scrollTop;
+    const maxIndex = Math.min(
         currentStep,
-        scenario.length-1
+        scenario.length - 1
     );
 
-    if(maxIndex<0||!scenario.length){
-        panel.innerHTML=`
+    if (maxIndex < 0 || !scenario.length) {
+        panel.innerHTML = `
             <div class="log-empty">
                 まだ記録はありません。
             </div>
@@ -1162,95 +1162,95 @@ function renderPastLog(){
         return;
     }
 
-    const entries=[];
+    const entries = [];
 
-    for(let i=0;i<=maxIndex;i++){
-        if(
-            !seenSceneIds.has(i)&&
-            i!==currentStep
-        ){
+    for (let i = 0; i <= maxIndex; i++) {
+        if (
+            !seenSceneIds.has(i) &&
+            i !== currentStep
+        ) {
             continue;
         }
 
-        const scene=scenario[i];
-        if(!scene) continue;
+        const scene = scenario[i];
+        if (!scene) continue;
 
-        const thought=escapeHtml(
-            scene.vaneThought||""
-        ).replace(/\n/g,"<br>");
+        const thought = escapeHtml(
+            scene.vaneThought || ""
+        ).replace(/\n/g, "<br>");
 
         entries.push(`
             <div class="log-entry" id="log-scene-${i}">
                 <div class="log-scene">
-                    SCENE ${String(i+1).padStart(2,"0")}
+                    SCENE ${String(i + 1).padStart(2, "0")}
                 </div>
                 <div class="log-speaker">LANCELOT</div>
                 <div class="log-dialogue">
                     ${renderLogDialogueText(scene.q)}
                 </div>
-                ${thought?`
+                ${thought ? `
                     <div class="log-thought-label">VANE</div>
                     <div class="log-thought">${thought}</div>
-                `:""}
+                `: ""}
             </div>
         `);
     }
 
-    panel.innerHTML=entries.length
-        ?entries.join("")
-        :`<div class="log-empty">まだ記録はありません。</div>`;
+    panel.innerHTML = entries.length
+        ? entries.join("")
+        : `<div class="log-empty">まだ記録はありません。</div>`;
 
-    panel.scrollTop=scroll;
+    panel.scrollTop = scroll;
 }
 
-function getVisibleWordKeys(){
+function getVisibleWordKeys() {
     return Object.keys(wordBank);
 }
 
-function renderWordList(){
-    const list=document.getElementById("word-list");
-    if(!list) return;
+function renderWordList() {
+    const list = document.getElementById("word-list");
+    if (!list) return;
 
-    list.innerHTML=getVisibleWordKeys().map(key=>{
-        const understood=vaneKnownWords.has(key);
-        const encountered=
-            getEncounteredScenesForWord(key).length>0;
+    list.innerHTML = getVisibleWordKeys().map(key => {
+        const understood = vaneKnownWords.has(key);
+        const encountered =
+            getEncounteredScenesForWord(key).length > 0;
 
-        const selectable=encountered||understood;
+        const selectable = encountered || understood;
 
-        const guess=understood
-            ?wordBank[key].canonical
-            :String(userDict[key]||"").trim();
+        const guess = understood
+            ? wordBank[key].canonical
+            : String(userDict[key] || "").trim();
 
-        const status=understood
-            ?"理解"
-            :encountered
-                ?(guess?"推測中":"未推測")
-                :"？？？";
+        const status = understood
+            ? "理解"
+            : encountered
+                ? (guess ? "推測中" : "未推測")
+                : "？？？";
 
-        const statusCls=understood
-            ?" understood"
-            :(encountered&&guess?" guessing":"");
+        const statusCls = understood
+            ? " understood"
+            : (encountered && guess ? " guessing" : "");
 
-        const guessCls=understood
-            ?" understood"
-            :(guess?"":" empty");
+        const guessCls = understood
+            ? " understood"
+            : (guess ? "" : " empty");
 
-        const active=key===activeDictKey?" active":"";
-        const unencountered=selectable?"":" unencountered";
+        const active = key === activeDictKey ? " active" : "";
+        const unencountered = selectable ? "" : " unencountered";
 
         return `
             <button
                 type="button"
                 class="word-row${active}${unencountered}"
                 onclick="jumpToDict('${key}')"
-                ${selectable?"":"disabled"}
+                ${selectable ? "" : "disabled"}
             >
                 <span class="word-symbol">
                     ${wordBank[key].q}
                 </span>
                 <span class="word-guess${guessCls}">
-                    ${escapeHtml(guess||"―")}
+                    ${escapeHtml(guess || "―")}
                 </span>
                 <span class="word-status${statusCls}">
                     ${status}
@@ -1260,88 +1260,88 @@ function renderWordList(){
     }).join("");
 }
 
-window.onload=()=>{
-    masteredWords=getMasteredWordSet();
+window.onload = () => {
+    masteredWords = getMasteredWordSet();
     checkEnvironment();
 
-    const entry=document.getElementById("entry-btn");
-    const recollectionEntry=document.getElementById(
+    const entry = document.getElementById("entry-btn");
+    const recollectionEntry = document.getElementById(
         "recollection-entry-btn"
     );
 
-    const mobile=
-        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||
-        window.innerWidth<800;
+    const mobile =
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+        window.innerWidth < 800;
 
-    if(
-        !mobile&&
-        typeof recollectionProgress!=="undefined"&&
+    if (
+        !mobile &&
+        typeof recollectionProgress !== "undefined" &&
         recollectionProgress.gameCleared
-    ){
-        entry.innerText="はじめから";
-        recollectionEntry.style.display="inline-block";
+    ) {
+        entry.innerText = "はじめから";
+        recollectionEntry.style.display = "inline-block";
     }
 
-    entry.onclick=()=>{
+    entry.onclick = () => {
         document.getElementById(
             "device-check-overlay"
-        ).style.display="none";
+        ).style.display = "none";
 
         document.getElementById(
             "intro-overlay"
-        ).style.display="flex";
+        ).style.display = "flex";
     };
 
-    recollectionEntry.onclick=()=>openContinueSetup();
+    recollectionEntry.onclick = () => openContinueSetup();
 
-    document.getElementById("to-tutorial").onclick=()=>{
+    document.getElementById("to-tutorial").onclick = () => {
         document.getElementById(
             "intro-overlay"
-        ).style.display="none";
+        ).style.display = "none";
 
         document.getElementById(
             "tutorial-overlay"
-        ).style.display="flex";
+        ).style.display = "flex";
     };
 
-    document.getElementById("start-init-btn").onclick=()=>{
-        if(hasCompatibleSavedWords()){
+    document.getElementById("start-init-btn").onclick = () => {
+        if (hasCompatibleSavedWords()) {
             document.getElementById(
                 "tutorial-overlay"
-            ).style.display="none";
+            ).style.display = "none";
 
             document.getElementById(
                 "load-overlay"
-            ).style.display="flex";
-        }else{
+            ).style.display = "flex";
+        } else {
             startGame(false);
         }
     };
 
-    document.getElementById("load-yes").onclick=
-        ()=>startGame(true);
+    document.getElementById("load-yes").onclick =
+        () => startGame(true);
 
-    document.getElementById("load-no").onclick=
-        ()=>startGame(false);
+    document.getElementById("load-no").onclick =
+        () => startGame(false);
 
-    try{
-        const saved=JSON.parse(
+    try {
+        const saved = JSON.parse(
             localStorage.getItem(
                 "vane_collection_v3"
-            )||"[]"
+            ) || "[]"
         );
 
-        colSet=new Set(
-            Array.isArray(saved)?saved:[]
+        colSet = new Set(
+            Array.isArray(saved) ? saved : []
         );
-    }catch(e){
-        colSet=new Set();
+    } catch (e) {
+        colSet = new Set();
     }
 
     updateColUI();
-    const galleryEntry=document.getElementById("ending-gallery-entry-btn");
-    if(galleryEntry && getEndingGalleryCollectedIds().size>0){
-        galleryEntry.style.display="inline-block";
+    const galleryEntry = document.getElementById("ending-gallery-entry-btn");
+    if (galleryEntry && getEndingGalleryCollectedIds().size > 0) {
+        galleryEntry.style.display = "inline-block";
     }
     initDict({});
     renderPastLog();
@@ -1349,56 +1349,56 @@ window.onload=()=>{
     switchMainView("play");
 };
 
-function startGame(inherit){
-    currentStep=0;
-    viewingStep=0;
+function startGame(inherit) {
+    currentStep = 0;
+    viewingStep = 0;
 
     document.getElementById(
         "tutorial-overlay"
-    ).style.display="none";
+    ).style.display = "none";
 
     document.getElementById(
         "load-overlay"
-    ).style.display="none";
+    ).style.display = "none";
 
     document.getElementById(
         "game-container"
-    ).style.display="flex";
+    ).style.display = "flex";
 
-    if(typeof runMode!=="undefined"){
-        runMode="story";
+    if (typeof runMode !== "undefined") {
+        runMode = "story";
     }
 
-    if(typeof recollectionBaseEndingId!=="undefined"){
-        recollectionBaseEndingId=null;
+    if (typeof recollectionBaseEndingId !== "undefined") {
+        recollectionBaseEndingId = null;
     }
 
-    selectedAnswers=
+    selectedAnswers =
         new Array(scenario.length).fill(null);
 
-    sceneChoiceRecords=
+    sceneChoiceRecords =
         new Array(scenario.length).fill(null);
 
-    masteredWords=getMasteredWordSet();
-    vaneKnownWords=new Set();
-    vaneUnderstoodAt={};
-    wordSeenCounts={};
-    seenSceneIds=new Set();
+    masteredWords = getMasteredWordSet();
+    vaneKnownWords = new Set();
+    vaneUnderstoodAt = {};
+    wordSeenCounts = {};
+    seenSceneIds = new Set();
 
-    notebookChecks={};
-    notebookHintLevels={};
-    finalReviewOpen=false;
-    interactionPhase="conversation";
-    pendingOption=null;
-    pendingResolvedKeys=[];
-    pendingFinalLine="";
-    pendingChoiceContext=null;
-    activeDictKey=null;
-    mainViewMode="play";
+    notebookChecks = {};
+    notebookHintLevels = {};
+    finalReviewOpen = false;
+    interactionPhase = "conversation";
+    pendingOption = null;
+    pendingResolvedKeys = [];
+    pendingFinalLine = "";
+    pendingChoiceContext = null;
+    activeDictKey = null;
+    mainViewMode = "play";
 
     rebuildRunState();
 
-    initDict(inherit?getSavedWords():{});
+    initDict(inherit ? getSavedWords() : {});
 
     registerSceneWords(currentStep);
     renderTabs();
@@ -1408,24 +1408,24 @@ function startGame(inherit){
     switchMainView("play");
 }
 
-function initDict(initialWords){
-    userDict={};
-    activeDictKey=null;
+function initDict(initialWords) {
+    userDict = {};
+    activeDictKey = null;
 
-    for(const key of Object.keys(wordBank)){
-        const inherited=!!(
-            initialWords[key]&&
-            isAcceptedGuess(key,initialWords[key])
+    for (const key of Object.keys(wordBank)) {
+        const inherited = !!(
+            initialWords[key] &&
+            isAcceptedGuess(key, initialWords[key])
         );
 
-        userDict[key]=inherited
-            ?wordBank[key].canonical
-            :"";
+        userDict[key] = inherited
+            ? wordBank[key].canonical
+            : "";
 
-        if(inherited){
+        if (inherited) {
             masteredWords.add(key);
             vaneKnownWords.add(key);
-            vaneUnderstoodAt[key]=-1;
+            vaneUnderstoodAt[key] = -1;
         }
     }
 
@@ -1434,112 +1434,112 @@ function initDict(initialWords){
     renderWordList();
 }
 
-function renderDictEntryState(key){
-    if(key!==activeDictKey) return;
+function renderDictEntryState(key) {
+    if (key !== activeDictKey) return;
 
-    const entry=document.getElementById(
+    const entry = document.getElementById(
         `entry-${key}`
     );
 
-    const input=document.getElementById(
+    const input = document.getElementById(
         `input-${key}`
     );
 
-    const status=document.getElementById(
+    const status = document.getElementById(
         `status-${key}`
     );
 
-    if(!entry||!input||!status) return;
+    if (!entry || !input || !status) return;
 
-    entry.classList.remove("correct","guessing");
+    entry.classList.remove("correct", "guessing");
     input.classList.remove("wrong-text");
 
-    if(vaneKnownWords.has(key)){
+    if (vaneKnownWords.has(key)) {
         entry.classList.add("correct");
-        status.innerText="状態　理解した";
-        input.disabled=true;
+        status.innerText = "状態　理解した";
+        input.disabled = true;
 
-        if(input.value!==wordBank[key].canonical){
-            input.value=wordBank[key].canonical;
+        if (input.value !== wordBank[key].canonical) {
+            input.value = wordBank[key].canonical;
         }
-    }else if(String(userDict[key]||"").trim()){
+    } else if (String(userDict[key] || "").trim()) {
         entry.classList.add("guessing");
-        status.innerText="状態　推測中";
-        input.disabled=false;
+        status.innerText = "状態　推測中";
+        input.disabled = false;
 
-        if(input.value!==userDict[key]){
-            input.value=userDict[key];
+        if (input.value !== userDict[key]) {
+            input.value = userDict[key];
         }
-    }else{
-        status.innerText="状態　未推測";
-        input.disabled=false;
+    } else {
+        status.innerText = "状態　未推測";
+        input.disabled = false;
 
-        if(input.value){
-            input.value="";
+        if (input.value) {
+            input.value = "";
         }
     }
 }
 
-function updateGuess(key,val){
-    if(
-        !wordBank[key]||
+function updateGuess(key, val) {
+    if (
+        !wordBank[key] ||
         vaneKnownWords.has(key)
-    ){
+    ) {
         return;
     }
 
-    userDict[key]=String(val).trim();
+    userDict[key] = String(val).trim();
     delete notebookChecks[key];
-    const checkElement=document.getElementById(`notebook-check-result-${key}`);
-    if(checkElement) checkElement.innerText="";
+    const checkElement = document.getElementById(`notebook-check-result-${key}`);
+    if (checkElement) checkElement.innerText = "";
 
     renderDictEntryState(key);
     renderWordList();
     refreshFinalNotebookRow(key);
 }
 
-function registerSceneWords(index){
-    if(
-        index<0||
-        index>=scenario.length||
+function registerSceneWords(index) {
+    if (
+        index < 0 ||
+        index >= scenario.length ||
         seenSceneIds.has(index)
-    ){
+    ) {
         return;
     }
 
     seenSceneIds.add(index);
 
-    for(const key of Object.keys(wordBank)){
-        if(sceneContainsWord(scenario[index].q,key)){
-            wordSeenCounts[key]=
-                (wordSeenCounts[key]||0)+1;
+    for (const key of Object.keys(wordBank)) {
+        if (sceneContainsWord(scenario[index].q, key)) {
+            wordSeenCounts[key] =
+                (wordSeenCounts[key] || 0) + 1;
         }
     }
 
     renderPastLog();
     renderWordList();
 
-    if(activeDictKey){
+    if (activeDictKey) {
         renderActiveDictEntry();
     }
 }
 
-function resolveWord(key,guessOverride){
-    if(vaneKnownWords.has(key)) return false;
+function resolveWord(key, guessOverride) {
+    if (vaneKnownWords.has(key)) return false;
 
-    const guess=guessOverride===undefined
-        ?String(userDict[key]||"").trim()
-        :String(guessOverride||"").trim();
+    const guess = guessOverride === undefined
+        ? String(userDict[key] || "").trim()
+        : String(guessOverride || "").trim();
 
-    if(!isAcceptedGuess(key,guess)){
+    if (!isAcceptedGuess(key, guess)) {
         return false;
     }
 
     vaneKnownWords.add(key);
-    vaneUnderstoodAt[key]=currentStep;
-    userDict[key]=wordBank[key].canonical;
+    vaneUnderstoodAt[key] = currentStep;
+    userDict[key] = wordBank[key].canonical;
 
-    if(!masteredWords.has(key)){
+    if (!masteredWords.has(key)) {
         masteredWords.add(key);
         persistMasteredWord(key);
     }
@@ -1552,45 +1552,45 @@ function resolveWord(key,guessOverride){
     return true;
 }
 
-function evaluateUnderstanding(scene,lockedGuesses){
+function evaluateUnderstanding(scene, lockedGuesses) {
     let candidates;
 
-    if(Array.isArray(scene.resolveChecks)){
-        candidates=[...scene.resolveChecks];
-    }else{
-        candidates=Object.keys(wordBank).filter(key=>{
-            const available=
-                wordTotalClueScenes[key]||1;
+    if (Array.isArray(scene.resolveChecks)) {
+        candidates = [...scene.resolveChecks];
+    } else {
+        candidates = Object.keys(wordBank).filter(key => {
+            const available =
+                wordTotalClueScenes[key] || 1;
 
-            const minimum=Math.min(
-                wordBank[key].minClues||2,
+            const minimum = Math.min(
+                wordBank[key].minClues || 2,
                 available
             );
 
             return (
-                (wordSeenCounts[key]||0)>=minimum
+                (wordSeenCounts[key] || 0) >= minimum
             );
         });
     }
 
-    if(
-        scene.finalResolve&&
-        scene.finalResolve.special&&
+    if (
+        scene.finalResolve &&
+        scene.finalResolve.special &&
         scene.finalResolve.key
-    ){
-        candidates=candidates.filter(
-            key=>key!==scene.finalResolve.key
+    ) {
+        candidates = candidates.filter(
+            key => key !== scene.finalResolve.key
         );
     }
 
-    const resolvedNow=[];
+    const resolvedNow = [];
 
-    candidates.forEach(key=>{
-        const guess=lockedGuesses
-            ?lockedGuesses[key]
-            :undefined;
+    candidates.forEach(key => {
+        const guess = lockedGuesses
+            ? lockedGuesses[key]
+            : undefined;
 
-        if(resolveWord(key,guess)){
+        if (resolveWord(key, guess)) {
             resolvedNow.push(key);
         }
     });
@@ -1598,56 +1598,56 @@ function evaluateUnderstanding(scene,lockedGuesses){
     return resolvedNow;
 }
 
-function updateIntelUI(){
-    const total=Object.keys(wordBank).length;
+function updateIntelUI() {
+    const total = Object.keys(wordBank).length;
 
-    const value=total
-        ?Math.floor(vaneKnownWords.size/total*100)
-        :0;
+    const value = total
+        ? Math.floor(vaneKnownWords.size / total * 100)
+        : 0;
 
-    const el=document.getElementById("intel-val");
+    const el = document.getElementById("intel-val");
 
-    if(el){
-        el.innerText=value+"%";
+    if (el) {
+        el.innerText = value + "%";
     }
 }
 
-function getReactionText(option){
-    return option?.reaction||
+function getReactionText(option) {
+    return option?.reaction ||
         "（ランちゃんは、俺の返事を静かに聞いている。）";
 }
 
-function renderDialogueText(text){
-    let rendered=escapeHtml(text||"");
+function renderDialogueText(text) {
+    let rendered = escapeHtml(text || "");
 
-    for(const key of Object.keys(wordBank)){
-        const reg=new RegExp(
-            "\\[\\["+key+"(?:\\|([^\\]]+))?\\]\\]",
+    for (const key of Object.keys(wordBank)) {
+        const reg = new RegExp(
+            "\\[\\[" + key + "(?:\\|([^\\]]+))?\\]\\]",
             "g"
         );
 
-        rendered=rendered.replace(
+        rendered = rendered.replace(
             reg,
-            (match,surfaceForm)=>{
-                const resolved=vaneKnownWords.has(key);
-                const cls=resolved?"resolved":"symbol";
+            (match, surfaceForm) => {
+                const resolved = vaneKnownWords.has(key);
+                const cls = resolved ? "resolved" : "symbol";
 
-                const value=resolved
-                    ?(surfaceForm||wordBank[key].canonical)
-                    :wordBank[key].q;
+                const value = resolved
+                    ? (surfaceForm || wordBank[key].canonical)
+                    : wordBank[key].q;
 
                 return `<span class="${cls}" onclick="jumpToDict('${key}')">${escapeHtml(value)}</span>`;
             }
         );
     }
 
-    return rendered.replace(/\n/g,"<br>");
+    return rendered.replace(/\n/g, "<br>");
 }
 
-function buildUnderstandingNarrative(key){
-    if(!wordBank[key]) return "";
+function buildUnderstandingNarrative(key) {
+    if (!wordBank[key]) return "";
 
-    const word=wordBank[key];
+    const word = wordBank[key];
 
     return `
         <div class="understanding-item">
@@ -1677,292 +1677,292 @@ function buildUnderstandingNarrative(key){
     `;
 }
 
-function continueFromReaction(){
-    if(
-        interactionPhase!=="reaction"||
-        currentStep>=scenario.length
-    ){
+function continueFromReaction() {
+    if (
+        interactionPhase !== "reaction" ||
+        currentStep >= scenario.length
+    ) {
         return;
     }
 
-    const scene=scenario[currentStep];
+    const scene = scenario[currentStep];
 
-    const lockedGuesses=
-        pendingChoiceContext?.allGuesses||
-        {...userDict};
+    const lockedGuesses =
+        pendingChoiceContext?.allGuesses ||
+        { ...userDict };
 
-    pendingResolvedKeys=evaluateUnderstanding(
+    pendingResolvedKeys = evaluateUnderstanding(
         scene,
         lockedGuesses
     );
 
-    pendingFinalLine="";
+    pendingFinalLine = "";
 
-    const flashKeys=[...pendingResolvedKeys];
+    const flashKeys = [...pendingResolvedKeys];
 
-    if(
-        scene.finalResolve?.special&&
+    if (
+        scene.finalResolve?.special &&
         scene.finalResolve.key
-    ){
-        const finalKey=scene.finalResolve.key;
+    ) {
+        const finalKey = scene.finalResolve.key;
 
-        if(
-            !vaneKnownWords.has(finalKey)&&
+        if (
+            !vaneKnownWords.has(finalKey) &&
             isAcceptedGuess(
                 finalKey,
                 lockedGuesses[finalKey]
             )
-        ){
-            if(
+        ) {
+            if (
                 resolveWord(
                     finalKey,
                     lockedGuesses[finalKey]
                 )
-            ){
-                pendingFinalLine=
-                    scene.finalResolve.line||"";
+            ) {
+                pendingFinalLine =
+                    scene.finalResolve.line || "";
 
                 flashKeys.push(finalKey);
             }
         }
     }
 
-    if(
-        pendingResolvedKeys.length||
+    if (
+        pendingResolvedKeys.length ||
         pendingFinalLine
-    ){
-        interactionPhase="resolution";
+    ) {
+        interactionPhase = "resolution";
         updateUI(true);
         playUnderstandingFlash(flashKeys);
-    }else{
+    } else {
         advanceScene();
     }
 }
 
-function advanceScene(){
-    pendingOption=null;
-    pendingResolvedKeys=[];
-    pendingFinalLine="";
-    pendingChoiceContext=null;
-    interactionPhase="conversation";
+function advanceScene() {
+    pendingOption = null;
+    pendingResolvedKeys = [];
+    pendingFinalLine = "";
+    pendingChoiceContext = null;
+    interactionPhase = "conversation";
 
     currentStep++;
-    viewingStep=currentStep;
+    viewingStep = currentStep;
 
-    if(currentStep<scenario.length){
+    if (currentStep < scenario.length) {
         registerSceneWords(currentStep);
         renderTabs();
         updateUI(true);
         renderPastLog();
         renderWordList();
 
-        const display=document.getElementById(
+        const display = document.getElementById(
             "display"
         );
 
-        if(display){
-            display.scrollTop=0;
+        if (display) {
+            display.scrollTop = 0;
         }
 
-        const panel=document.getElementById(
+        const panel = document.getElementById(
             "log-panel"
         );
 
-        if(panel){
-            panel.scrollTop=panel.scrollHeight;
+        if (panel) {
+            panel.scrollTop = panel.scrollHeight;
         }
-    }else{
-        if(typeof canChoosePuddingEnding==="function" && canChoosePuddingEnding()){
+    } else {
+        if (typeof canChoosePuddingEnding === "function" && canChoosePuddingEnding()) {
             renderPuddingEndingChoice();
-        }else{
+        } else {
             showEnd();
         }
     }
 }
 
-function renderPuddingEndingChoice(){
-    const display=document.getElementById("display");
-    const area=document.getElementById("action-area");
-    if(!display || !area) return;
-    display.innerHTML=`<div class="story-bubble" style="margin:auto 0;max-width:90%">
+function renderPuddingEndingChoice() {
+    const display = document.getElementById("display");
+    const area = document.getElementById("action-area");
+    if (!display || !area) return;
+    display.innerHTML = `<div class="story-bubble" style="margin:auto 0;max-width:90%">
         <div class="block-label">LAST PAGE</div>
         最後の言葉を聞き終えて、ヴェインはノートを開いた。<br>
         ノートには、まだ確かめきれていない言葉が残っている。<br>
         今までの行き違いを確かめてみようか。それとも、今の気持ちのまま前へ進もうか。
     </div>`;
-    area.innerHTML="";
-    const review=document.createElement("button");
-    review.className="opt-btn";
-    review.innerText="ノートに残る食い違いを確かめる";
-    review.onclick=()=>showEnd(5);
-    const goOn=document.createElement("button");
-    goOn.className="opt-btn";
-    goOn.innerText="このまま物語を結ぶ";
-    goOn.onclick=()=>showEnd();
+    area.innerHTML = "";
+    const review = document.createElement("button");
+    review.className = "opt-btn";
+    review.innerText = "ノートに残る食い違いを確かめる";
+    review.onclick = () => showEnd(5);
+    const goOn = document.createElement("button");
+    goOn.className = "opt-btn";
+    goOn.innerText = "このまま物語を結ぶ";
+    goOn.onclick = () => showEnd();
     area.appendChild(review);
     area.appendChild(goOn);
-    display.scrollTop=0;
+    display.scrollTop = 0;
 }
 
-function renderTabs(){
-    const current=document.getElementById(
+function renderTabs() {
+    const current = document.getElementById(
         "progress-current"
     );
 
-    const total=document.getElementById(
+    const total = document.getElementById(
         "progress-total"
     );
 
-    if(current){
-        current.innerText=
-            String(viewingStep+1).padStart(2,"0");
+    if (current) {
+        current.innerText =
+            String(viewingStep + 1).padStart(2, "0");
     }
 
-    if(total){
-        total.innerText=
-            String(scenario.length).padStart(2,"0");
+    if (total) {
+        total.innerText =
+            String(scenario.length).padStart(2, "0");
     }
 }
 
-function updateUI(redo=true){
-    if(currentStep>=scenario.length) return;
+function updateUI(redo = true) {
+    if (currentStep >= scenario.length) return;
 
     renderTabs();
 
-    const scene=scenario[viewingStep];
+    const scene = scenario[viewingStep];
 
-    const header=document.getElementById(
+    const header = document.getElementById(
         "chara-header"
     );
 
-    const speaker=document.getElementById(
+    const speaker = document.getElementById(
         "speaker-name"
     );
 
-    const message=document.getElementById(
+    const message = document.getElementById(
         "message-text"
     );
 
-    const thoughtBlock=document.getElementById(
+    const thoughtBlock = document.getElementById(
         "vane-thought-block"
     );
 
-    const thought=document.getElementById(
+    const thought = document.getElementById(
         "vane-thought-text"
     );
 
-    const storyBlock=document.getElementById(
+    const storyBlock = document.getElementById(
         "story-block"
     );
 
-    const storyText=document.getElementById(
+    const storyText = document.getElementById(
         "story-text"
     );
 
-    const resolutionBlock=document.getElementById(
+    const resolutionBlock = document.getElementById(
         "resolution-block"
     );
 
-    const resolutionText=document.getElementById(
+    const resolutionText = document.getElementById(
         "resolution-text"
     );
 
-    if(
-        !header||
-        !speaker||
-        !message||
-        !thoughtBlock||
-        !thought||
-        !storyBlock||
-        !storyText||
-        !resolutionBlock||
+    if (
+        !header ||
+        !speaker ||
+        !message ||
+        !thoughtBlock ||
+        !thought ||
+        !storyBlock ||
+        !storyText ||
+        !resolutionBlock ||
         !resolutionText
-    ){
+    ) {
         return;
     }
 
     updateIntelUI();
 
-    const isCurrent=viewingStep===currentStep;
+    const isCurrent = viewingStep === currentStep;
 
-    speaker.innerText="LANCELOT";
-    message.innerHTML=renderDialogueText(scene.q);
+    speaker.innerText = "LANCELOT";
+    message.innerHTML = renderDialogueText(scene.q);
 
-    thought.innerHTML=escapeHtml(
-        scene.vaneThought||""
-    ).replace(/\n/g,"<br>");
+    thought.innerHTML = escapeHtml(
+        scene.vaneThought || ""
+    ).replace(/\n/g, "<br>");
 
-    header.style.display="none";
-    message.style.display="none";
-    thoughtBlock.style.display="none";
-    storyBlock.style.display="none";
-    storyText.innerHTML="";
-    resolutionBlock.style.display="none";
-    resolutionText.innerHTML="";
+    header.style.display = "none";
+    message.style.display = "none";
+    thoughtBlock.style.display = "none";
+    storyBlock.style.display = "none";
+    storyText.innerHTML = "";
+    resolutionBlock.style.display = "none";
+    resolutionText.innerHTML = "";
 
-    const selectedId=selectedAnswers[viewingStep];
+    const selectedId = selectedAnswers[viewingStep];
 
-    const selectedOption=
-        isCurrent&&pendingOption
-            ?pendingOption
-            :findSceneOption(scene,selectedId);
+    const selectedOption =
+        isCurrent && pendingOption
+            ? pendingOption
+            : findSceneOption(scene, selectedId);
 
-    const showConversation=isCurrent
-        ?(
-            interactionPhase==="conversation"||
-            interactionPhase==="choice"
+    const showConversation = isCurrent
+        ? (
+            interactionPhase === "conversation" ||
+            interactionPhase === "choice"
         )
-        :!selectedOption;
+        : !selectedOption;
 
-    const showStory=!!selectedOption&&(
-        !isCurrent||
-        interactionPhase==="reaction"
+    const showStory = !!selectedOption && (
+        !isCurrent ||
+        interactionPhase === "reaction"
     );
 
-    const showResolution=
-        isCurrent&&interactionPhase==="resolution";
+    const showResolution =
+        isCurrent && interactionPhase === "resolution";
 
-    if(showConversation){
-        header.style.display="flex";
-        message.style.display="block";
-        thoughtBlock.style.display="block";
+    if (showConversation) {
+        header.style.display = "flex";
+        message.style.display = "block";
+        thoughtBlock.style.display = "block";
     }
 
-    if(showStory){
-        const parts=[
+    if (showStory) {
+        const parts = [
             `<div class="selected-reply">${escapeHtml(selectedOption.t)}</div>`
         ];
 
-        const reaction=getReactionText(selectedOption);
+        const reaction = getReactionText(selectedOption);
 
-        if(reaction){
+        if (reaction) {
             parts.push(
-                escapeHtml(reaction).replace(/\n/g,"<br>")
+                escapeHtml(reaction).replace(/\n/g, "<br>")
             );
         }
 
-        if(scene.afterStory){
+        if (scene.afterStory) {
             parts.push(
                 escapeHtml(scene.afterStory)
-                    .replace(/\n/g,"<br>")
+                    .replace(/\n/g, "<br>")
             );
         }
 
-        if(scene.nextHook){
+        if (scene.nextHook) {
             parts.push(
                 escapeHtml(scene.nextHook)
-                    .replace(/\n/g,"<br>")
+                    .replace(/\n/g, "<br>")
             );
         }
 
-        storyText.innerHTML=parts.join("<br><br>");
-        storyBlock.style.display="block";
+        storyText.innerHTML = parts.join("<br><br>");
+        storyBlock.style.display = "block";
     }
 
-    if(showResolution){
-        const parts=[];
+    if (showResolution) {
+        const parts = [];
 
-        if(pendingResolvedKeys.length){
+        if (pendingResolvedKeys.length) {
             parts.push(
                 pendingResolvedKeys
                     .map(buildUnderstandingNarrative)
@@ -1972,30 +1972,30 @@ function updateUI(redo=true){
             );
         }
 
-        if(pendingFinalLine){
+        if (pendingFinalLine) {
             parts.push(
                 `<div class="final-resolve-line">${escapeHtml(pendingFinalLine)}</div>`
             );
         }
 
-        resolutionText.innerHTML=parts.join("");
-        resolutionBlock.style.display="block";
+        resolutionText.innerHTML = parts.join("");
+        resolutionBlock.style.display = "block";
     }
 
     renderPastLog();
     renderWordList();
 
-    const light=Math.min(
+    const light = Math.min(
         85,
-        10+lovePoints/5
+        10 + lovePoints / 5
     );
 
-    const sat=Math.min(
+    const sat = Math.min(
         100,
-        20+lovePoints/4
+        20 + lovePoints / 4
     );
 
-    const hue=210-lovePoints/10;
+    const hue = 210 - lovePoints / 10;
 
     document.documentElement.style.setProperty(
         "--love-light",
@@ -2012,125 +2012,125 @@ function updateUI(redo=true){
         `${hue}`
     );
 
-    if(!redo) return;
+    if (!redo) return;
 
-    const area=document.getElementById(
+    const area = document.getElementById(
         "action-area"
     );
 
-    if(!area) return;
+    if (!area) return;
 
-    area.innerHTML="";
+    area.innerHTML = "";
 
-    if(isCurrent){
-        if(interactionPhase==="conversation"){
-            const guide=document.createElement("p");
+    if (isCurrent) {
+        if (interactionPhase === "conversation") {
+            const guide = document.createElement("p");
 
-            guide.className="reply-guide";
-            guide.innerText=
+            guide.className = "reply-guide";
+            guide.innerText =
                 "ノートに書き終わったら、ランちゃんに返事しないとな。";
 
             area.appendChild(guide);
 
-            const button=document.createElement(
+            const button = document.createElement(
                 "button"
             );
 
-            button.className=
+            button.className =
                 "opt-btn reply-start-button";
 
-            button.innerText=
+            button.innerText =
                 "返答へ進む";
 
-            button.onclick=
+            button.onclick =
                 lockChoicesForCurrentScene;
 
             area.appendChild(button);
 
-            if(currentStep===scenario.length-1){
-                const reviewButton=document.createElement("button");
-                reviewButton.className="opt-btn";
-                reviewButton.innerText=finalReviewOpen
-                    ?"最終確認を閉じる" : "ノートを最終確認する（任意）";
-                reviewButton.onclick=toggleFinalNotebookReview;
+            if (currentStep === scenario.length - 1) {
+                const reviewButton = document.createElement("button");
+                reviewButton.className = "opt-btn";
+                reviewButton.innerText = finalReviewOpen
+                    ? "最終確認を閉じる" : "ノートを最終確認する（任意）";
+                reviewButton.onclick = toggleFinalNotebookReview;
                 area.appendChild(reviewButton);
-                if(finalReviewOpen){
-                    const review=document.createElement("div");
-                    review.className="final-notebook-panel";
-                    const rows=Object.keys(wordBank).map(key=>{
-                        const status=vaneKnownWords.has(key)?"理解済み"
-                            :String(userDict[key]||"").trim()?"推測あり":"未推測";
+                if (finalReviewOpen) {
+                    const review = document.createElement("div");
+                    review.className = "final-notebook-panel";
+                    const rows = Object.keys(wordBank).map(key => {
+                        const status = vaneKnownWords.has(key) ? "理解済み"
+                            : String(userDict[key] || "").trim() ? "推測あり" : "未推測";
                         return `<div class="final-notebook-word" data-final-word-key="${key}">
                             <span>${escapeHtml(wordBank[key].q)}　<span class="final-notebook-status">${status}</span></span>
                             <button type="button" onclick="jumpToDict('${key}')">ノートで確認</button>
                         </div>`;
                     }).join("");
-                    review.innerHTML=`<div class="final-notebook-summary">未確定の言葉は、右側のノートで答え合わせやヒントを確認して書き直せます。返答を確定すると、この場面の解釈は固定されます。</div>${rows}`;
+                    review.innerHTML = `<div class="final-notebook-summary">未確定の言葉は、右側のノートで答え合わせやヒントを確認して書き直せます。返答を確定すると、この場面の解釈は固定されます。</div>${rows}`;
                     area.appendChild(review);
                 }
             }
 
-        }else if(interactionPhase==="choice"){
-            if(
-                !pendingChoiceContext||
-                pendingChoiceContext.sceneIndex!==currentStep
-            ){
+        } else if (interactionPhase === "choice") {
+            if (
+                !pendingChoiceContext ||
+                pendingChoiceContext.sceneIndex !== currentStep
+            ) {
                 return;
             }
 
             pendingChoiceContext.options.forEach(
-                choice=>{
-                    const button=document.createElement(
+                choice => {
+                    const button = document.createElement(
                         "button"
                     );
 
-                    button.className="opt-btn";
+                    button.className = "opt-btn";
 
-                    button.innerText=
+                    button.innerText =
                         `${choice.option.t}`;
 
-                    button.onclick=
-                        ()=>chooseReply(choice);
+                    button.onclick =
+                        () => chooseReply(choice);
 
                     area.appendChild(button);
                 }
             );
 
-        }else if(
-            interactionPhase==="reaction"||
-            interactionPhase==="resolution"
-        ){
-            const next=document.createElement(
+        } else if (
+            interactionPhase === "reaction" ||
+            interactionPhase === "resolution"
+        ) {
+            const next = document.createElement(
                 "button"
             );
 
-            next.className="opt-btn";
-            next.innerText="次へ";
+            next.className = "opt-btn";
+            next.innerText = "次へ";
 
-            next.onclick=
-                interactionPhase==="reaction"
-                    ?continueFromReaction
-                    :advanceScene;
+            next.onclick =
+                interactionPhase === "reaction"
+                    ? continueFromReaction
+                    : advanceScene;
 
             area.appendChild(next);
         }
 
-    }else{
-        const options=getAllSceneOptions(scene);
+    } else {
+        const options = getAllSceneOptions(scene);
 
-        options.forEach(option=>{
-            const button=document.createElement(
+        options.forEach(option => {
+            const button = document.createElement(
                 "button"
             );
 
-            button.className="opt-btn";
-            button.disabled=true;
+            button.className = "opt-btn";
+            button.disabled = true;
 
-            if(option.id===selectedId){
+            if (option.id === selectedId) {
                 button.classList.add("my-choice");
             }
 
-            button.innerText=
+            button.innerText =
                 `${option.t}`;
 
             area.appendChild(button);
@@ -2138,35 +2138,35 @@ function updateUI(redo=true){
     }
 }
 
-function updateColUI(){
-    const collected=new Set(
-        [...colSet].map(id=>String(id))
+function updateColUI() {
+    const collected = new Set(
+        [...colSet].map(id => String(id))
     );
 
-    const count=collected.size;
+    const count = collected.size;
 
-    const colVal=document.getElementById(
+    const colVal = document.getElementById(
         "col-val"
     );
 
-    if(colVal){
-        colVal.innerText=
-            Math.floor(count/7*100)+"%";
+    if (colVal) {
+        colVal.innerText =
+            Math.floor(count / 7 * 100) + "%";
     }
 
-    for(const id of colSet){
-        const badge=document.getElementById(
+    for (const id of colSet) {
+        const badge = document.getElementById(
             `b-${id}`
         );
 
-        if(badge){
+        if (badge) {
             badge.classList.add("unlocked");
         }
     }
 
     document.querySelectorAll(
         "[data-ending-id]"
-    ).forEach(element=>{
+    ).forEach(element => {
         element.classList.toggle(
             "unlocked",
             collected.has(
@@ -2177,8 +2177,8 @@ function updateColUI(){
 
     document.querySelectorAll(
         "[data-ending-count]"
-    ).forEach(element=>{
-        element.innerText=`${count} / 7`;
+    ).forEach(element => {
+        element.innerText = `${count} / 7`;
     });
 }
 </script>
@@ -2186,169 +2186,168 @@ function updateColUI(){
 <script src="endings.js"></script>
 <script>
 
-// エンディング名の唯一の設定場所は endings.js の ENDING_TITLES。
-function getEndingTitle(id){
-    return typeof endingsData!=="undefined" && endingsData[id]
+function getEndingTitle(id) {
+    return typeof endingsData !== "undefined" && endingsData[id]
         ? endingsData[id].title
-        : `END ${String(id).padStart(2,"0")}`;
+        : `END ${String(id).padStart(2, "0")}`;
 }
-function syncEndingTitleUI(){
-    document.querySelectorAll("[data-ending-id]").forEach(element=>{
-        element.title=getEndingTitle(element.dataset.endingId);
+function syncEndingTitleUI() {
+    document.querySelectorAll("[data-ending-id]").forEach(element => {
+        element.title = getEndingTitle(element.dataset.endingId);
     });
-    for(let id=1;id<=7;id++){
-        const badge=document.getElementById(`b-${id}`);
-        if(badge) badge.title=getEndingTitle(id);
+    for (let id = 1; id <= 7; id++) {
+        const badge = document.getElementById(`b-${id}`);
+        if (badge) badge.title = getEndingTitle(id);
     }
 }
 syncEndingTitleUI();
 
-const continuationPoints=Object.freeze([0,10,19]);
-const continuationPointNames=Object.freeze({
-    0:"はじまり",
-    10:"物語の途中",
-    19:"最後の言葉"
+const continuationPoints = Object.freeze([0, 10, 19]);
+const continuationPointNames = Object.freeze({
+    0: "はじまり",
+    10: "物語の途中",
+    19: "最後の言葉"
 });
-let continueSceneIndex=0;
-let continueKnowledgeMode="zero";
-let continueOpenedFromGame=false;
+let continueSceneIndex = 0;
+let continueKnowledgeMode = "zero";
+let continueOpenedFromGame = false;
 
-function getContinuationSource(){
-    if(typeof recollectionProgress==="undefined") return null;
+function getContinuationSource() {
+    if (typeof recollectionProgress === "undefined") return null;
 
-    if(recollectionProgress.latestRunSnapshot &&
-       Number.isInteger(recollectionProgress.latestRunEndingId) &&
-       recollectionProgress.latestRunEndingId>=1 &&
-       recollectionProgress.latestRunEndingId<=6 &&
-       Array.isArray(recollectionProgress.latestRunSnapshot.selectedAnswers)){
+    if (recollectionProgress.latestRunSnapshot &&
+        Number.isInteger(recollectionProgress.latestRunEndingId) &&
+        recollectionProgress.latestRunEndingId >= 1 &&
+        recollectionProgress.latestRunEndingId <= 6 &&
+        Array.isArray(recollectionProgress.latestRunSnapshot.selectedAnswers)) {
         return {
-            endingId:recollectionProgress.latestRunEndingId,
-            snapshot:recollectionProgress.latestRunSnapshot
+            endingId: recollectionProgress.latestRunEndingId,
+            snapshot: recollectionProgress.latestRunSnapshot
         };
     }
 
-    const snapshots=recollectionProgress.endingSnapshots||{};
-    const valid=Object.keys(snapshots).map(key=>({
-        endingId:Number(key),
-        snapshot:snapshots[key]
-    })).filter(item=>
-        item.endingId>=1 && item.endingId<=6 &&
+    const snapshots = recollectionProgress.endingSnapshots || {};
+    const valid = Object.keys(snapshots).map(key => ({
+        endingId: Number(key),
+        snapshot: snapshots[key]
+    })).filter(item =>
+        item.endingId >= 1 && item.endingId <= 6 &&
         item.snapshot && Array.isArray(item.snapshot.selectedAnswers)
     );
-    valid.sort((a,b)=>
-        (Number(b.snapshot.clearedAt)||0)-(Number(a.snapshot.clearedAt)||0)
-        || b.endingId-a.endingId
+    valid.sort((a, b) =>
+        (Number(b.snapshot.clearedAt) || 0) - (Number(a.snapshot.clearedAt) || 0)
+        || b.endingId - a.endingId
     );
-    return valid[0]||null;
+    return valid[0] || null;
 }
 
-function getContinuationKnownKeys(mode,index,source){
-    if(mode==="zero") return [];
-    if(mode==="all") return [...getMasteredWordSet()];
-    if(mode!=="memory"||!source) return [];
-    const snapshot=source.snapshot;
-    if(typeof getSnapshotKnowledgeBeforeScene==="function"){
-        return getSnapshotKnowledgeBeforeScene(snapshot,index)
-            .filter(key=>getMasteredWordSet().has(key));
+function getContinuationKnownKeys(mode, index, source) {
+    if (mode === "zero") return [];
+    if (mode === "all") return [...getMasteredWordSet()];
+    if (mode !== "memory" || !source) return [];
+    const snapshot = source.snapshot;
+    if (typeof getSnapshotKnowledgeBeforeScene === "function") {
+        return getSnapshotKnowledgeBeforeScene(snapshot, index)
+            .filter(key => getMasteredWordSet().has(key));
     }
-    const understoodAt=snapshot.vaneUnderstoodAt||{};
-    const mastered=getMasteredWordSet();
-    return Object.keys(wordBank).filter(key=>
-        mastered.has(key)&&
-        Number.isFinite(Number(understoodAt[key]))&&
-        Number(understoodAt[key])<index
+    const understoodAt = snapshot.vaneUnderstoodAt || {};
+    const mastered = getMasteredWordSet();
+    return Object.keys(wordBank).filter(key =>
+        mastered.has(key) &&
+        Number.isFinite(Number(understoodAt[key])) &&
+        Number(understoodAt[key]) < index
     );
 }
 
-function openContinueSetup(){
-    if(typeof recollectionProgress==="undefined") return;
-    recollectionProgress=loadRecollectionProgress();
-    if(!recollectionProgress.gameCleared) return;
-    masteredWords=getMasteredWordSet();
+function openContinueSetup() {
+    if (typeof recollectionProgress === "undefined") return;
+    recollectionProgress = loadRecollectionProgress();
+    if (!recollectionProgress.gameCleared) return;
+    masteredWords = getMasteredWordSet();
 
-    const game=document.getElementById("game-container");
-    continueOpenedFromGame=!!(game && window.getComputedStyle(game).display!=="none");
-    continueSceneIndex=0;
-    continueKnowledgeMode="zero";
-    document.getElementById("device-check-overlay").style.display="none";
-    const overlay=document.getElementById("continue-overlay");
-    overlay.style.display="flex";
-    overlay.setAttribute("aria-hidden","false");
+    const game = document.getElementById("game-container");
+    continueOpenedFromGame = !!(game && window.getComputedStyle(game).display !== "none");
+    continueSceneIndex = 0;
+    continueKnowledgeMode = "zero";
+    document.getElementById("device-check-overlay").style.display = "none";
+    const overlay = document.getElementById("continue-overlay");
+    overlay.style.display = "flex";
+    overlay.setAttribute("aria-hidden", "false");
     refreshContinueSetup();
 }
 
-function closeContinueSetup(){
-    const overlay=document.getElementById("continue-overlay");
-    overlay.style.display="none";
-    overlay.setAttribute("aria-hidden","true");
-    if(!continueOpenedFromGame){
-        document.getElementById("device-check-overlay").style.display="flex";
+function closeContinueSetup() {
+    const overlay = document.getElementById("continue-overlay");
+    overlay.style.display = "none";
+    overlay.setAttribute("aria-hidden", "true");
+    if (!continueOpenedFromGame) {
+        document.getElementById("device-check-overlay").style.display = "flex";
     }
 }
 
-function chooseContinueScene(index){
-    if(!continuationPoints.includes(index)) return;
-    if(index!==0 && !getContinuationSource()) return;
-    continueSceneIndex=index;
+function chooseContinueScene(index) {
+    if (!continuationPoints.includes(index)) return;
+    if (index !== 0 && !getContinuationSource()) return;
+    continueSceneIndex = index;
     refreshContinueSetup();
 }
 
-function chooseContinueKnowledge(mode){
-    if(!["zero","memory","all"].includes(mode)) return;
-    continueKnowledgeMode=mode;
+function chooseContinueKnowledge(mode) {
+    if (!["zero", "memory", "all"].includes(mode)) return;
+    continueKnowledgeMode = mode;
     refreshContinueSetup();
 }
 
-function refreshContinueSetup(){
-    const source=getContinuationSource();
-    const memoryCount=getContinuationKnownKeys("memory",continueSceneIndex,source).length;
-    const totalMastered=getMasteredWordSet().size;
-    const caption=document.getElementById("continue-memory-count");
-    const allCaption=document.getElementById("continue-all-count");
-    if(caption){
-        caption.innerText=source
-            ?`この地点で理解していた ${memoryCount} 語`
-            :"保存された記憶がありません";
+function refreshContinueSetup() {
+    const source = getContinuationSource();
+    const memoryCount = getContinuationKnownKeys("memory", continueSceneIndex, source).length;
+    const totalMastered = getMasteredWordSet().size;
+    const caption = document.getElementById("continue-memory-count");
+    const allCaption = document.getElementById("continue-all-count");
+    if (caption) {
+        caption.innerText = source
+            ? `この地点で理解していた ${memoryCount} 語`
+            : "保存された記憶がありません";
     }
-    if(allCaption){
-        allCaption.innerText=`解読実績 ${totalMastered} / ${Object.keys(wordBank).length} 語`;
+    if (allCaption) {
+        allCaption.innerText = `解読実績 ${totalMastered} / ${Object.keys(wordBank).length} 語`;
     }
-    document.querySelectorAll("[data-continue-scene]").forEach(button=>{
-        const point=Number(button.dataset.continueScene);
+    document.querySelectorAll("[data-continue-scene]").forEach(button => {
+        const point = Number(button.dataset.continueScene);
 
-        button.disabled=point!==0 && !source;
-        const chosen=point===continueSceneIndex;
-        button.classList.toggle("active",chosen);
-        button.setAttribute("aria-pressed",chosen?"true":"false");
+        button.disabled = point !== 0 && !source;
+        const chosen = point === continueSceneIndex;
+        button.classList.toggle("active", chosen);
+        button.setAttribute("aria-pressed", chosen ? "true" : "false");
     });
-    if(!source && continueKnowledgeMode==="memory") continueKnowledgeMode="zero";
-    document.querySelectorAll("[data-continue-knowledge]").forEach(button=>{
-        const chosen=button.dataset.continueKnowledge===continueKnowledgeMode;
-        button.classList.toggle("active",chosen);
-        button.setAttribute("aria-pressed",chosen?"true":"false");
-        if(button.dataset.continueKnowledge==="memory") button.disabled=!source;
+    if (!source && continueKnowledgeMode === "memory") continueKnowledgeMode = "zero";
+    document.querySelectorAll("[data-continue-knowledge]").forEach(button => {
+        const chosen = button.dataset.continueKnowledge === continueKnowledgeMode;
+        button.classList.toggle("active", chosen);
+        button.setAttribute("aria-pressed", chosen ? "true" : "false");
+        if (button.dataset.continueKnowledge === "memory") button.disabled = !source;
     });
-    const understood=getContinuationKnownKeys(
-        continueKnowledgeMode,continueSceneIndex,source
+    const understood = getContinuationKnownKeys(
+        continueKnowledgeMode, continueSceneIndex, source
     ).length;
-    const location=continuationPointNames[continueSceneIndex];
-    const before=continueSceneIndex===0
-        ?"はじめから選び直します。"
-        :source
-            ?`それ以前の返答は「${getEndingTitle(source.endingId)}」を回収した時の記録から引き継ぎます。`
-            :"以前の選択記録がないため、過去の返答は引き継ぎません。";
-    document.getElementById("continue-summary").innerText=
-        `${location}（SCENE ${String(continueSceneIndex+1).padStart(2,"0")}）／`+
+    const location = continuationPointNames[continueSceneIndex];
+    const before = continueSceneIndex === 0
+        ? "はじめから選び直します。"
+        : source
+            ? `それ以前の返答は「${getEndingTitle(source.endingId)}」を回収した時の記録から引き継ぎます。`
+            : "以前の選択記録がないため、過去の返答は引き継ぎません。";
+    document.getElementById("continue-summary").innerText =
+        `${location}（SCENE ${String(continueSceneIndex + 1).padStart(2, "0")}）／` +
         `理解済み ${understood} 語\n${before} ここから先の返答は選び直せます。`;
-    document.getElementById("continue-final").style.display=
-        recollectionProgress.finalRecollectionUnlocked?"block":"none";
+    document.getElementById("continue-final").style.display =
+        recollectionProgress.finalRecollectionUnlocked ? "block" : "none";
 }
 
-function restoreContinuationDisplay(){
-    if(document.getElementById("message-text") &&
-       document.getElementById("resolution-text")) return;
-    const display=document.getElementById("display");
-    display.innerHTML=`
+function restoreContinuationDisplay() {
+    if (document.getElementById("message-text") &&
+        document.getElementById("resolution-text")) return;
+    const display = document.getElementById("display");
+    display.innerHTML = `
         <div id="chara-header"><span id="speaker-name">LANCELOT</span></div>
         <div class="bubble" id="message-text">......</div>
         <div id="vane-thought-block"><div class="block-label">VANE</div>
@@ -2359,114 +2358,114 @@ function restoreContinuationDisplay(){
             <div class="resolution-bubble" id="resolution-text"></div></div>`;
 }
 
-function normalizeContinuationAnswer(value,index){
-    if(!value||!scenario[index]) return null;
-    const option=getAllSceneOptions(scenario[index]).find(item=>
-        item.id===value || item.t===value
+function normalizeContinuationAnswer(value, index) {
+    if (!value || !scenario[index]) return null;
+    const option = getAllSceneOptions(scenario[index]).find(item =>
+        item.id === value || item.t === value
     );
-    return option?option.id:null;
+    return option ? option.id : null;
 }
 
-function startChosenContinuation(){
-    if(!continuationPoints.includes(continueSceneIndex)) return false;
-    if(!recollectionProgress.gameCleared) return false;
-    const index=continueSceneIndex;
-    const source=getContinuationSource();
-    if(index!==0 && !source) return false;
-    const snapshot=source?source.snapshot:null;
-    const knowledge=getContinuationKnownKeys(continueKnowledgeMode,index,source);
+function startChosenContinuation() {
+    if (!continuationPoints.includes(continueSceneIndex)) return false;
+    if (!recollectionProgress.gameCleared) return false;
+    const index = continueSceneIndex;
+    const source = getContinuationSource();
+    if (index !== 0 && !source) return false;
+    const snapshot = source ? source.snapshot : null;
+    const knowledge = getContinuationKnownKeys(continueKnowledgeMode, index, source);
 
-    if(index===0){
+    if (index === 0) {
         closeContinueSetup();
         restoreContinuationDisplay();
         startGame(false);
-        applyContinuationKnowledge(knowledge,snapshot,index);
-        runMode="recollection";
-        recollectionBaseEndingId=source?source.endingId:null;
-        for(const id of ["device-check-overlay","intro-overlay","tutorial-overlay","load-overlay"]){
-            const element=document.getElementById(id);
-            if(element) element.style.display="none";
+        applyContinuationKnowledge(knowledge, snapshot, index);
+        runMode = "recollection";
+        recollectionBaseEndingId = source ? source.endingId : null;
+        for (const id of ["device-check-overlay", "intro-overlay", "tutorial-overlay", "load-overlay"]) {
+            const element = document.getElementById(id);
+            if (element) element.style.display = "none";
         }
         switchMainView("play");
         updateUI(true);
         return true;
     }
 
-    notebookChecks={};
-    notebookHintLevels={};
-    finalReviewOpen=false;
-    selectedAnswers=new Array(scenario.length).fill(null);
-    sceneChoiceRecords=new Array(scenario.length).fill(null);
-    const pastAnswers=snapshot?.selectedAnswers||[];
-    const pastRecords=Array.isArray(snapshot?.sceneChoiceRecords)
-        ?snapshot.sceneChoiceRecords:[];
-    for(let i=0;i<index;i++){
-        const id=normalizeContinuationAnswer(pastAnswers[i],i);
-        selectedAnswers[i]=id;
-        const record=pastRecords[i];
-        if(id && record && typeof record==="object" && record.optionId===id){
-            sceneChoiceRecords[i]={
+    notebookChecks = {};
+    notebookHintLevels = {};
+    finalReviewOpen = false;
+    selectedAnswers = new Array(scenario.length).fill(null);
+    sceneChoiceRecords = new Array(scenario.length).fill(null);
+    const pastAnswers = snapshot?.selectedAnswers || [];
+    const pastRecords = Array.isArray(snapshot?.sceneChoiceRecords)
+        ? snapshot.sceneChoiceRecords : [];
+    for (let i = 0; i < index; i++) {
+        const id = normalizeContinuationAnswer(pastAnswers[i], i);
+        selectedAnswers[i] = id;
+        const record = pastRecords[i];
+        if (id && record && typeof record === "object" && record.optionId === id) {
+            sceneChoiceRecords[i] = {
                 ...record,
-                wordStates:{...(record.wordStates||{})},
-                guesses:{...(record.guesses||{})}
+                wordStates: { ...(record.wordStates || {}) },
+                guesses: { ...(record.guesses || {}) }
             };
         }
     }
 
-    runMode="recollection";
-    recollectionBaseEndingId=source?source.endingId:null;
-    currentStep=index;
-    viewingStep=index;
-    interactionPhase="conversation";
-    pendingOption=null;
-    pendingResolvedKeys=[];
-    pendingFinalLine="";
-    pendingChoiceContext=null;
-    vaneKnownWords=new Set();
-    vaneUnderstoodAt={};
-    masteredWords=getMasteredWordSet();
-    activeDictKey=null;
-    mainViewMode="play";
+    runMode = "recollection";
+    recollectionBaseEndingId = source ? source.endingId : null;
+    currentStep = index;
+    viewingStep = index;
+    interactionPhase = "conversation";
+    pendingOption = null;
+    pendingResolvedKeys = [];
+    pendingFinalLine = "";
+    pendingChoiceContext = null;
+    vaneKnownWords = new Set();
+    vaneUnderstoodAt = {};
+    masteredWords = getMasteredWordSet();
+    activeDictKey = null;
+    mainViewMode = "play";
     restoreContinuationDisplay();
     initDict({});
-    applyContinuationKnowledge(knowledge,snapshot,index);
-    if(continueKnowledgeMode==="memory" && source &&
-       typeof restoreNotebookGuessesBeforeScene==="function"){
-        restoreNotebookGuessesBeforeScene(snapshot,index,"memory");
+    applyContinuationKnowledge(knowledge, snapshot, index);
+    if (continueKnowledgeMode === "memory" && source &&
+        typeof restoreNotebookGuessesBeforeScene === "function") {
+        restoreNotebookGuessesBeforeScene(snapshot, index, "memory");
     }
 
-    wordSeenCounts={};
-    seenSceneIds=new Set();
-    for(let i=0;i<=index;i++) registerSceneWords(i);
+    wordSeenCounts = {};
+    seenSceneIds = new Set();
+    for (let i = 0; i <= index; i++) registerSceneWords(i);
     rebuildRunState();
 
     closeContinueSetup();
-    for(const id of ["intro-overlay","tutorial-overlay","load-overlay","device-check-overlay"]){
-        document.getElementById(id).style.display="none";
+    for (const id of ["intro-overlay", "tutorial-overlay", "load-overlay", "device-check-overlay"]) {
+        document.getElementById(id).style.display = "none";
     }
-    document.getElementById("game-container").style.display="flex";
+    document.getElementById("game-container").style.display = "flex";
     switchMainView("play");
     renderTabs();
     updateUI(true);
     renderPastLog();
     renderWordList();
-    const display=document.getElementById("display");
-    if(display) display.scrollTop=0;
+    const display = document.getElementById("display");
+    if (display) display.scrollTop = 0;
     return true;
 }
 
-function applyContinuationKnowledge(keys,snapshot,startIndex){
-    const allowed=new Set(getMasteredWordSet());
-    const wanted=[...new Set(keys)].filter(key=>allowed.has(key)&&wordBank[key]);
-    vaneKnownWords=new Set(wanted);
-    vaneUnderstoodAt={};
-    const oldAt=snapshot?.vaneUnderstoodAt||{};
-    for(const key of wanted){
-        const hadEarlierKnowledge=Object.prototype.hasOwnProperty.call(oldAt,key);
-        const at=hadEarlierKnowledge?Number(oldAt[key]):NaN;
-        vaneUnderstoodAt[key]=Number.isFinite(at)&&at<startIndex
-            ?at:startIndex-1;
-        userDict[key]=wordBank[key].canonical;
+function applyContinuationKnowledge(keys, snapshot, startIndex) {
+    const allowed = new Set(getMasteredWordSet());
+    const wanted = [...new Set(keys)].filter(key => allowed.has(key) && wordBank[key]);
+    vaneKnownWords = new Set(wanted);
+    vaneUnderstoodAt = {};
+    const oldAt = snapshot?.vaneUnderstoodAt || {};
+    for (const key of wanted) {
+        const hadEarlierKnowledge = Object.prototype.hasOwnProperty.call(oldAt, key);
+        const at = hadEarlierKnowledge ? Number(oldAt[key]) : NaN;
+        vaneUnderstoodAt[key] = Number.isFinite(at) && at < startIndex
+            ? at : startIndex - 1;
+        userDict[key] = wordBank[key].canonical;
     }
     renderDictPlaceholder();
     updateIntelUI();
@@ -2474,98 +2473,96 @@ function applyContinuationKnowledge(keys,snapshot,startIndex){
     renderWordList();
 }
 
-function openFinalContinuation(){
-    if(!recollectionProgress.finalRecollectionUnlocked) return;
+function openFinalContinuation() {
+    if (!recollectionProgress.finalRecollectionUnlocked) return;
     closeContinueSetup();
-    if(typeof startFinalRecollectionFromUI==="function"){
+    if (typeof startFinalRecollectionFromUI === "function") {
         startFinalRecollectionFromUI();
     }
 }
 
-window.openRecollection=openContinueSetup;
+window.openRecollection = openContinueSetup;
 
-// 読み返しは表示だけ。クリア記録・ノート・ルート計算に触れない。
-function getEndingGalleryCollectedIds(){
-    const ids=new Set();
-    try{
-        const stored=JSON.parse(localStorage.getItem("vane_collection_v3")||"[]");
-        if(Array.isArray(stored)){
-            stored.forEach(raw=>{
-                const id=Number(raw);
-                if(Number.isInteger(id)&&id>=1&&id<=7) ids.add(id);
+function getEndingGalleryCollectedIds() {
+    const ids = new Set();
+    try {
+        const stored = JSON.parse(localStorage.getItem("vane_collection_v3") || "[]");
+        if (Array.isArray(stored)) {
+            stored.forEach(raw => {
+                const id = Number(raw);
+                if (Number.isInteger(id) && id >= 1 && id <= 7) ids.add(id);
             });
         }
-    }catch(e){}
-    // 旧来の回収記録が残っている場合も、通常END1〜6は閲覧可能。
-    if(typeof recollectionProgress!=="undefined"){
-        (recollectionProgress.collectedNormalEndings||[]).forEach(raw=>{
-            const id=Number(raw);
-            if(Number.isInteger(id)&&id>=1&&id<=6) ids.add(id);
+    } catch (e) { }
+    if (typeof recollectionProgress !== "undefined") {
+        (recollectionProgress.collectedNormalEndings || []).forEach(raw => {
+            const id = Number(raw);
+            if (Number.isInteger(id) && id >= 1 && id <= 6) ids.add(id);
         });
     }
     return ids;
 }
-function openEndingGallery(){
-    if(!getEndingGalleryCollectedIds().size) return;
-    const overlay=document.getElementById("ending-gallery-overlay");
-    if(!overlay) return;
-    overlay.style.display="flex";
-    overlay.setAttribute("aria-hidden","false");
+function openEndingGallery() {
+    if (!getEndingGalleryCollectedIds().size) return;
+    const overlay = document.getElementById("ending-gallery-overlay");
+    if (!overlay) return;
+    overlay.style.display = "flex";
+    overlay.setAttribute("aria-hidden", "false");
     showEndingGalleryList();
     document.getElementById("ending-gallery-title")?.focus();
 }
-function showEndingGalleryList(){
-    const unlocked=getEndingGalleryCollectedIds();
-    const list=document.getElementById("ending-gallery-list");
-    const story=document.getElementById("ending-gallery-story");
-    const back=document.getElementById("ending-gallery-back");
-    if(!list||!story||!back) return;
-    list.innerHTML="";
-    for(let id=1;id<=7;id++){
-        const button=document.createElement("button");
-        button.type="button";
-        button.disabled=!unlocked.has(id);
-        button.textContent=`END ${String(id).padStart(2,"0")}｜${unlocked.has(id)?endingsData[id].title:"？？？（未回収）"}`;
-        if(!button.disabled) button.onclick=()=>readEndingFromGallery(id);
+function showEndingGalleryList() {
+    const unlocked = getEndingGalleryCollectedIds();
+    const list = document.getElementById("ending-gallery-list");
+    const story = document.getElementById("ending-gallery-story");
+    const back = document.getElementById("ending-gallery-back");
+    if (!list || !story || !back) return;
+    list.innerHTML = "";
+    for (let id = 1; id <= 7; id++) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.disabled = !unlocked.has(id);
+        button.textContent = `END ${String(id).padStart(2, "0")}｜${unlocked.has(id) ? endingsData[id].title : "？？？（未回収）"}`;
+        if (!button.disabled) button.onclick = () => readEndingFromGallery(id);
         list.appendChild(button);
     }
-    list.style.display="grid";
-    story.style.display="none";
-    story.innerHTML="";
-    back.style.display="none";
-    document.getElementById("ending-gallery-panel").scrollTop=0;
+    list.style.display = "grid";
+    story.style.display = "none";
+    story.innerHTML = "";
+    back.style.display = "none";
+    document.getElementById("ending-gallery-panel").scrollTop = 0;
 }
-function readEndingFromGallery(id){
-    if(!getEndingGalleryCollectedIds().has(id)||!endingsData[id]||typeof endingBodies[id]!=="string") return;
-    const list=document.getElementById("ending-gallery-list");
-    const story=document.getElementById("ending-gallery-story");
-    const back=document.getElementById("ending-gallery-back");
-    if(!list||!story||!back) return;
-    list.style.display="none";
-    story.innerHTML=`<h3 style="color:var(--main-dark);text-align:center">END ${String(id).padStart(2,"0")}　${escapeHtml(endingsData[id].title)}</h3><div>${endingBodies[id]}</div>`;
-    story.style.display="block";
-    back.style.display="inline-block";
-    document.getElementById("ending-gallery-panel").scrollTop=0;
+function readEndingFromGallery(id) {
+    if (!getEndingGalleryCollectedIds().has(id) || !endingsData[id] || typeof endingBodies[id] !== "string") return;
+    const list = document.getElementById("ending-gallery-list");
+    const story = document.getElementById("ending-gallery-story");
+    const back = document.getElementById("ending-gallery-back");
+    if (!list || !story || !back) return;
+    list.style.display = "none";
+    story.innerHTML = `<h3 style="color:var(--main-dark);text-align:center">END ${String(id).padStart(2, "0")}　${escapeHtml(endingsData[id].title)}</h3><div>${endingBodies[id]}</div>`;
+    story.style.display = "block";
+    back.style.display = "inline-block";
+    document.getElementById("ending-gallery-panel").scrollTop = 0;
 }
-function closeEndingGallery(){
-    const overlay=document.getElementById("ending-gallery-overlay");
-    if(!overlay) return;
-    overlay.style.display="none";
-    overlay.setAttribute("aria-hidden","true");
+function closeEndingGallery() {
+    const overlay = document.getElementById("ending-gallery-overlay");
+    if (!overlay) return;
+    overlay.style.display = "none";
+    overlay.setAttribute("aria-hidden", "true");
     document.getElementById("ending-gallery-entry-btn")?.focus();
 }
-function openNotice(){
-    const overlay=document.getElementById("notice-overlay");
-    if(!overlay) return;
-    overlay.style.display="flex";
-    overlay.setAttribute("aria-hidden","false");
+function openNotice() {
+    const overlay = document.getElementById("notice-overlay");
+    if (!overlay) return;
+    overlay.style.display = "flex";
+    overlay.setAttribute("aria-hidden", "false");
     document.getElementById("notice-title")?.focus?.();
 }
-function closeNotice(){
-    const overlay=document.getElementById("notice-overlay");
-    if(!overlay) return;
-    overlay.style.display="none";
-    overlay.setAttribute("aria-hidden","true");
+function closeNotice() {
+    const overlay = document.getElementById("notice-overlay");
+    if (!overlay) return;
+    overlay.style.display = "none";
+    overlay.setAttribute("aria-hidden", "true");
     document.getElementById("notice-entry-btn")?.focus();
 }
 </script>
