@@ -204,13 +204,18 @@ function saveEndingCollection() {
 
 
 
-function renderEndingScreen(id, progressResult = null) {
+function renderEndingScreen(id, progressResult = null, fromGallery = false) {
     const ending = endingsData[id];
     const body = endingBodies[id];
     if (!ending || typeof body !== "string") return false;
 
     const progressMessages = [];
 
+    if (progressResult?.keysGained > 0) {
+        progressMessages.push(
+            `エンディング解放カギを${progressResult.keysGained}個獲得しました。<br>カギはタイトル画面の『エンディング回想』内のエンディングリストから、未解放のエンディングを解放するために使えます。`
+        );
+    }
     if (progressResult?.isFirstClear) {
         progressMessages.push(
             "『つづきから』が解放されました。<br>次の周回では、物語のはじまり・途中・最後の言葉から再開できます。"
@@ -268,34 +273,41 @@ function renderEndingScreen(id, progressResult = null) {
             </div>`;
     }
 
-    const display = document.getElementById("display");
-    const actionArea = document.getElementById("action-area");
-    if (!display || !actionArea) return false;
-    const canContinue = typeof recollectionProgress !== "undefined" &&
-        recollectionProgress.gameCleared;
-    const continueButton = canContinue ? `
-        <button onclick="openRecollection()" class="btn-style"
-            style="background:#d4af37;color:#000;margin-top:20px">
-            つづきから
-        </button>` : "";
+    const overlay = document.getElementById("ending-reader-overlay");
+    const number = document.getElementById("ending-reader-number");
+    const title = document.getElementById("ending-reader-title");
+    const story = document.getElementById("ending-reader-body");
+    const notes = document.getElementById("ending-reader-notes");
+    const returnButton = document.getElementById("ending-reader-return");
+    if (!overlay || !number || !title || !story || !notes || !returnButton) return false;
 
-    display.innerHTML = `
-        <div style="font-size:.72rem;letter-spacing:.18em;color:var(--muted)">END ${String(id).padStart(2, "0")}</div>
-        <h2 style="color:#d4af37">【 ${ending.title} 】</h2>
-        <div style="width:72px;height:1px;background:var(--line-strong);margin:0 auto 12px"></div>
-        <p style="padding:20px 40px;line-height:2.2;text-align:left">
-            ${body}
-        </p>
-        ${progressHtml}
-        ${hintHtml}
-        ${continueButton}
-        <button onclick="location.reload()" class="btn-style"
-            style="background:var(--main);color:#fff;margin-top:20px">
-            タイトルへ
-        </button>`;
-    actionArea.innerHTML = "";
-    display.scrollTop = 0;
+    number.textContent = `END ${String(id).padStart(2, "0")}`;
+    title.textContent = ending.title;
+    story.innerHTML = body;
+    notes.innerHTML = fromGallery ? "" : progressHtml + hintHtml;
+    returnButton.textContent = fromGallery ? "一覧へ戻る" : "タイトルへ";
+    overlay.dataset.fromGallery = fromGallery ? "true" : "false";
+    if (fromGallery) {
+        document.getElementById("ending-gallery-overlay")?.setAttribute("aria-hidden", "true");
+    }
+    overlay.style.display = "block";
+    overlay.setAttribute("aria-hidden", "false");
+    overlay.scrollTop = 0;
+    title.focus();
     return true;
+}
+
+function returnFromEndingReader() {
+    const overlay = document.getElementById("ending-reader-overlay");
+    if (!overlay || overlay.dataset.fromGallery !== "true") {
+        location.reload();
+        return;
+    }
+    overlay.style.display = "none";
+    overlay.setAttribute("aria-hidden", "true");
+    document.getElementById("ending-gallery-overlay")?.setAttribute("aria-hidden", "false");
+    showEndingGalleryList();
+    document.getElementById("ending-gallery-title")?.focus();
 }
 
 
