@@ -15,6 +15,7 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 .device-box{width:min(520px,82vw);border:1px solid var(--line);padding:42px;border-radius:16px;background:rgba(255,255,255,.96);box-shadow:0 18px 55px rgba(68,91,101,.10)}
 .content-box{max-width:700px;width:90%;line-height:2.05;max-height:90vh;overflow-y:auto;padding:30px;box-sizing:border-box}
 .title-image{display:block;width:min(620px,92%);height:auto;margin:0 auto 28px}
+.title-image-fallback{display:none;margin:0 auto 28px;color:var(--main-dark);font-size:clamp(1.35rem,3vw,2rem);line-height:1.6;font-weight:700}
 #game-container{width:98vw;max-width:1200px;height:92vh;background:var(--surface);display:none;border:1px solid var(--line-strong);border-radius:12px;overflow:hidden;color:var(--text);box-shadow:0 24px 70px rgba(68,91,101,.14),0 2px 10px rgba(68,91,101,.05)}
 #main-screen{flex:2;display:flex;flex-direction:column;border-right:1px solid var(--line);min-width:0;height:100%;background:var(--surface)}
 #progress-bar{height:34px;min-height:34px;flex:0 0 34px;background:var(--surface-soft);color:var(--muted);display:flex;justify-content:center;align-items:center;font-size:.72em;letter-spacing:.14em;border-bottom:1px solid var(--line);box-sizing:border-box}
@@ -116,8 +117,6 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 .continue-actions .btn-style{margin:0;font-size:.92rem;padding:12px 22px}
 .continue-actions .continue-primary{background:var(--main);color:#fff}
 .continue-actions .continue-secondary{background:var(--surface-soft);color:var(--main-dark);border-color:var(--line-strong)}
-.continue-final{border-top:1px solid var(--line);margin-top:16px;padding-top:14px;text-align:center}
-.continue-final .btn-style{margin:0;padding:10px 24px;background:var(--main-soft);color:var(--main-dark);border-color:var(--line)}
 @media(max-width:700px){.continue-grid{grid-template-columns:1fr}.continue-choice{min-height:75px}}
 
 
@@ -144,7 +143,7 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 .final-notebook-word button{font:inherit;color:var(--main-dark);background:var(--surface-soft);border:1px solid var(--line);border-radius:4px;padding:4px 10px;cursor:pointer}
 
 #ending-gallery-overlay{position:fixed;inset:0;z-index:225;display:none;justify-content:center;align-items:center;padding:20px;box-sizing:border-box;background:rgba(237,243,245,.98)}
-#ending-gallery-panel{width:min(800px,96vw);max-height:92vh;overflow-y:auto;background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;padding:28px 36px;box-sizing:border-box;box-shadow:0 20px 65px rgba(68,91,101,.12)}
+#ending-gallery-panel{width:min(800px,96vw);max-height:92vh;max-height:92dvh;display:flex;flex-direction:column;overflow-y:auto;background:var(--surface);border:1px solid var(--line-strong);border-radius:12px;padding:28px 36px;box-sizing:border-box;box-shadow:0 20px 65px rgba(68,91,101,.12)}
 #ending-gallery-panel h2{color:var(--main-dark);margin:0 0 10px;text-align:center}
 #ending-gallery-title:focus{outline:none}
 #ending-gallery-panel .gallery-help{color:var(--text-soft);font-size:.85rem;line-height:1.7;text-align:center}
@@ -155,12 +154,12 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 .ending-gallery-number{font-size:.89rem;font-weight:700;letter-spacing:.06em;color:var(--main-dark)}
 .ending-gallery-name{font-size:.8rem;line-height:1.45;color:var(--text-soft);overflow-wrap:anywhere}
 .ending-gallery-state{font-size:.7rem;line-height:1.45;color:var(--muted)}
-#ending-gallery-list{display:grid;grid-template-columns:1fr;gap:9px;margin:23px 0}
+#ending-gallery-list{display:grid;grid-template-columns:1fr;gap:9px;margin:12px 0;overflow-y:auto;min-height:80px;flex:1 1 auto;overscroll-behavior:contain}
 #ending-gallery-list button{font-family:inherit;font-size:.86rem;line-height:1.4;min-width:70px;padding:9px 13px;text-align:center;border:1px solid var(--line-strong);border-radius:7px;background:var(--surface);color:var(--main-dark);cursor:pointer;font-weight:700}
 #ending-gallery-list button.ending-gallery-unlock{background:var(--main-soft)}
 #ending-gallery-list button:hover:not(:disabled){background:var(--main-soft);border-color:var(--main)}
 #ending-gallery-list button:disabled{cursor:default;color:var(--muted-light);opacity:.55}
-.gallery-footer{text-align:center;margin-top:18px}
+.gallery-footer{text-align:center;margin-top:12px;flex:0 0 auto}
 .gallery-footer .btn-style{font-size:.9rem;padding:12px 20px;background:var(--main);color:#fff}
 @media(max-width:700px){#ending-gallery-panel{padding:20px}.ending-gallery-item{gap:7px;padding:10px}#ending-gallery-list button{min-width:56px;padding:9px 8px;font-size:.8rem}}
 
@@ -176,6 +175,30 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 .ending-reader-actions{text-align:center;margin-top:36px;padding-top:28px;border-top:1px solid var(--line)}
 .ending-reader-actions .btn-style{background:var(--main);color:#fff;margin:0}
 @media(max-width:700px){.ending-reader-page{padding:0}.ending-reader-paper{min-height:100vh;min-height:100dvh;border:0;border-radius:0;padding:28px 22px 44px;box-shadow:none}.ending-reader-rule{margin-bottom:28px}#ending-reader-body{font-size:.97rem;line-height:2.1}}
+
+/* END 07の自動解放後は、タイトル画面と「1年後」の本文を暖色に切り替える。 */
+html.one-year-unlocked #bg-layer{background:radial-gradient(circle at 20% 15%,rgba(255,255,255,.7),transparent 40%),linear-gradient(135deg,#fff1de,#ffcd94)}
+html.one-year-unlocked #device-check-overlay{background:linear-gradient(150deg,#fff7eb 0%,#ffe2ba 55%,#ffcf9b 100%)}
+html.one-year-unlocked #device-check-overlay .device-box{border-color:#e7b47c;box-shadow:0 22px 65px rgba(169,96,45,.16)}
+#one-year-entry-btn{background:linear-gradient(120deg,#f8cb8b,#edaa6b);border-color:#d69a68;color:#6d4328;font-weight:700;box-shadow:0 4px 13px rgba(189,108,54,.13)}
+#one-year-entry-btn:hover{background:linear-gradient(120deg,#ffdbab,#f3bb81)}
+#ending-reader-overlay.ending-final{background:linear-gradient(135deg,#fff4e1,#f7c895)}
+#ending-reader-overlay.ending-final .ending-reader-paper{background:#fffaf2;border-color:#e7bf93;box-shadow:0 14px 50px rgba(155,87,35,.13)}
+#ending-reader-overlay.ending-final .ending-reader-number,#ending-reader-overlay.ending-final #ending-reader-title{color:#a15d30}
+#ending-reader-overlay.ending-final .ending-reader-rule{background:#dba36b}
+#game-modal-overlay{position:fixed;inset:0;z-index:260;display:none;align-items:center;justify-content:center;background:rgba(49,57,60,.55);padding:20px;box-sizing:border-box}
+#game-modal-panel{width:min(460px,96vw);max-height:90dvh;overflow-y:auto;box-sizing:border-box;border:1px solid var(--line-strong);border-radius:14px;background:var(--surface);padding:30px 30px 26px;text-align:center;box-shadow:0 24px 75px rgba(34,48,56,.22)}
+#game-modal-title{font-size:1.24rem;line-height:1.6;margin:3px 0 12px;color:var(--main-dark)}
+#game-modal-message{color:var(--text-soft);font-size:.9rem;line-height:1.9;white-space:pre-line;margin:0 0 23px}
+.game-modal-symbol{font-size:1.5rem;color:var(--main);margin-bottom:5px}
+.game-modal-actions{display:flex;justify-content:center;gap:11px;flex-wrap:wrap}
+.game-modal-actions .btn-style{margin:0;min-width:120px;padding:10px 16px;font-size:.9rem}
+.game-modal-cancel{background:var(--surface-soft);color:var(--main-dark);border:1px solid var(--line-strong)}
+.game-modal-confirm{background:var(--main);color:#fff}
+#game-modal-overlay.one-year-modal #game-modal-panel{border-color:#e8b783;background:#fff9f0}
+#game-modal-overlay.one-year-modal .game-modal-symbol,#game-modal-overlay.one-year-modal #game-modal-title{color:#ac622b}
+#game-modal-overlay.one-year-modal .game-modal-confirm{background:#bd7747;color:#fff}
+@media(max-width:540px){#game-modal-panel{padding:26px 18px 22px}.game-modal-actions .btn-style{min-width:106px}}
 </style>
 </head>
 <body>
@@ -186,6 +209,7 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 <div id="check-action">
 <button id="entry-btn" class="btn-style" style="background:var(--main);color:#fff;display:none">物語を始める</button>
 <button id="recollection-entry-btn" class="btn-style" style="background:var(--main-dark);color:#fff;display:none">つづきから</button>
+<button id="one-year-entry-btn" type="button" class="btn-style" style="display:none" onclick="openOneYearAfter()">1年後 <span aria-hidden="true">✦</span></button>
 <button id="ending-gallery-entry-btn" type="button" class="btn-style" style="background:var(--surface-soft);color:var(--main-dark);border-color:var(--line-strong);display:none" onclick="openEndingGallery()">エンディング回想</button>
 <button id="notice-entry-btn" class="btn-style" type="button" style="background:var(--surface-soft);color:var(--main-dark);border-color:var(--line-strong)" onclick="openNotice()">おしらせ</button>
 <p id="error-msg" style="color:var(--wrong);display:none"><b>MOBILE DEVICE DETECTED</b><br>スマートフォン等のモバイル環境ではプレイできません。</p>
@@ -206,7 +230,7 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
 <div id="ending-gallery-overlay" role="dialog" aria-modal="true" aria-labelledby="ending-gallery-title" aria-hidden="true">
   <section id="ending-gallery-panel">
     <h2 id="ending-gallery-title" tabindex="-1">エンディング回想</h2>
-    <p class="gallery-help">未解放のエンディングはカギ1個で解放できます（閲覧だけではクリア扱いになりません）。END 07はEND 01〜06をすべて解放した後に解放できます。</p>
+    <p class="gallery-help">END 01〜06は未解放ならカギ1個で解放できます（閲覧だけではクリア扱いになりません）。6種類すべて解放すると、タイトル画面に「1年後」が現れます。</p>
     <p id="ending-gallery-keys" class="gallery-key-balance" aria-live="polite"></p>
     <p id="ending-gallery-status" class="gallery-unlock-feedback" role="status" aria-live="polite"></p>
     <div id="ending-gallery-list"></div>
@@ -215,8 +239,20 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
     </div>
   </section>
 </div>
+<div id="game-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="game-modal-title" aria-describedby="game-modal-message" aria-hidden="true">
+  <section id="game-modal-panel" tabindex="-1">
+    <div class="game-modal-symbol" aria-hidden="true">✦</div>
+    <h2 id="game-modal-title"></h2>
+    <p id="game-modal-message"></p>
+    <div class="game-modal-actions">
+      <button type="button" class="btn-style game-modal-cancel" id="game-modal-cancel">キャンセル</button>
+      <button type="button" class="btn-style game-modal-confirm" id="game-modal-confirm">確認</button>
+    </div>
+  </section>
+</div>
 <div id="intro-overlay"><div class="content-box">
-<img src="title.png" alt="声を聴かせて、ランスロット！" class="title-image">
+<img src="title.png" alt="声を聴かせて、ランスロット！" class="title-image" onerror="this.style.display='none'; document.getElementById('intro-title-fallback').style.display='block'">
+<h1 id="intro-title-fallback" class="title-image-fallback">声を聴かせて、ランスロット！</h1>
 <p>ある日。散歩中のランスロットとヴェインは、魔物に襲われている親子を目撃する。<br>
 とっさに動いたランスロットは背後から魔物が放った呪いに気づけなかった。<br>
 ヴェインは身を投げ出してランスロットをかばい、その拍子に呪いを全身に浴びてしまう。<br>
@@ -294,9 +330,6 @@ body{background:#edf3f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
     <div class="continue-actions">
       <button type="button" class="btn-style continue-secondary" onclick="closeContinueSetup()">タイトルへ戻る</button>
       <button type="button" class="btn-style continue-primary" id="continue-start" onclick="startChosenContinuation()">この状態で始める</button>
-    </div>
-    <div class="continue-final" id="continue-final" style="display:none">
-      <button type="button" class="btn-style" onclick="openFinalContinuation()">最後の記憶へ</button>
     </div>
   </div>
 </div>
@@ -1321,6 +1354,7 @@ window.onload = () => {
     };
 
     recollectionEntry.onclick = () => openContinueSetup();
+    syncOneYearUnlockUI();
 
     document.getElementById("to-tutorial").onclick = () => {
         document.getElementById(
@@ -2147,7 +2181,7 @@ function updateUI(redo = true) {
 
 function updateColUI() {
     const collected = new Set(
-        [...colSet].map(id => String(id))
+        [...getEndingGalleryAvailableIds()].map(id => String(id))
     );
 
     const count = collected.size;
@@ -2314,8 +2348,6 @@ function refreshContinueSetup() {
     document.getElementById("continue-summary").innerText =
         `${location}（SCENE ${String(continueSceneIndex + 1).padStart(2, "0")}）／` +
         `理解済み ${understood} 語\n${before} ここから先の返答は選び直せます。`;
-    document.getElementById("continue-final").style.display =
-        recollectionProgress.finalRecollectionUnlocked ? "block" : "none";
 }
 
 function restoreContinuationDisplay() {
@@ -2445,13 +2477,84 @@ function applyContinuationKnowledge(keys, snapshot, startIndex) {
     renderWordList();
 }
 
-function openFinalContinuation() {
-    if (!recollectionProgress.finalRecollectionUnlocked) return;
-    closeContinueSetup();
-    if (typeof startFinalRecollectionFromUI === "function") {
-        startFinalRecollectionFromUI();
-    }
+function openOneYearAfter() {
+    if (!recollectionProgress.finalRecollectionUnlocked) return false;
+    if (typeof startFinalRecollectionFromUI !== "function") return false;
+    return startFinalRecollectionFromUI();
 }
+
+function syncOneYearUnlockUI() {
+    const unlocked = Boolean(recollectionProgress?.finalRecollectionUnlocked);
+    const button = document.getElementById("one-year-entry-btn");
+    const continueButton = document.getElementById("recollection-entry-btn");
+    if (button) {
+        button.style.display = unlocked && continueButton?.style.display !== "none" ? "inline-block" : "none";
+    }
+    document.documentElement.classList.toggle("one-year-unlocked", unlocked);
+    updateColUI();
+}
+
+let activeGameModalAction = null;
+let gameModalReturnFocus = null;
+function closeGameModal(confirmed = false) {
+    const overlay = document.getElementById("game-modal-overlay");
+    if (!overlay || overlay.style.display === "none") return;
+    const action = confirmed ? activeGameModalAction : null;
+    activeGameModalAction = null;
+    overlay.style.display = "none";
+    overlay.setAttribute("aria-hidden", "true");
+    overlay.classList.remove("one-year-modal");
+    if (gameModalReturnFocus?.isConnected) gameModalReturnFocus.focus();
+    gameModalReturnFocus = null;
+    if (action) action();
+}
+function showGameModal({ title, message, confirmText = "確認", cancelText = "キャンセル", onConfirm = null, announcement = false }) {
+    const overlay = document.getElementById("game-modal-overlay");
+    const confirmButton = document.getElementById("game-modal-confirm");
+    const cancelButton = document.getElementById("game-modal-cancel");
+    if (!overlay || !confirmButton || !cancelButton) return false;
+    gameModalReturnFocus = document.activeElement;
+    document.getElementById("game-modal-title").textContent = title;
+    document.getElementById("game-modal-message").textContent = message;
+    confirmButton.textContent = confirmText;
+    cancelButton.textContent = cancelText;
+    cancelButton.style.display = announcement ? "none" : "inline-block";
+    activeGameModalAction = onConfirm;
+    overlay.classList.toggle("one-year-modal", announcement);
+    overlay.style.display = "flex";
+    overlay.setAttribute("aria-hidden", "false");
+    confirmButton.onclick = () => closeGameModal(true);
+    cancelButton.onclick = () => closeGameModal(false);
+    confirmButton.focus();
+    return true;
+}
+function announceOneYearUnlock() {
+    syncOneYearUnlockUI();
+    return showGameModal({
+        title: "「1年後」が解放されました",
+        message: "END 01〜06をすべて解放しました。タイトル画面の「つづきから」の下に現れた「1年後」から、最後の物語を読めます。",
+        confirmText: "閉じる",
+        announcement: true
+    });
+}
+document.getElementById("game-modal-overlay").addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+        event.preventDefault();
+        closeGameModal(false);
+    }
+    if (event.key === "Tab") {
+        // モーダルが開いている間はフォーカスをモーダル内に閉じ込める。
+        const buttons = [...document.querySelectorAll("#game-modal-overlay .game-modal-actions button")]
+            .filter(button => button.style.display !== "none");
+        if (!buttons.length) return;
+        const current = buttons.indexOf(document.activeElement);
+        if (event.shiftKey && current <= 0) {
+            event.preventDefault(); buttons[buttons.length - 1].focus();
+        } else if (!event.shiftKey && current === buttons.length - 1) {
+            event.preventDefault(); buttons[0].focus();
+        }
+    }
+});
 
 function getEndingGalleryCollectedIds() {
     const ids = new Set();
@@ -2475,9 +2578,12 @@ function getEndingGalleryCollectedIds() {
 function getEndingGalleryAvailableIds() {
     const ids = getEndingGalleryCollectedIds();
     if (typeof recollectionProgress !== "undefined") {
-        for (const id of recollectionProgress.purchasedEndingIds || []) ids.add(Number(id));
-        // 古い保存データにEND 07があっても、END 01〜06の全解放前には表示しない。
-        if (!recollectionProgress.finalRecollectionUnlocked) ids.delete(7);
+        for (const id of recollectionProgress.purchasedEndingIds || []) {
+            if (Number(id) >= 1 && Number(id) <= 6) ids.add(Number(id));
+        }
+        // END 07はカギを使わず、通常エンディング6種の解放で自動開放する。
+        if (recollectionProgress.finalRecollectionUnlocked) ids.add(7);
+        else ids.delete(7);
     }
     return ids;
 }
@@ -2499,9 +2605,8 @@ function showEndingGalleryList() {
     const keys = recollectionProgress.voiceKeys;
     balance.textContent = `所持カギ：${keys}個 ／ 解放に必要なカギ：${ENDING_UNLOCK_COST}個`;
     list.replaceChildren();
-    for (let id = 1; id <= 7; id++) {
+    for (let id = 1; id <= 6; id++) {
         const isAvailable = available.has(id);
-        const finalEndingLocked = id === 7 && !recollectionProgress.finalRecollectionUnlocked;
         const item = document.createElement("div");
         item.className = "ending-gallery-item";
 
@@ -2515,9 +2620,7 @@ function showEndingGalleryList() {
         name.textContent = isAvailable ? endingsData[id].title : "？？？";
         const state = document.createElement("span");
         state.className = "ending-gallery-state";
-        state.textContent = finalEndingLocked
-            ? "END 01〜06の全解放後に解放可能"
-            : isAvailable ? (reached.has(id) ? "到達済み" : "カギで解放済み")
+        state.textContent = isAvailable ? (reached.has(id) ? "到達済み" : "カギで解放済み")
             : "未解放";
         info.append(number, name, state);
 
@@ -2535,9 +2638,8 @@ function showEndingGalleryList() {
         unlock.className = "ending-gallery-unlock";
         unlock.dataset.endingUnlock = String(id);
         unlock.textContent = "解放";
-        unlock.disabled = isAvailable || finalEndingLocked || keys < ENDING_UNLOCK_COST;
+        unlock.disabled = isAvailable || keys < ENDING_UNLOCK_COST;
         unlock.title = isAvailable ? "解放済みです"
-            : finalEndingLocked ? "END 01〜06の全解放後に利用可能"
             : keys < ENDING_UNLOCK_COST ? "カギが足りません"
             : `カギ${ENDING_UNLOCK_COST}個で解放`;
         unlock.onclick = () => unlockEndingFromGallery(id);
@@ -2548,8 +2650,15 @@ function showEndingGalleryList() {
     document.getElementById("ending-gallery-panel").scrollTop = 0;
 }
 function unlockEndingFromGallery(id) {
-    if (!Number.isInteger(id) || id < 1 || id > 7) return;
-    if (!window.confirm(`END ${String(id).padStart(2, "0")}をカギ${ENDING_UNLOCK_COST}個で解放しますか？`)) return;
+    if (!Number.isInteger(id) || id < 1 || id > 6) return;
+    showGameModal({
+        title: `END ${String(id).padStart(2, "0")}を解放しますか？`,
+        message: `エンディング解放カギを${ENDING_UNLOCK_COST}個消費します。`,
+        confirmText: "解放する",
+        onConfirm: () => performEndingGalleryUnlock(id)
+    });
+}
+function performEndingGalleryUnlock(id) {
     const result = spendEndingUnlockKeys(id);
     const status = document.getElementById("ending-gallery-status");
     if (!result.ok) {
@@ -2562,9 +2671,10 @@ function unlockEndingFromGallery(id) {
         return;
     }
     showEndingGalleryList();
-    if (status) status.textContent = `END ${String(id).padStart(2, "0")}を解放しました。カギを${result.spent}個消費しました。` +
-        (result.finalRecollectionUnlockedNow ? " END 07が解放可能になり、『つづきから』に「最後の追憶」が追加されました。" : "");
-    document.querySelector(`[data-ending-open="${id}"]`)?.focus();
+    if (status) status.textContent = `END ${String(id).padStart(2, "0")}を解放しました。カギを${result.spent}個消費しました。`;
+    syncOneYearUnlockUI();
+    if (result.finalRecollectionUnlockedNow) announceOneYearUnlock();
+    else document.querySelector(`[data-ending-open="${id}"]`)?.focus();
 }
 function readEndingFromGallery(id) {
     if (!getEndingGalleryAvailableIds().has(id) || !endingsData[id] || typeof endingBodies[id] !== "string") return;
